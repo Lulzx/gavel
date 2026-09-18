@@ -334,7 +334,11 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 38 tasks.
+   progress** — 50 tasks (20 tier 1, 27 tier 2, 3 tier 3), validated together
+   rather than per task, because a task is sound only against a corpus that
+   shares the degenerate generator with it. The remaining tier-3 batch is
+   unregistered: a task with no `mutants/` fails V2, and a manifest entry that
+   fails validation is worse than a missing one.
 3. `tools/migrate.py` and a dry run against 2.0.4 to measure churn. **Done, and the answer is not the expected one** — see below.
 
 **M2.3 churn, measured.** The plan assumed syntax drift across releases ("three
