@@ -1,0 +1,22 @@
+{
+  "task_id": "t1-len-map",
+  "tier": 1,
+  "laws": [
+    "len_cons",
+    "len_single",
+    "len_map",
+    "map_cons"
+  ],
+  "policy_targets": [
+    "inc",
+    "len",
+    "map"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ee4c55f5cb3f175df620ed607b3890454f3fc6872570ab09e98ad50d9dae2ac8",
+    "prelude": "a5461426e86ad659172404e584df701777dcb143706cc6568cab25185b8a86e8"
+  },
+  "bend_version": "2.0.5"
+}

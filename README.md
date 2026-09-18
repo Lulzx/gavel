@@ -51,12 +51,18 @@ either pin has drifted.
 ```
 uv run python -m tools.publish            # derive metadata, rebuild manifest.json
 uv run gavel list                         # tasks by tier
-uv run gavel info t1-add-zero             # prompt, laws, stub
-uv run gavel check t1-add-zero --reference
-uv run gavel check t1-add-zero --solution my.bend --proof my-proof.bend
-uv run gavel validate                     # V1/V4/V5 over the whole bank
+uv run gavel info t1-add-succ             # prompt, laws, stub
+uv run gavel check t1-add-succ --reference
+uv run gavel check t1-add-succ --solution my.bend --proof my-proof.bend
+uv run gavel validate                     # V1-V5 over the whole bank
 uv run gavel bench -n 10                  # check latency distribution
+uv run python -m tools.mutate --check     # author mutants and see which are strong
+uv run python -m tools.calibrate --dry-run
 ```
+
+`tools/validate.py` and `tools/mutate.py` exit non-zero on failure, so they can gate a
+merge. `tools/calibrate.py --dry-run` prints a prompt without spending anything;
+without `--dry-run` it measures zero-shot solve rate against a model.
 
 ## Reward tiers
 
@@ -70,6 +76,44 @@ uv run gavel bench -n 10                  # check latency distribution
 
 Tier 2 exists so that a policy which produces well-typed but unproven code gets a
 non-zero step rather than an all-or-nothing cliff.
+
+## What makes a law worth training on
+
+A task is only as good as its laws, and the obvious way to write a law is wrong. A
+law whose right-hand side is a constant or a bare variable does not determine the
+function it is about. On `t1-add-zero` — `law add_zero: for x: Nat {S.add(x, 0n) == x : Nat}`
+— this submission earns full reward:
+
+```
+def add(a: Nat, b: Nat) -> Nat:
+  a
+
+def L.add_zero(x):
+  {==}
+```
+
+The projection `add(a, b) = a` satisfies the law definitionally, so `{==}` proves it.
+The checker agrees: exit 0, `All terms check.` The same applies to a base-case law
+(`f(0n) == 0n` is satisfied by `f = 0n`) and to any right-identity law
+(`f(x, e) == x` is satisfied by `f(a, b) = a`). `t1-add-zero` was written that way
+and has been retired.
+
+A law pins its function only if **both sides depend on the arguments**. The inductive
+equation does:
+
+```
+law add_succ: for x: Nat  for y: Nat         {S.add(x, 1n+y) == 1n+S.add(x, y) : Nat}
+law len_cons: for x: Nat  for xs: List<Nat>  {S.len(x <> xs) == 1n+S.len(xs) : Nat}
+```
+
+So the bank is built as: **tier 1 = the inductive law alone; tier 2 = a weak base law
+plus the inductive law**, where the second rules out the projection the first permits.
+
+`gavel/validate.py` V3 enforces this mechanically. It crosses every degenerate
+solution with every degenerate proof — a projection or a constant, paired with a
+`{==}` proof — and fails the task if any combination reaches tier 4. Checking a bad
+solution against the *reference* proof would not have caught it: that asks whether the
+reference proof is brittle, not whether the laws pin the function down.
 
 ## Status
 

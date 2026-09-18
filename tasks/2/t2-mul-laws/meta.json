@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-mul-laws",
+  "tier": 2,
+  "laws": [
+    "mul_one_left",
+    "mul_succ"
+  ],
+  "policy_targets": [
+    "add",
+    "mul"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "df9ca5661b81de874c0deab71fb8b20ca2412abc90760caa5c98ae109f74e975",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

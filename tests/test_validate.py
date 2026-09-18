@@ -11,16 +11,12 @@ import pytest
 from gavel.degenerate import corpus, laws_of, signatures
 from gavel.tasks import PROOF_FILE, SOLUTION_FILE
 from gavel.validate import validate_task
-from gavel.verdict import TIER_COMPLETE
+from gavel.verdict import TIER_CHECKS, TIER_COMPLETE, TIER_NO_CHECK
 
 pytestmark = pytest.mark.checker
 
 
 # --- the corpus is generated from the task, not hand-written per task ----------
-
-def test_signatures_are_read_off_the_stub(task):
-    assert signatures(task.stub_src) == [("add", [("a", "Nat"), ("b", "Nat")], "Nat")]
-
 
 def test_signatures_are_read_off_the_stub(task):
     assert signatures(task.stub_src) == [("add", [("a", "Nat"), ("b", "Nat")], "Nat")]
@@ -33,7 +29,7 @@ def test_signatures_skip_a_shape_they_do_not_understand():
 
 
 def test_law_binders_come_from_the_for_lines(task):
-    assert laws_of(task) == [("add_zero", [("x", "Nat")])]
+    assert laws_of(task) == [("add_succ", [("x", "Nat"), ("y", "Nat")])]
 
 
 def test_a_two_binder_law_keeps_both_binders(manifest):
@@ -44,13 +40,39 @@ def test_a_two_binder_law_keeps_both_binders(manifest):
 
 def test_the_corpus_covers_the_ways_a_submission_can_be_empty(task):
     names = {attempt.name for attempt in corpus(task)}
-    assert names == {"identity-solution", "constant-solution", "reflexive-proof",
-                     "self-referential-unsafe", "holed-proof"}
+    assert names == {"identity-solution+reflexive-proof",
+                     "constant-solution+reflexive-proof",
+                     "reference+reflexive-proof",
+                     "reference+no-proof",
+                     "reference+holed-proof",
+                     "self-referential-unsafe"}
+
+
+def test_every_degenerate_solution_is_crossed_with_a_real_proof(task):
+    """Holding the proof fixed would miss a law that does not pin its function."""
+    crossed = [a for a in corpus(task) if "solution+" in a.name]
+    assert {a.name.split("+")[0] for a in crossed} == {"identity-solution",
+                                                       "constant-solution"}
+
+
+def test_a_degenerate_solution_is_well_typed_whatever_the_signature(manifest):
+    """`len(xs: List<Nat>) -> Nat` cannot return `xs`.
+
+    An attempt that fails to type-check is at tier 1 for a reason that has
+    nothing to do with the laws, so V3 would pass without testing anything.
+    """
+    task = manifest.get("t1-len-append")
+    identity = next(a for a in corpus(task)
+                    if a.name.startswith("identity-solution"))
+    body = identity.files[SOLUTION_FILE]
+    assert "def len(xs: List<Nat>) -> Nat:\n  0n" in body
+    assert "def append(xs: List<Nat>, ys: List<Nat>) -> List<Nat>:\n  xs" in body
 
 
 def test_a_generated_solution_does_not_import_itself(task):
     """The proof header names solution.bend; a solution carrying it would loop."""
-    attempt = next(a for a in corpus(task) if a.name == "identity-solution")
+    attempt = next(a for a in corpus(task)
+                   if a.name.startswith("identity-solution"))
     solution = attempt.files[SOLUTION_FILE]
     assert SOLUTION_FILE not in solution
     assert "import Base" in solution
@@ -62,13 +84,14 @@ def test_a_generated_solution_does_not_import_itself(task):
 def test_a_sound_task_passes_every_invariant(task, toolchain):
     report = validate_task(task, toolchain)
     assert report.valid, report.problems
-    assert report.warnings == ["V2: no mutants authored -- laws unguarded"]
+    assert report.warnings == ["calibration: no zero_shot_solve_rate recorded"]
     assert report.reference_ms > 0
     assert report.checked[0] == "reference"
-    assert "degenerate:holed-proof" in report.checked
+    assert "degenerate:reference+holed-proof" in report.checked
+    assert report.mutant_tiers and all(t != TIER_COMPLETE for t in report.mutant_tiers)
 
 
-def test_strict_promotes_an_unchecked_invariant_to_a_failure(task, toolchain):
+def test_strict_promotes_an_unmeasured_quantity_to_a_failure(task, toolchain):
     assert validate_task(task, toolchain, strict=True).valid is False
 
 
@@ -87,9 +110,10 @@ import ./prelude.bend as P
 import ./solution.bend as S
 
 # A law that holds by definition -- a task nobody should have published.
-law add_zero:
+law add_succ:
   for x: Nat
-  {S.add(x, x) == S.add(x, x) : Nat}
+  for y: Nat
+  {S.add(S.add(x, y), x) == S.add(S.add(x, y), x) : Nat}
 """
 
 REFLEXIVE_PROOF = """\
@@ -98,7 +122,7 @@ import ./prelude.bend as P
 import ./solution.bend as S
 import ./LAWS.bend as L
 
-def L.add_zero(x):
+def L.add_succ(x, y):
   {==}
 """
 
@@ -181,9 +205,10 @@ import Base
 import ./prelude.bend as P
 import ./solution.bend as S
 
-law add_zero:
+law add_succ:
   for x: Nat
-  {S.add(x, 0n) == x : Nat}
+  for y: Nat
+  {S.add(x, 1n+y) == 1n+S.add(x, y) : Nat}
 
 law never_proved:
   for x: Nat
@@ -191,35 +216,64 @@ law never_proved:
 """
 
 
-def test_v2_fails_when_a_mutant_still_proves_the_laws(
-        make_task, toolchain, task, tmp_path):
-    """The mutant dir holds the *reference* here, so it must trip V2."""
+@pytest.fixture
+def mutant_references(make_task, tmp_path, task):
+    """A task whose ``mutants/`` directory the test fills in.
+
+    Returns a builder so each test names its own corpus, since the invariant
+    being checked is about the corpus and not about the task.
+    """
     references = tmp_path / "references"
     (references / "mutants").mkdir(parents=True)
     (references / SOLUTION_FILE).write_text(task.reference_solution)
     (references / PROOF_FILE).write_text(task.reference_proof)
-    (references / "mutants" / "unmutated.bend").write_text(task.reference_solution)
 
-    made = make_task(references=references)
+    def build(mutants: dict[str, str]):
+        for name, source in mutants.items():
+            (references / "mutants" / f"{name}.bend").write_text(source)
+        return make_task(references=references)
+
+    return build
+
+
+def test_v2_fails_when_a_mutant_still_proves_the_laws(mutant_references, toolchain,
+                                                      task):
+    """The mutant here *is* the reference, so it must trip V2."""
+    made = mutant_references({"unmutated": task.reference_solution})
     report = validate_task(made, toolchain)
-    assert any("V2" in problem for problem in report.problems)
+    assert any("V2" in problem and "still prove" in problem
+               for problem in report.problems)
     assert "mutant:unmutated" in report.checked
-    assert not report.warnings
 
 
-def test_v2_passes_when_a_mutant_is_caught(make_task, toolchain, task, tmp_path):
-    references = tmp_path / "references"
-    (references / "mutants").mkdir(parents=True)
-    (references / SOLUTION_FILE).write_text(task.reference_solution)
-    (references / PROOF_FILE).write_text(task.reference_proof)
-    # A solution that type-checks and is wrong -- exactly what a mutant is.
-    (references / "mutants" / "constant.bend").write_text(
-        "import Base\n\ndef add(a: Nat, b: Nat) -> Nat:\n  0n\n")
+def test_v2_fails_when_no_mutant_is_strong(mutant_references, toolchain):
+    """A corpus of mutants that all die at tier 1 never exercises a law."""
+    made = mutant_references(
+        {"broken": 'import Base\n\ndef add(a: Nat, b: Nat) -> Nat:\n  "no"\n'})
+    report = validate_task(made, toolchain)
+    assert any("V2" in problem and "type-checks" in problem
+               for problem in report.problems)
+    assert report.mutant_tiers == [TIER_NO_CHECK]
 
-    made = make_task(references=references)
+
+def test_v2_passes_when_a_mutant_is_caught(mutant_references, toolchain):
+    made = mutant_references(
+        {"constant": "import Base\n\ndef add(a: Nat, b: Nat) -> Nat:\n  0n\n"})
     report = validate_task(made, toolchain)
     assert report.valid, report.problems
-    assert not report.warnings
+    assert report.mutant_tiers == [TIER_CHECKS]
+
+
+def test_v2_fails_when_there_are_no_mutants_at_all(make_task, toolchain, task,
+                                                   tmp_path):
+    """A task whose reference has no mutants/ beside it is unguarded."""
+    references = tmp_path / "bare"
+    references.mkdir()
+    (references / SOLUTION_FILE).write_text(task.reference_solution)
+    (references / PROOF_FILE).write_text(task.reference_proof)
+    report = validate_task(make_task(references=references), toolchain)
+    assert any("V2" in problem and "no mutants" in problem
+               for problem in report.problems)
 
 
 # --- V4 -------------------------------------------------------------------------

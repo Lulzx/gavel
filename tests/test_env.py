@@ -10,7 +10,7 @@ from gavel.verdict import TIER_COMPLETE
 
 pytestmark = pytest.mark.checker
 
-TASK = "t1-add-zero"
+TASK = "t1-add-succ"
 
 
 @pytest.fixture
@@ -133,7 +133,7 @@ def test_feedback_carries_the_checkers_own_words(env, task):
     env.reset(TASK)
     observation, _, _, _ = env.step(Action(files={
         SOLUTION_FILE: task.reference_solution,
-        PROOF_FILE: task.proof_header + "\ndef L.add_zero(x):\n  ?TODO\n"}))
+        PROOF_FILE: task.proof_header + "\ndef L.add_succ(x, y):\n  ?TODO\n"}))
     feedback = observation["feedback"]
     assert "TODO" in feedback or "Error" in feedback
     assert observation["turn"] == 2
@@ -143,7 +143,7 @@ def test_feedback_carries_gate_findings_without_running_the_checker(env, task):
     env.reset(TASK)
     observation, reward, _, verdict = env.step(Action(files={
         SOLUTION_FILE: task.reference_solution,
-        PROOF_FILE: task.proof_header + "\n@unsafe\ndef L.add_zero(x):\n  {==}\n"}))
+        PROOF_FILE: task.proof_header + "\n@unsafe\ndef L.add_succ(x, y):\n  {==}\n"}))
     assert reward == 0.0
     assert verdict.checks == ()
     assert "unsafe" in observation["feedback"].lower()

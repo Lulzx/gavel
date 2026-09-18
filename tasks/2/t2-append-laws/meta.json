@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-append-laws",
+  "tier": 2,
+  "laws": [
+    "append_nil_left",
+    "len_append"
+  ],
+  "policy_targets": [
+    "add",
+    "append",
+    "len"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ba3d40f2f8c285480f19b5765cc43d32b74c6293c3c118ffd2a4ee5938e3b77e",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

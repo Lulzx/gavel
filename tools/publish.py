@@ -8,7 +8,7 @@ is perfectly fine.
 
 Usage:
     uv run python -m tools.publish            # every task under tasks/
-    uv run python -m tools.publish tasks/1/t1-add-zero
+    uv run python -m tools.publish tasks/1/t1-add-succ
 """
 
 from __future__ import annotations

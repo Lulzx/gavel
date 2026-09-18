@@ -1,0 +1,32 @@
+{
+  "task_id": "t1-pred-succ",
+  "tier": 1,
+  "title": "pred(x + 1) = x",
+  "difficulty_weight": 1.0,
+  "source": {
+    "benchmark": "custom",
+    "origin": "Bend guide, laws section"
+  },
+  "tags": [
+    "nat",
+    "predecessor",
+    "successor",
+    "induction",
+    "helper-lemma"
+  ],
+  "laws": [
+    "pred_succ",
+    "pred_add_one"
+  ],
+  "policy_targets": [
+    "add",
+    "pred"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "1a32ca63d00f30ed4968578adc92da7bd0ade81121be02adfd70767e0336a686",
+    "prelude": "90209e424d9384ffc550c1d54ba1b0f2f64c3a09ac89b56ffe60004b97c4afd0"
+  },
+  "bend_version": "2.0.5"
+}

@@ -32,13 +32,13 @@ def test_a_clean_submission_clears_the_gate(task, submission):
 # --- the checker's own holes -------------------------------------------------
 
 def test_unsafe_is_rejected_on_its_own_line(task, submission):
-    submission[PROOF_FILE] = HEADER + "\n@unsafe\ndef L.add_zero(x):\n  {==}\n"
+    submission[PROOF_FILE] = HEADER + "\n@unsafe\ndef L.add_succ(x, y):\n  {==}\n"
     assert "unsafe" in codes(check(task, submission))
 
 
 def test_unsafe_is_rejected_however_it_is_spaced(task, submission):
     # bend.ts:2540 skips whitespace between "@", "unsafe" and "def"
-    submission[PROOF_FILE] = HEADER + "\n@ unsafe\ndef L.add_zero(x):\n  {==}\n"
+    submission[PROOF_FILE] = HEADER + "\n@ unsafe\ndef L.add_succ(x, y):\n  {==}\n"
     assert "unsafe" in codes(check(task, submission))
 
 
@@ -51,12 +51,12 @@ def test_a_submitted_main_is_rejected(task, submission):
 
 
 def test_a_policy_cannot_declare_a_law(task, submission):
-    submission[PROOF_FILE] = HEADER + "\nlaw add_zero:\n  for x: Nat\n  {x == x : Nat}\n"
+    submission[PROOF_FILE] = HEADER + "\nlaw add_succ:\n  for x: Nat\n  {x == x : Nat}\n"
     assert "law" in codes(check(task, submission))
 
 
 def test_a_foreign_import_is_rejected(task, submission):
-    submission[PROOF_FILE] = HEADER + '\ndef L.add_zero(x):\n  import "x.c"\n  {==}\n'
+    submission[PROOF_FILE] = HEADER + '\ndef L.add_succ(x, y):\n  import "x.c"\n  {==}\n'
     assert "foreign-import" in codes(check(task, submission))
 
 
@@ -88,13 +88,13 @@ def test_forbidden_words_inside_a_string_are_not_findings(task, submission):
 
 def test_forbidden_words_inside_a_comment_are_not_findings(task, submission):
     submission[PROOF_FILE] = (
-        HEADER + "\n# law @unsafe main\ndef L.add_zero(x):\n  ?TODO\n")
+        HEADER + "\n# law @unsafe main\ndef L.add_succ(x, y):\n  ?TODO\n")
     assert codes(check(task, submission)) == []
 
 
 def test_a_hole_named_unsafe_is_not_the_decorator(task, submission):
     # ?unsafe is a hole whose name happens to be "unsafe"
-    submission[PROOF_FILE] = HEADER + "\ndef L.add_zero(x):\n  ?unsafe\n"
+    submission[PROOF_FILE] = HEADER + "\ndef L.add_succ(x, y):\n  ?unsafe\n"
     assert codes(check(task, submission)) == []
 
 
@@ -135,7 +135,7 @@ def test_a_name_outside_the_target_list_is_rejected(task, submission):
 def test_policy_helpers_are_allowed(task, submission):
     submission[PROOF_FILE] = HEADER + (
         "\ndef Policy.step(x: Nat) -> Nat:\n  x\n"
-        "\ndef L.add_zero(x):\n  ?TODO\n")
+        "\ndef L.add_succ(x, y):\n  ?TODO\n")
     assert codes(check(task, submission)) == []
 
 
@@ -145,12 +145,12 @@ def test_a_proof_for_an_undeclared_law_is_rejected(task, submission):
 
 
 def test_a_proof_qualified_by_the_wrong_module_is_rejected(task, submission):
-    submission[PROOF_FILE] = HEADER + "\ndef X.add_zero(x):\n  {==}\n"
+    submission[PROOF_FILE] = HEADER + "\ndef X.add_succ(x, y):\n  {==}\n"
     assert "name" in codes(check(task, submission))
 
 
 def test_an_unaliased_proof_name_is_rejected(task, submission):
-    submission[PROOF_FILE] = HEADER + "\ndef add_zero(x):\n  {==}\n"
+    submission[PROOF_FILE] = HEADER + "\ndef add_succ(x, y):\n  {==}\n"
     assert "name" in codes(check(task, submission))
 
 
@@ -159,7 +159,7 @@ def test_an_alias_the_submission_chose_is_honoured(task, submission):
     # submission actually bound, so a policy that renames it is not punished.
     submission[PROOF_FILE] = (
         "import Base\nimport ./LAWS.bend as Laws\n"
-        "\ndef Laws.add_zero(x):\n  ?TODO\n")
+        "\ndef Laws.add_succ(x, y):\n  ?TODO\n")
     assert codes(check(task, submission)) == []
 
 

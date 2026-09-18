@@ -1,0 +1,19 @@
+{
+  "task_id": "t1-len-cons",
+  "tier": 1,
+  "laws": [
+    "len_cons",
+    "len_single",
+    "len_nil_right"
+  ],
+  "policy_targets": [
+    "len"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "b9b904b88b5d8cd056cfbcb5d420839b8c2e44e5dc63eac4d3108b5611800fc0",
+    "prelude": "d9333f3b5fa50c75ed54990a4783f9aacb8955d876107780052144bfd3825138"
+  },
+  "bend_version": "2.0.5"
+}

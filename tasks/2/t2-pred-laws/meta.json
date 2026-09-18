@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-pred-laws",
+  "tier": 2,
+  "laws": [
+    "pred_succ",
+    "pred_add_succ"
+  ],
+  "policy_targets": [
+    "pred",
+    "add"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ffed9da8b02bd500fad99a4948c713abe0d2604be0c5454394bec030f1e71aec",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

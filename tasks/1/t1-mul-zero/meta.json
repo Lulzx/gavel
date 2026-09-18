@@ -1,0 +1,30 @@
+{
+  "task_id": "t1-mul-zero",
+  "tier": 1,
+  "title": "x * 0 = 0",
+  "difficulty_weight": 1.0,
+  "source": {
+    "benchmark": "custom",
+    "origin": "Bend guide, laws section"
+  },
+  "tags": [
+    "nat",
+    "multiplication",
+    "induction"
+  ],
+  "laws": [
+    "mul_zero",
+    "mul_one_left"
+  ],
+  "policy_targets": [
+    "add",
+    "mul"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "c1b8b02be92444469f596afee93590c5502a1ecb84bbdeb61ebe6778e4c3272d",
+    "prelude": "90209e424d9384ffc550c1d54ba1b0f2f64c3a09ac89b56ffe60004b97c4afd0"
+  },
+  "bend_version": "2.0.5"
+}

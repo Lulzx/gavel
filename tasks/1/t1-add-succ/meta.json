@@ -1,0 +1,28 @@
+{
+  "task_id": "t1-add-succ",
+  "tier": 1,
+  "title": "x + (y+1) = (x+y) + 1",
+  "difficulty_weight": 1.0,
+  "source": {
+    "benchmark": "custom",
+    "origin": "Bend guide, laws section"
+  },
+  "tags": [
+    "nat",
+    "successor",
+    "induction"
+  ],
+  "laws": [
+    "add_succ"
+  ],
+  "policy_targets": [
+    "add"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "e4bb9d121e139adedf2bff1e30a26f92cc0635b068f05355ec39fa585ecef394",
+    "prelude": "90209e424d9384ffc550c1d54ba1b0f2f64c3a09ac89b56ffe60004b97c4afd0"
+  },
+  "bend_version": "2.0.5"
+}

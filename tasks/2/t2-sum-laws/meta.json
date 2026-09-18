@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-sum-laws",
+  "tier": 2,
+  "laws": [
+    "sum_append",
+    "sum_single"
+  ],
+  "policy_targets": [
+    "add",
+    "append",
+    "sum"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "354cf7b9854e3e5d922d07080507406df860401c259e54852a969f3513de83f4",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

@@ -75,6 +75,22 @@ def _zero_of(typ: str) -> str | None:
     return None
 
 
+def _ignore_arguments(params: list[tuple[str, str]], ret: str) -> str | None:
+    """A body that mentions none of its arguments and still type-checks.
+
+    A parameter whose type is the return type can be handed back unchanged;
+    ``len(xs: List<Nat>) -> Nat`` cannot, because returning ``xs`` would be a
+    type error and a solution that fails to type-check says nothing about the
+    law. Those fall back to the zero of the return type, which is the other way
+    to ignore the arguments, and to ``?TODO`` when the type has no obvious
+    inhabitant.
+    """
+    for name, typ in params:
+        if typ == ret:
+            return name
+    return _zero_of(ret)
+
+
 def laws_of(task) -> list[tuple[str, list[tuple[str, str]]]]:
     """``(law_name, [(binder, type)])`` from the task's LAWS.bend."""
     out = []
@@ -99,8 +115,25 @@ def _binders(binders: list[tuple[str, str]]) -> str:
     return ", ".join(name for name, _ in binders)
 
 
+def _reflexive_proof(laws, header: str) -> str:
+    """A proof that claims every law is true by definition."""
+    lines = [header, ""]
+    for law, binders in laws:
+        lines += [f"def L.{law}({_binders(binders)}):", "  {==}", ""]
+    return "\n".join(lines)
+
+
 def corpus(task) -> list[Degenerate]:
-    """Every degenerate attempt that makes sense for this task."""
+    """Every degenerate attempt that makes sense for this task.
+
+    The submissions that matter most are the *cross products* of a degenerate
+    solution and a degenerate proof. Pairing a wrong solution with the
+    reference proof only asks whether the reference proof is brittle; it says
+    nothing about whether the laws pin the solution down. A law of the form
+    ``f(x, e) == x`` is satisfied by the projection ``f(a, b) = a`` proved with
+    ``{==}`` -- full reward for a function nobody implemented. Holding the
+    proof fixed would never have shown that.
+    """
     targets = signatures(task.stub_src)
     laws = laws_of(task)
     # The two files import differently: a solution.bend that carried the proof
@@ -112,58 +145,54 @@ def corpus(task) -> list[Degenerate]:
 
     out: list[Degenerate] = []
 
-    # A solution that type-checks but ignores its arguments. This is the
-    # commonest way a policy earns tier 2 for free, and it must never earn
-    # more than that.
+    # Solutions that type-check and ignore their arguments.
     identity = [stub_imports, ""]
     constant = [stub_imports, ""]
     for name, params, ret in targets:
         identity.append(_render(name, params, ret))
-        identity.append(f"  {params[0][0] if params else '?'}")
+        identity.append(f"  {_ignore_arguments(params, ret) or '?TODO'}")
         identity.append("")
         zero = _zero_of(ret)
         constant.append(_render(name, params, ret))
         constant.append(f"  {zero}" if zero else "  ?TODO")
         constant.append("")
-    out.append(Degenerate("identity-solution",
-                          {SOLUTION_FILE: "\n".join(identity),
-                           PROOF_FILE: header}))
-    out.append(Degenerate("constant-solution",
-                          {SOLUTION_FILE: "\n".join(constant),
-                           PROOF_FILE: header}))
+    solutions = {"identity-solution": "\n".join(identity),
+                 "constant-solution": "\n".join(constant)}
 
-    # A proof file that is syntactically complete and inductive in nothing.
-    reflexive = [header, ""]
-    for law, binders in laws:
-        reflexive.append(f"def L.{law}({_binders(binders)}):")
-        reflexive.append("  {==}")
-        reflexive.append("")
-    out.append(Degenerate("reflexive-proof",
+    # Only the reflexive proof is worth crossing with. A hole cannot prove a
+    # law, so `+no-proof` is tier 2 and `+holed-proof` is tier 3 at best --
+    # neither can reach tier 4, and each cross product is two checker runs.
+    for solution_name, solution in solutions.items():
+        out.append(Degenerate(f"{solution_name}+reflexive-proof",
+                              {SOLUTION_FILE: solution,
+                               PROOF_FILE: _reflexive_proof(laws, header)}))
+
+    # The reference solution against a proof that proves nothing. This isolates
+    # the proof, since the cross products above can fail for either reason, and
+    # is also what establishes the tier-2 floor for a well-typed solution.
+    out.append(Degenerate("reference+reflexive-proof",
                           {SOLUTION_FILE: task.reference_solution,
-                           PROOF_FILE: "\n".join(reflexive)}))
+                           PROOF_FILE: _reflexive_proof(laws, header)}))
+    out.append(Degenerate("reference+no-proof",
+                          {SOLUTION_FILE: task.reference_solution,
+                           PROOF_FILE: header + "\n"}))
+    holed = [header, ""]
+    for law, binders in laws:
+        holed += [f"def L.{law}({_binders(binders)}):", "  ?TODO", ""]
+    out.append(Degenerate("reference+holed-proof",
+                          {SOLUTION_FILE: task.reference_solution,
+                           PROOF_FILE: "\n".join(holed)}))
 
     # The self-referential @unsafe def: exit 0, and worth nothing. The gate is
     # what has to stop it, since the checker does not.
     unsafe = [header, ""]
     for law, binders in laws:
-        unsafe.append("@unsafe")
-        unsafe.append(f"def L.{law}({_binders(binders)}):")
-        unsafe.append(f"  L.{law}({_binders(binders)})")
-        unsafe.append("")
+        unsafe += ["@unsafe", f"def L.{law}({_binders(binders)}):",
+                   f"  L.{law}({_binders(binders)})", ""]
     out.append(Degenerate("self-referential-unsafe",
                           {SOLUTION_FILE: task.reference_solution,
                            PROOF_FILE: "\n".join(unsafe)},
                           must_be_gate_rejected=True))
-
-    # Every law named, none attempted.
-    holed = [header, ""]
-    for law, binders in laws:
-        holed.append(f"def L.{law}({_binders(binders)}):")
-        holed.append("  ?TODO")
-        holed.append("")
-    out.append(Degenerate("holed-proof",
-                          {SOLUTION_FILE: task.reference_solution,
-                           PROOF_FILE: "\n".join(holed)}))
 
     return out
 

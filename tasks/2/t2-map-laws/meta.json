@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-map-laws",
+  "tier": 2,
+  "laws": [
+    "len_map",
+    "map_cons"
+  ],
+  "policy_targets": [
+    "append",
+    "len",
+    "map"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "db23c175df32e26d6ce9b66b05c89d4950357cbf9206c4d1ada943866c098e70",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

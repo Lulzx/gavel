@@ -1,7 +1,7 @@
 """Validate the task bank against V1-V5, as a CI job would.
 
     uv run python -m tools.validate               # every task in the manifest
-    uv run python -m tools.validate t1-add-zero   # just these
+    uv run python -m tools.validate t1-add-succ   # just these
     uv run python -m tools.validate --json
     uv run python -m tools.validate --strict      # warnings fail the build
 

@@ -6,9 +6,11 @@ it cannot be satisfied by a submission that proves nothing, and that the
 latency it imposes is one a training loop can afford.
 
 The distinction that matters throughout: a **problem** is a defect in the task
-and fails validation. A **warning** is an invariant that could not be checked
-because its corpus is not built yet. Warnings exist so that a half-built
-pipeline reports "not yet known" instead of the much worse "fine".
+and fails validation. A **warning** is something that could not be *measured*
+-- a corpus that is not built, a rate nobody has calibrated. Warnings exist so
+that a half-built pipeline reports "not yet known" instead of the much worse
+"fine", and ``--strict`` is what CI uses once "not yet known" is no longer an
+acceptable answer.
 """
 
 from __future__ import annotations
@@ -21,7 +23,7 @@ from .degenerate import corpus
 from .laws import parse_imports, split_top_level
 from .tasks import LAWS_FILE, PRELUDE_FILE, PROOF_FILE, SOLUTION_FILE, Task
 from .toolchain import Toolchain
-from .verdict import TIER_COMPLETE
+from .verdict import TIER_COMPLETE, TIER_NO_CHECK
 
 # V4: a reference slower than this makes an episode too expensive to sample.
 DEFAULT_BUDGET_MS = 2000
@@ -43,6 +45,8 @@ class TaskReport:
     reference_ms: int = 0            # the slowest single checker run
     reference_total_ms: int = 0      # every run the verdict needed
     checked: list[str] = field(default_factory=list)
+    mutant_tiers: list[int] = field(default_factory=list)
+    mutant_strong: list[tuple[str, int]] = field(default_factory=list)
     zero_shot_solve_rate: float | None = None
 
     @property
@@ -61,6 +65,8 @@ class TaskReport:
             "laws": list(self.laws),
             "hash": self.hash,
             "checked": list(self.checked),
+            "mutant_tiers": list(self.mutant_tiers),
+            "mutant_strong": [name for name, _ in self.mutant_strong],
             "zero_shot_solve_rate": self.zero_shot_solve_rate,
         }
 
@@ -85,6 +91,12 @@ def validate_task(task: Task, toolchain: Toolchain, *,
     _v3_degenerate(task, toolchain, config, report)
     _v5_immutable_files(task, report)
     _v4_latency(report, budget_ms)
+
+    # Not an invariant so much as a missing measurement: M0's exit criterion is
+    # stated as a solve rate, and a task nobody has calibrated is a task whose
+    # difficulty is assumed. tools/calibrate.py --write-meta fills this in.
+    if report.zero_shot_solve_rate is None:
+        report.warnings.append("calibration: no zero_shot_solve_rate recorded")
 
     if strict:
         report.problems.extend(report.warnings)
@@ -117,31 +129,56 @@ def _v1_reference(task: Task, toolchain: Toolchain, config: CheckConfig,
 
 # --- V2: mutants of the reference must not prove the laws ----------------------
 
+def mutant_verdicts(task: Task, toolchain: Toolchain, source: str,
+                    config: CheckConfig) -> tuple[Any, Any]:
+    """A mutant's solution under the reference proof, and under no proof.
+
+    Two different questions, and tier alone answers neither. The first run asks
+    whether the task's laws catch the mutant -- it must not reach tier 4. The
+    second asks whether the mutant *type-checks*, which is what makes the first
+    run evidence about a law rather than about a coverage error: a solution
+    that does not type-check fails the reference proof for reasons that have
+    nothing to do with what the law says.
+    """
+    against_proof = check_submission(task, toolchain, {
+        SOLUTION_FILE: source, PROOF_FILE: task.reference_proof}, config)
+    bare = check_submission(task, toolchain, {
+        SOLUTION_FILE: source, PROOF_FILE: task.proof_header}, config)
+    return against_proof, bare
+
+
 def _v2_mutants(task: Task, toolchain: Toolchain, config: CheckConfig,
                 report: TaskReport) -> None:
     """A law is only as strong as the wrong solutions it rules out.
 
-    Each mutant is a reference solution with one rule broken; a mutant that
-    still reaches tier 4 means the law it was supposed to violate does not
-    actually constrain the solution -- the task would pay full reward for a
-    wrong answer.
+    Two failures matter, and they are different. A mutant that still reaches
+    tier 4 means the law does not constrain the solution at all -- the task
+    would pay full reward for a wrong answer. A corpus in which *every* mutant
+    fails to type-check means none of them ever reached a law: the corpus only
+    looks like evidence, and the task is unguarded.
     """
     mutants = task.mutant_paths
     if not mutants:
-        report.warnings.append("V2: no mutants authored -- laws unguarded")
+        report.problems.append("V2: no mutants authored -- laws unguarded")
         return
-    bad = []
+    escaped, strong = [], []
     for path in mutants:
-        verdict = check_submission(task, toolchain, {
-            SOLUTION_FILE: path.read_text(),
-            PROOF_FILE: task.reference_proof,
-        }, config)
+        source = path.read_text()
+        against_proof, bare = mutant_verdicts(task, toolchain, source, config)
         report.checked.append(f"mutant:{path.stem}")
-        if verdict.tier == TIER_COMPLETE:
-            bad.append(path.name)
-    if bad:
+        report.mutant_tiers.append(against_proof.tier)
+        if against_proof.tier == TIER_COMPLETE:
+            escaped.append(path.name)
+        elif bare.tier > TIER_NO_CHECK:
+            strong.append((path.name, against_proof.tier))
+    report.mutant_strong = strong
+    if escaped:
         report.problems.append(
-            f"V2: {len(bad)} mutant(s) still prove every law: {', '.join(bad)}")
+            f"V2: {len(escaped)} mutant(s) still prove every law: {', '.join(escaped)}")
+    elif not strong:
+        report.problems.append(
+            f"V2: none of the {len(mutants)} mutants type-checks -- they fail "
+            f"before a law is consulted, so the corpus proves nothing")
 
 
 # --- V3: a submission that proves nothing must not score -----------------------

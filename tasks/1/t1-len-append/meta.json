@@ -1,0 +1,21 @@
+{
+  "task_id": "t1-len-append",
+  "tier": 1,
+  "laws": [
+    "len_cons",
+    "len_single",
+    "len_nil_right",
+    "append_nil_left"
+  ],
+  "policy_targets": [
+    "len",
+    "append"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "99499ac88fd988844450ebb383f038b82090e3fca85210843b5d2f6a814c074c",
+    "prelude": "90209e424d9384ffc550c1d54ba1b0f2f64c3a09ac89b56ffe60004b97c4afd0"
+  },
+  "bend_version": "2.0.5"
+}

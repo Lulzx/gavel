@@ -1,6 +1,6 @@
 """Measure zero-shot solve rate: k attempts per task, no human in the loop.
 
-    uv run python -m tools.calibrate t1-add-zero -k 5
+    uv run python -m tools.calibrate t1-add-succ -k 5
     uv run python -m tools.calibrate -k 3 --model claude-opus-5
     uv run python -m tools.calibrate --dry-run          # prompt only, no spend
     uv run python -m tools.calibrate -k 5 --write-meta  # record on the tasks
