@@ -17,12 +17,11 @@ import time
 from pathlib import Path
 
 from .check import CheckConfig, check_submission
-from .laws import parse_imports, split_top_level
 from .runner import run_check
-from .tasks import (LAWS_FILE, PRELUDE_FILE, PROOF_FILE, SOLUTION_FILE,
-                    load_manifest)
+from .tasks import PROOF_FILE, SOLUTION_FILE, load_manifest
 from .toolchain import DEFAULT_VERSION, Toolchain, ToolchainError
-from .verdict import TIER_COMPLETE, Verdict
+from .validate import validate_task
+from .verdict import Verdict
 
 DEFAULT_MANIFEST = "manifest.json"
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -132,71 +131,24 @@ def _print_verdict(verdict: Verdict, as_json: bool) -> None:
 
 
 def cmd_validate(args) -> int:
-    """V1, V4, V5 of SPEC.md 5.5. V2 and V3 arrive with the mutant pipeline.
-
-    V2 is a warning until the mutant corpus exists: a missing mutant is not a
-    defect in the task, but it does mean the task's laws are unguarded against
-    a degenerate proof, so it must not pass silently forever. --strict promotes
-    it, and M1 flips the default once every task has mutants.
-    """
+    """SPEC.md 5.5. The invariants themselves live in gavel/validate.py."""
     toolchain, manifest = _load(args)
     tasks = _tasks(manifest, args.tasks)
-    failures: list[str] = []
-    reports = []
-    for task in tasks:
-        report = _validate_task(task, toolchain)
-        if args.strict and report["warnings"]:
-            report["problems"].extend(report["warnings"])
-            report["warnings"] = []
-        report["valid"] = not report["problems"]
-        reports.append(report)
-        if not report["valid"]:
-            failures.append(task.task_id)
-        if not args.json:
-            notes = report["problems"] or report["warnings"]
-            status = "ok  " if report["valid"] else "FAIL"
-            print(f"[{status}] {task.task_id:24s} tier {task.tier}  "
-                  f"{report['reference_ms']}ms  "
-                  f"{' '.join(notes) or 'V1,V4,V5 pass'}")
+    reports = [validate_task(task, toolchain, budget_ms=REFERENCE_BUDGET_MS,
+                             strict=args.strict) for task in tasks]
+
     if args.json:
-        print(json.dumps(reports, indent=2))
-    print(f"\n{len(tasks) - len(failures)}/{len(tasks)} tasks valid")
+        print(json.dumps([r.to_json() for r in reports], indent=2))
+    else:
+        for report in reports:
+            notes = report.problems or report.warnings
+            status = "ok  " if report.valid else "FAIL"
+            print(f"[{status}] {report.task_id:24s} tier {report.tier}  "
+                  f"{report.reference_ms}ms  "
+                  f"{' '.join(notes) or 'V1,V4,V5 pass'}")
+    failures = [r for r in reports if not r.valid]
+    print(f"\n{len(reports) - len(failures)}/{len(reports)} tasks valid")
     return 1 if failures else 0
-
-
-def _validate_task(task, toolchain: Toolchain) -> dict:
-    problems: list[str] = []
-    warnings: list[str] = []
-    files = {SOLUTION_FILE: task.reference_solution, PROOF_FILE: task.reference_proof}
-    verdict = check_submission(task, toolchain, files, CheckConfig())
-
-    # V1: the reference proves every law.
-    if verdict.tier != TIER_COMPLETE:
-        problems.append(f"V1: reference is tier {verdict.tier}, not 4, "
-                        f"({verdict.tier_name})")
-    # V4: the reference checks inside the latency budget.
-    reference_ms = max((c.ms for c in verdict.checks), default=0)
-    if reference_ms > REFERENCE_BUDGET_MS:
-        problems.append(f"V4: reference took {reference_ms}ms > {REFERENCE_BUDGET_MS}ms")
-    # V5: the task's own files carry no forbidden construct.
-    for name, text in ((LAWS_FILE, task.laws_src), (PRELUDE_FILE, task.prelude_src)):
-        for chunk in split_top_level(text):
-            if chunk.unsafe:
-                problems.append(f"V5: {name} uses @unsafe (line {chunk.line})")
-        for imp in _task_imports(text):
-            problems.append(f"V5: {name} has a disallowed import ({imp})")
-    if not task.mutant_paths:
-        warnings.append("V2: no mutants authored")
-
-    return {"task_id": task.task_id, "tier": task.tier, "valid": not problems,
-            "problems": problems, "warnings": warnings, "reference_ms": reference_ms,
-            "laws": list(task.laws), "hash": task.hash,
-            "zero_shot_solve_rate": task.meta.get("zero_shot_solve_rate")}
-
-
-def _task_imports(text: str) -> list[str]:
-    allowed = {"Base", f"./{LAWS_FILE}", f"./{PRELUDE_FILE}", f"./{SOLUTION_FILE}"}
-    return [imp.path for imp in parse_imports(text) if imp.path not in allowed]
 
 
 def cmd_bench(args) -> int:
