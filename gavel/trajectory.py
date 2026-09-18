@@ -18,6 +18,7 @@ typed. ``store_actions=True`` opts in for a run that needs it.
 from __future__ import annotations
 
 import json
+import threading
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -162,6 +163,9 @@ class Trajectory:
         self.run_id = run_id or _new_run_id()
         self._fh = None
         self.episodes_written = 0
+        # Two threads appending whole lines to one file is exactly the way to
+        # get a spliced line that parses as neither record.
+        self._lock = threading.Lock()
 
     def _handle(self):
         if self._fh is None:
@@ -179,15 +183,18 @@ class Trajectory:
         """
         if not episode.run_id:
             episode.run_id = self.run_id
-        handle = self._handle()
-        handle.write(json.dumps(episode.to_json()) + "\n")
-        handle.flush()
-        self.episodes_written += 1
+        line = json.dumps(episode.to_json()) + "\n"
+        with self._lock:
+            handle = self._handle()
+            handle.write(line)
+            handle.flush()
+            self.episodes_written += 1
 
     def close(self) -> None:
-        if self._fh is not None:
-            self._fh.close()
-            self._fh = None
+        with self._lock:
+            if self._fh is not None:
+                self._fh.close()
+                self._fh = None
 
     def __enter__(self) -> "Trajectory":
         return self

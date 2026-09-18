@@ -349,7 +349,18 @@ looks.
    cannot disagree. `GavelEnv.close()` ends any open episode (an abandoned
    episode is data) and closes the trajectory; it deliberately leaves the cache
    open, because a memo shared across envs must outlive any one of them.
-3. `server.py` JSON-lines over Unix socket + HTTP; client example in a non-Python stack.
+3. `server.py` JSON-lines over Unix socket + HTTP; client example in a
+   non-Python stack. **Done.** Sessions rather than connections — HTTP has no
+   connection to hang an episode on — so `reset` mints an id that every later
+   request carries, and sessions share the bank, toolchain, cache, trajectory,
+   and metrics while each keeps its own turn counter. Both transports call the
+   same `GavelServer.handle`, so a bug in one is a bug in both. A malformed
+   frame is answered with an error and the connection stays open; a client that
+   sends one bad line should lose that line, not the run. The Unix socket is
+   chmod 600, because the socket *is* the access control when the payload is
+   arbitrary programs. Client example: `examples/client.ts`, run by the bun the
+   checker is already pinned to, and covered by a test that starts a real
+   server (`tests/test_server.py`).
 4. Persistent bun worker backend; publish p50/p95/p99 and verdicts/min/core.
 5. 10k-episode unattended soak with a scripted policy.
 

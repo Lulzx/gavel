@@ -195,6 +195,29 @@ def cmd_checker(args) -> int:
     return 0
 
 
+def cmd_serve(args) -> int:
+    """Serve the episode protocol. Blocks until interrupted."""
+    from . import server as server_mod
+
+    if not args.socket and not args.http:
+        args.socket = "gavel.sock"
+    gavel = server_mod.GavelServer.from_manifest(
+        Path(args.manifest), mode=args.mode, max_turns=args.max_turns,
+        backend=args.backend,
+        cache=server_mod.VerdictCache(args.cache) if args.cache else None,
+        trajectory=(server_mod.Trajectory(args.trajectory, run_id=args.run_id)
+                    if args.trajectory else None))
+    http = None
+    if args.http:
+        host, _, port = args.http.rpartition(":")
+        http = (host or "127.0.0.1", int(port or 8765))
+    where = ", ".join(filter(None, [args.socket and f"unix:{args.socket}",
+                                    http and f"http://{http[0]}:{http[1]}"]))
+    print(f"gavel serving {len(gavel.manifest)} tasks on {where}", flush=True)
+    server_mod.serve(socket_path=args.socket, http=http, gavel=gavel)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="gavel", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -239,6 +262,20 @@ def build_parser() -> argparse.ArgumentParser:
     p_chk.add_argument("dir")
     p_chk.add_argument("target", nargs="?", default=PROOF_FILE)
     p_chk.set_defaults(func=cmd_checker)
+
+    p_srv = sub.add_parser("serve", help="serve the episode protocol over a socket")
+    p_srv.add_argument("--socket", default=None,
+                       help="Unix socket path (default gavel.sock)")
+    p_srv.add_argument("--http", default=None,
+                       help="host:port to bind, loopback by default")
+    p_srv.add_argument("--mode", default="dense", choices=("dense", "sparse"))
+    p_srv.add_argument("--max-turns", type=int, default=4)
+    p_srv.add_argument("--backend", default="auto",
+                       choices=("auto", "plain", "bwrap"))
+    p_srv.add_argument("--cache", default=None, help="sqlite verdict cache path")
+    p_srv.add_argument("--trajectory", default=None, help="JSONL episode log path")
+    p_srv.add_argument("--run-id", default=None, help="name this run in the log")
+    p_srv.set_defaults(func=cmd_serve)
     return parser
 
 

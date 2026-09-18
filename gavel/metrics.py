@@ -18,6 +18,7 @@ look something up.
 from __future__ import annotations
 
 import json
+import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
@@ -64,6 +65,8 @@ class Metrics:
     """Submissions that reproduced a mutant's own solution. Should be zero; a
     nonzero count means V2 let a task through."""
 
+    _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
+
     @property
     def solve_rate(self) -> float:
         return self.solved / self.episodes if self.episodes else 0.0
@@ -77,6 +80,13 @@ class Metrics:
         return self.turns / self.episodes if self.episodes else 0.0
 
     def add(self, episode: EpisodeRecord) -> None:
+        """One episode, from one thread. A server shares one report across
+        sessions, so the counters are updated under a lock -- a report that
+        loses an episode to a race is a report that disagrees with its own log."""
+        with self._lock:
+            self._add(episode)
+
+    def _add(self, episode: EpisodeRecord) -> None:
         self.episodes += 1
         self.turns += episode.turns_used
         self.reward += episode.total_reward
@@ -104,6 +114,12 @@ class Metrics:
                 for p in percentiles}
 
     def to_json(self) -> dict[str, Any]:
+        """A snapshot. Taken under the lock because it sorts the histograms,
+        and iterating a dict another thread is inserting into raises."""
+        with self._lock:
+            return self._snapshot()
+
+    def _snapshot(self) -> dict[str, Any]:
         return {
             "episodes": self.episodes,
             "solved": self.solved,

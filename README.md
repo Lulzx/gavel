@@ -30,11 +30,12 @@ Two consequences of how the checker is built shape everything else:
 
 ```
 gavel/          the harness — gate, runner, check protocol, reward, environment,
-                verdict cache, episode log, metrics
+                verdict cache, episode log, metrics, socket server
 toolchain/      the vendored, pinned Bend checker (see toolchain/fetch.py)
 tasks/<tier>/   task definitions: prompt, LAWS.bend, prelude.bend, stub
 references/     hidden reference solutions, proofs, and mutants
 tools/          offline authoring tools; none of these run in the reward path
+examples/       client in another stack (TypeScript, on the pinned bun)
 tests/          test suite, including the adversarial corpus
 Dockerfile      the Linux environment, with bubblewrap, for the sandboxed run
 ```
@@ -62,6 +63,8 @@ uv run python -m tools.mutate --check     # author mutants and see which are str
 uv run python -m tools.calibrate --dry-run
 uv run python -m tools.sandbox_check      # prove the sandbox runs a real check
 uv run python -m tools.migrate --from ~/.bend/app/2.0.4/rRKuW7 --label 2.0.4
+uv run gavel serve --socket /tmp/gavel.sock --http 127.0.0.1:8765
+bun run examples/client.ts                # a non-Python client
 ```
 
 ## Running episodes
