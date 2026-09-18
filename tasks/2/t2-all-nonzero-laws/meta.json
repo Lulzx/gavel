@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-all-nonzero-laws",
+  "tier": 2,
+  "laws": [
+    "all_nonzero_nil",
+    "all_nonzero_snoc"
+  ],
+  "policy_targets": [
+    "all_nonzero"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "97663ae94ff1af0382997024ada5717f2143437a32891db483b7156d83868822",
+    "prelude": "13ab9932dad3f1d61f90eea6e9055bdb30bb52444448e460b22ecde2e98a907d"
+  },
+  "bend_version": "2.0.5"
+}

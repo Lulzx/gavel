@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-reverse-laws",
+  "tier": 2,
+  "laws": [
+    "reverse_single",
+    "reverse_snoc"
+  ],
+  "policy_targets": [
+    "reverse"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "1ed3944e5029e3815bb184c1928936080484d121f240a71ea4ecf6f6c304406a",
+    "prelude": "b850be8e6a545355387d0815e7c43dc2d593f72288e523d8b45fddb21f020a1b"
+  },
+  "bend_version": "2.0.5"
+}

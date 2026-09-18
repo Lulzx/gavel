@@ -181,11 +181,35 @@
       "valid": true
     },
     {
+      "task_id": "t2-all-nonzero-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-all-nonzero-laws",
+      "reference": "references/t2-all-nonzero-laws",
+      "hash": "598e2e9f664ebaff3ed9745026b7757e38235bc4e9c8f7828f826151111e3429",
+      "valid": true
+    },
+    {
       "task_id": "t2-append-laws",
       "tier": 2,
       "path": "tasks/2/t2-append-laws",
       "reference": "references/t2-append-laws",
       "hash": "2f1f3b2c1987baa6c2cb624043f28c5ee60811e17f90a1adfb1da35f0984d38a",
+      "valid": true
+    },
+    {
+      "task_id": "t2-at-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-at-laws",
+      "reference": "references/t2-at-laws",
+      "hash": "f46f2a677c193546247e49e624f3516139e788fd2b7c14329adc0e48db8bac60",
+      "valid": true
+    },
+    {
+      "task_id": "t2-double-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-double-all-laws",
+      "reference": "references/t2-double-all-laws",
+      "hash": "66e4f2e94aef0f36bf6ffa507af13a49493a548c4957d73696c3cdd5bf13485d",
       "valid": true
     },
     {
@@ -197,11 +221,43 @@
       "valid": true
     },
     {
+      "task_id": "t2-elem-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-elem-laws",
+      "reference": "references/t2-elem-laws",
+      "hash": "9b5d0c25ca47f4ec1fd76d8b6f632876550d840a8fa11515155544f023f0123b",
+      "valid": true
+    },
+    {
+      "task_id": "t2-init-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-init-laws",
+      "reference": "references/t2-init-laws",
+      "hash": "b7dd9ce5631f92a42a0ca8661fec5dc1288a6bc2e58d4253a2b1576eb6d4580d",
+      "valid": true
+    },
+    {
+      "task_id": "t2-map-add-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-map-add-laws",
+      "reference": "references/t2-map-add-laws",
+      "hash": "77241202522e952d9d76890a3fe76d62250edcadf23abdc79914c0b8a72c30b0",
+      "valid": true
+    },
+    {
       "task_id": "t2-map-laws",
       "tier": 2,
       "path": "tasks/2/t2-map-laws",
       "reference": "references/t2-map-laws",
       "hash": "fec3a6e71665f7aed329038b807cc835f83607c71807f8e4f4b4487571bf96a2",
+      "valid": true
+    },
+    {
+      "task_id": "t2-max-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-max-laws",
+      "reference": "references/t2-max-laws",
+      "hash": "583b2a5cb4bbb7eb37097479d62f2c7fc90ba99226984ebc7a890629c874f405",
       "valid": true
     },
     {
@@ -261,6 +317,30 @@
       "valid": true
     },
     {
+      "task_id": "t2-reverse-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-reverse-laws",
+      "reference": "references/t2-reverse-laws",
+      "hash": "ff5addcba63fa1a1dfdd0aaed38aa37ea7c534fcadbbf840e8a615b1ae551bfe",
+      "valid": true
+    },
+    {
+      "task_id": "t2-snoc-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-snoc-laws",
+      "reference": "references/t2-snoc-laws",
+      "hash": "7052305770aa1fc4ddf15de25721892c9ab06d6111b07cf0b27492016761021b",
+      "valid": true
+    },
+    {
+      "task_id": "t2-sub-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sub-laws",
+      "reference": "references/t2-sub-laws",
+      "hash": "99ed5ed7e0cd0c19c40aa64eff8b51bb4a6eb3be61f1bf1051d42b4223eb281b",
+      "valid": true
+    },
+    {
       "task_id": "t2-sum-acc",
       "tier": 2,
       "path": "tasks/2/t2-sum-acc",
@@ -277,11 +357,27 @@
       "valid": true
     },
     {
+      "task_id": "t2-sum-prefix-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-prefix-laws",
+      "reference": "references/t2-sum-prefix-laws",
+      "hash": "82978d8d7cacc60da8d3644c4589e9e36c77fc9c874f168f2d0d4a4eb50fc751",
+      "valid": true
+    },
+    {
       "task_id": "t2-take-laws",
       "tier": 2,
       "path": "tasks/2/t2-take-laws",
       "reference": "references/t2-take-laws",
       "hash": "fca11cd2488841098c5d60be26812862d42d8a33ff7eb27e12b5401a57ef7756",
+      "valid": true
+    },
+    {
+      "task_id": "t2-zeros-prefix-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-zeros-prefix-laws",
+      "reference": "references/t2-zeros-prefix-laws",
+      "hash": "bf43c8e9f79f0114c35889b2751dd563bafbcfa15203201a6406edc01eba83c7",
       "valid": true
     },
     {

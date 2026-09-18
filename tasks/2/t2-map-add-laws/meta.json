@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-map-add-laws",
+  "tier": 2,
+  "laws": [
+    "map_add_single",
+    "map_add_append"
+  ],
+  "policy_targets": [
+    "map_add"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "62e9cc0962382c1c5bf3c7db44d5a6accb1cdf798dc25a0719994ef52dc895cf",
+    "prelude": "0e3f657f7bc9929591f8f06a0fc9285ff954e46aa89b0d468a76e43198b41363"
+  },
+  "bend_version": "2.0.5"
+}

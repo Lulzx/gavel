@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-init-laws",
+  "tier": 2,
+  "laws": [
+    "init_single",
+    "init_snoc"
+  ],
+  "policy_targets": [
+    "init"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3bbc060ce2e7df038b0a16996f1b7cdead596219202aa05a6c93024f3ddc872c",
+    "prelude": "014057b204d228da5f768b7fdab8da66ee720519ad8929e44dc13c34731ec80d"
+  },
+  "bend_version": "2.0.5"
+}

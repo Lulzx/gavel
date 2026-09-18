@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-double-all-laws",
+  "tier": 2,
+  "laws": [
+    "double_all_single",
+    "double_all_append"
+  ],
+  "policy_targets": [
+    "double_all"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ae6be18ba8f45092c09a15928486dae73c8285f4df2baa9f57a5e7af29dd4923",
+    "prelude": "b1971add30123206376960be63474411ebe030891a245adba87101aba8f9a357"
+  },
+  "bend_version": "2.0.5"
+}

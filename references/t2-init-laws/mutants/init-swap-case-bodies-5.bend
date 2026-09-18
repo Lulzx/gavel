@@ -1,0 +1,13 @@
+import Base
+
+def init(xs: List<Nat>) -> List<Nat>:
+  match xs:
+    case Nil{}:
+      Nil{}
+    case h <> t:
+      match t:
+        case Nil{}:
+          h <> init(h2 <> t2)
+
+        case h2 <> t2:
+          Nil{}

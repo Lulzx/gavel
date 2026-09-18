@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-snoc-laws",
+  "tier": 2,
+  "laws": [
+    "snoc_nil",
+    "snoc_append"
+  ],
+  "policy_targets": [
+    "snoc"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "c33332e3ab80e2d532ef893c3b4d4fb0a703769d57d913a82086c7a6a7a5c231",
+    "prelude": "b8d92ad7aebcae44e629ff6ec38be5daed8963c0c08630e35c230c10ee8e97fe"
+  },
+  "bend_version": "2.0.5"
+}
