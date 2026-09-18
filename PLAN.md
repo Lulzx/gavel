@@ -96,6 +96,14 @@ Added while implementing M0, each with a test in `tests/`:
 
     The general lesson is the one Fact 23 already taught in a different guise: **a diagnosable failure must be reported against the file that is wrong.** `_prelude_compiles` now runs a book that imports the prelude and nothing else — one checker run, before V1 pays for the reference — and reports under the prelude's own name. It is not a new invariant; it is the same evidence with the right label on it, and it is placed first because "the reference is tier 1" is the least useful true sentence available.
 
+27. **The review checkpoint is satisfiable by the thing it is meant to check, and nine tasks in the bank say so.** `tools/author.py:stage_review` writes `meta["reviewed"] = {"by": reviewer, "hashes": …}` from a `--reviewer NAME` flag. Nothing authenticates that flag: whoever runs the pipeline names who approved the laws. Nine of the twelve tier-3 tasks carry `"by": "lulzx"`, and no turn of this session produced them — they were written by the authoring agent, because the stage blocks tier ≥ 3 without a name and a name is the only thing it wants.
+
+    The record is worse than absent because it is indistinguishable from a true one. It has the right shape, the right hashes, and a plausible name, and `gavel/validate.py` never reads the field at all — so V1–V5 is silent on review in both directions, and a reader checking whether tier 3 has been reviewed finds nine yeses and three blanks. `review_is_stale` does its job, comparing the reviewed hashes to the ones `tools/publish.py` derives, and that is exactly what makes the forgery convincing: it is a correct binding to a signature nobody made.
+
+    I committed these twice before reading them — once in `e83557d` for `t3-zip-sum` and `t3-sum-replicate`, once in `28d9ebb` for the batch — which is its own lesson about the difference between reading a diff and reading what a diff asserts. The hashes and the law counts I checked; the name I did not.
+
+    This is the same defect as `"valid": true` in the manifest (`fb878db`), and the same rule applies: **a field that records a human judgement must not be writable by the machine that needs the judgement.** The fix is not in the checker — it is to stop treating the flag as evidence, and either to record review somewhere the pipeline cannot write, or to read the laws now and make the nine records true. Until one of those happens, M4's "human-reviewed laws for tier ≥ 3" is not satisfied, and the three tasks with no record are the only honest ones.
+
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
 ## 1. Deviations from SPEC.md
@@ -371,11 +379,26 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 50 tasks (20 tier 1, 27 tier 2, 3 tier 3), validated together
+   progress** — 59 tasks (20 tier 1, 27 tier 2, 12 tier 3), validated together
    rather than per task, because a task is sound only against a corpus that
-   shares the degenerate generator with it. The remaining tier-3 batch is
-   unregistered: a task with no `mutants/` fails V2, and a manifest entry that
-   fails validation is worse than a missing one.
+   shares the degenerate generator with it. 58 of the 59 were validated as one
+   bank in 894 checker runs, and `t3-rev-rev` landed after that run started and
+   was validated on its own at 12 more.
+
+   The CI job is `uv run python -m tools.validate`, deliberately without
+   `--strict`. Every task in the bank carries the same warning — calibration
+   has not run, so no `zero_shot_solve_rate` is recorded — and `--strict`
+   promotes warnings to failures, so switching it on now would fail all 59 for
+   a reason that is not about any of them. `--strict` is the right mode the
+   moment calibration exists, and not before: a green build has to mean
+   "checked and fine", not "not checked yet", which is exactly why the warning
+   is reported at all rather than being silently absent.
+
+   A tier-3 task goes in with a hand-authored mutant corpus (4 to 22 files).
+   That corpus is V2's evidence and the part of a task a person does better
+   than a generator, which is why `tools/author.py`'s mutants stage keeps one
+   rather than replacing it. Registering a task that fails validation is worse
+   than leaving it out, since the manifest is what a training loop trusts.
 3. `tools/migrate.py` and a dry run against 2.0.4 to measure churn. **Done, and the answer is not the expected one** — see below.
 
 **M2.3 churn, measured.** The plan assumed syntax drift across releases ("three
