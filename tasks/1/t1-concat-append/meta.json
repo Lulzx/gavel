@@ -1,0 +1,17 @@
+{
+  "task_id": "t1-concat-append",
+  "tier": 1,
+  "laws": [
+    "concat_append"
+  ],
+  "policy_targets": [
+    "concat"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "c2d45534850348a0b305b8ad10ea02066a14401ab62c4f86d71c3b0487ae75a9",
+    "prelude": "552bcee4cf8ca644d49739eb76bbf6d064a3fe4a289770d98322c1636bcacd79"
+  },
+  "bend_version": "2.0.5"
+}

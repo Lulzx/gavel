@@ -29,6 +29,22 @@
       "valid": true
     },
     {
+      "task_id": "t1-concat-append",
+      "tier": 1,
+      "path": "tasks/1/t1-concat-append",
+      "reference": "references/t1-concat-append",
+      "hash": "110fa4bbce62d3a656fb35280c92786a0349c36b595ed314462b69f9d83ef3b1",
+      "valid": true
+    },
+    {
+      "task_id": "t1-count-zeros",
+      "tier": 1,
+      "path": "tasks/1/t1-count-zeros",
+      "reference": "references/t1-count-zeros",
+      "hash": "e163039328a479b8ed5d8b88c0158923e6bb5a0124d187d56e449e67e9333974",
+      "valid": true
+    },
+    {
       "task_id": "t1-double",
       "tier": 1,
       "path": "tasks/1/t1-double",
@@ -101,11 +117,35 @@
       "valid": true
     },
     {
+      "task_id": "t1-rev-append",
+      "tier": 1,
+      "path": "tasks/1/t1-rev-append",
+      "reference": "references/t1-rev-append",
+      "hash": "3ee91b9d063d171b77358de1bf9f5071f14bfe15c5e349731993ab30d8a2db05",
+      "valid": true
+    },
+    {
+      "task_id": "t1-rev-snoc",
+      "tier": 1,
+      "path": "tasks/1/t1-rev-snoc",
+      "reference": "references/t1-rev-snoc",
+      "hash": "e6db19b3e305d98bdde181c0b3b4b38860473f2025e90853433b8b3be52b8719",
+      "valid": true
+    },
+    {
       "task_id": "t1-sum-append",
       "tier": 1,
       "path": "tasks/1/t1-sum-append",
       "reference": "references/t1-sum-append",
       "hash": "6afea6c811bbd4035cb107b83c542c3740c029f00be226692fae0cb9ad432609",
+      "valid": true
+    },
+    {
+      "task_id": "t1-take-drop",
+      "tier": 1,
+      "path": "tasks/1/t1-take-drop",
+      "reference": "references/t1-take-drop",
+      "hash": "89ec4dcd8db9a3a27cda6a880d85dd1d86fcb6198802c4551c4a6016e73fe692",
       "valid": true
     },
     {
@@ -133,6 +173,14 @@
       "valid": true
     },
     {
+      "task_id": "t2-drop-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-drop-laws",
+      "reference": "references/t2-drop-laws",
+      "hash": "ecc00a5e6456e3276816a26088e5eb75f553e2195e750d8030731f139435d0dd",
+      "valid": true
+    },
+    {
       "task_id": "t2-map-laws",
       "tier": 2,
       "path": "tasks/2/t2-map-laws",
@@ -157,11 +205,51 @@
       "valid": true
     },
     {
+      "task_id": "t2-replicate-len",
+      "tier": 2,
+      "path": "tasks/2/t2-replicate-len",
+      "reference": "references/t2-replicate-len",
+      "hash": "76de20b57aa9d54c57e2ec814e8982df0d615d46e7eaf4ef25fa706029251e19",
+      "valid": true
+    },
+    {
+      "task_id": "t2-rev-append",
+      "tier": 2,
+      "path": "tasks/2/t2-rev-append",
+      "reference": "references/t2-rev-append",
+      "hash": "a882a0035298cc6b9fab45be1413217be2e72ed7d5b644f0750fc28f1054186c",
+      "valid": true
+    },
+    {
+      "task_id": "t2-sum-acc",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-acc",
+      "reference": "references/t2-sum-acc",
+      "hash": "9d71c22206fc7476dabea8fe84c348fb766d6c99ba8f8dfd826050408e2dca8c",
+      "valid": true
+    },
+    {
       "task_id": "t2-sum-laws",
       "tier": 2,
       "path": "tasks/2/t2-sum-laws",
       "reference": "references/t2-sum-laws",
       "hash": "5a1c31140343bbe45dd143870aa32025f4aa1be31a6b96cad905392a28a425d2",
+      "valid": true
+    },
+    {
+      "task_id": "t2-take-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-take-laws",
+      "reference": "references/t2-take-laws",
+      "hash": "fca11cd2488841098c5d60be26812862d42d8a33ff7eb27e12b5401a57ef7756",
+      "valid": true
+    },
+    {
+      "task_id": "t3-filter-bound",
+      "tier": 3,
+      "path": "tasks/3/t3-filter-bound",
+      "reference": "references/t3-filter-bound",
+      "hash": "f2ec160701a6a2406f5e78fc94a3e10b27647bbd46b522224a284b0bf9c1209c",
       "valid": true
     }
   ]

@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-replicate-len",
+  "tier": 2,
+  "laws": [
+    "replicate_succ",
+    "replicate_len"
+  ],
+  "policy_targets": [
+    "replicate"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "6e69bdf0fc8b793e1ec44a86ff458073d2416784d191cf249344694ecff04845",
+    "prelude": "169ade3c74b1d6a8168fe67a0a3d062ef7370e6b571f64edf18f24ad3ba98074"
+  },
+  "bend_version": "2.0.5"
+}

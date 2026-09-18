@@ -1,0 +1,20 @@
+{
+  "task_id": "t3-filter-bound",
+  "tier": 3,
+  "laws": [
+    "filter_len",
+    "filter_keep",
+    "filter_drop"
+  ],
+  "policy_targets": [
+    "filter",
+    "len"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "2f051ce02184b6e51c1a3189c76e2f41f1dbf4a580fe0cd85ed7bfb328bc2a65",
+    "prelude": "b6f276d2c6ce6d5a757b3d7794466ec634613f5cc09464068a7db06d4215b756"
+  },
+  "bend_version": "2.0.5"
+}

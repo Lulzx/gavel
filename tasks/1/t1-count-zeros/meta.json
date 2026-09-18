@@ -1,0 +1,17 @@
+{
+  "task_id": "t1-count-zeros",
+  "tier": 1,
+  "laws": [
+    "count_zeros_snoc"
+  ],
+  "policy_targets": [
+    "count_zeros"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "85b296a997f1b8d1c0ae0af68952a0059c5edc78b5218e4341024865ae983c25",
+    "prelude": "eeebfa197f89aab2cb2038efc90076d3b6e2797b43153e0757cc57092b71300a"
+  },
+  "bend_version": "2.0.5"
+}

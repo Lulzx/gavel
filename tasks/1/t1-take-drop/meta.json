@@ -1,0 +1,17 @@
+{
+  "task_id": "t1-take-drop",
+  "tier": 1,
+  "laws": [
+    "take_drop"
+  ],
+  "policy_targets": [
+    "take"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "cb6c501612b7209a19734612239a150f8c0c6bbc34c75a8cb43fd6988aca5ee7",
+    "prelude": "597deaad53cd4257951129d158ae8d4b5125390c5f879adb11a579c297580478"
+  },
+  "bend_version": "2.0.5"
+}

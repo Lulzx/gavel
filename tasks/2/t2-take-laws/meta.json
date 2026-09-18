@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-take-laws",
+  "tier": 2,
+  "laws": [
+    "take_succ",
+    "take_append_len"
+  ],
+  "policy_targets": [
+    "take"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ce268b3590334b6ec6ec965231062f583785a209a4c61c5928eadcb3937db77b",
+    "prelude": "3356dcf51f38099d986384c5ebd93606467f19c7ab902b5a62e6d6381910f8ca"
+  },
+  "bend_version": "2.0.5"
+}

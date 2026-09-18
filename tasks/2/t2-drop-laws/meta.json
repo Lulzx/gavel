@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-drop-laws",
+  "tier": 2,
+  "laws": [
+    "drop_succ",
+    "drop_append_len"
+  ],
+  "policy_targets": [
+    "drop"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "521640a5c29ef28b26d34ea3e67c99c255ca1c3b2dc7af6edb1af02334b128b5",
+    "prelude": "3356dcf51f38099d986384c5ebd93606467f19c7ab902b5a62e6d6381910f8ca"
+  },
+  "bend_version": "2.0.5"
+}
