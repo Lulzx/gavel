@@ -324,7 +324,7 @@
       "tier": 2,
       "path": "tasks/2/t2-map-laws",
       "reference": "references/t2-map-laws",
-      "hash": "fec3a6e71665f7aed329038b807cc835f83607c71807f8e4f4b4487571bf96a2"
+      "hash": "b2561100455cf2e7ca93b8f11f3f8e8a5cf631f184ba05c75a67868686cd54aa"
     },
     {
       "task_id": "t2-max-all-laws",
@@ -338,7 +338,7 @@
       "tier": 2,
       "path": "tasks/2/t2-max-laws",
       "reference": "references/t2-max-laws",
-      "hash": "583b2a5cb4bbb7eb37097479d62f2c7fc90ba99226984ebc7a890629c874f405"
+      "hash": "3019e62b7bc0d4ed432b3943e9a79f37d26e9797d0e2d0a5fb60a5f9915e1fbe"
     },
     {
       "task_id": "t2-max-prefix-laws",
@@ -394,7 +394,7 @@
       "tier": 2,
       "path": "tasks/2/t2-pow-laws",
       "reference": "references/t2-pow-laws",
-      "hash": "9a20fd168c28fd7bf3b8c73f42e80cd132fb5751c9c336ce17aabb46c85d9afc"
+      "hash": "ba378df0d5ec6cb31f1ad7e7f8f8cec89ef6dcfbde1563c56a8d880a1cb4f101"
     },
     {
       "task_id": "t2-pow2-all-laws",
@@ -436,7 +436,7 @@
       "tier": 2,
       "path": "tasks/2/t2-reverse-laws",
       "reference": "references/t2-reverse-laws",
-      "hash": "ff5addcba63fa1a1dfdd0aaed38aa37ea7c534fcadbbf840e8a615b1ae551bfe"
+      "hash": "79d31207d8ec925d7da3c4bd32a22e022a3fc64687181a39f2753e5c303a08a8"
     },
     {
       "task_id": "t2-snoc-laws",
@@ -464,7 +464,7 @@
       "tier": 2,
       "path": "tasks/2/t2-sq-prefix-laws",
       "reference": "references/t2-sq-prefix-laws",
-      "hash": "6b7449750b9319438a94337f3fae8c29409cb194fd8f2615e98279d476558190"
+      "hash": "308434c6180c35d77e971f42879d932c197a061aa72dcc9dab03d01cccbb5957"
     },
     {
       "task_id": "t2-sub-all-laws",
@@ -660,7 +660,7 @@
       "tier": 3,
       "path": "tasks/3/t3-interleave-nil",
       "reference": "references/t3-interleave-nil",
-      "hash": "a1a6215f24e369bae2f08b8bcf5785c15e0a06e853d4429ce82ca2abe9c96306"
+      "hash": "2de08fd0d592b641e1a80d3f58fc607c23a84df982835e7fe4e4253fb99d76a5"
     },
     {
       "task_id": "t3-is-pal-rev",
@@ -723,7 +723,7 @@
       "tier": 3,
       "path": "tasks/3/t3-pad",
       "reference": "references/t3-pad",
-      "hash": "447d292c35eb593d3d880cb3f072d4a4fa6e53daf35ea916b9872e1b2d7cb9a6"
+      "hash": "a2e75ca7a1860a8d1443973129866589a9e04a992b3a54a93c9c9463bc4a0d1c"
     },
     {
       "task_id": "t3-prefixes-len",

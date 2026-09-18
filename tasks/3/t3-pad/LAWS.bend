@@ -29,3 +29,16 @@ law pad_len:
   for x: Nat
   for xs: List<Nat>
   {P.len(S.pad(n, x, xs)) == P.max(n, P.len(xs)) : Nat}
+
+# LAW: a non-empty list keeps its own head and the pad continues on the tail.
+# `pad_nil` fixes the zero count, `pad_single` only ever asks about `Nil{}` and
+# `pad_len` counts, so before this law no case of the step was constrained and a
+# body that overwrote every element with the filler -- `x <> pad(k, x, t)` --
+# proved all three at full reward. Definitional, and it is also the statement
+# that the input survives as a prefix of the result.
+law pad_step:
+  for n: Nat
+  for x: Nat
+  for y: Nat
+  for ys: List<Nat>
+  {S.pad(1n + n, x, y <> ys) == y <> S.pad(n, x, ys) : List<Nat>}

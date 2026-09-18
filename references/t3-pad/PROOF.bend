@@ -44,3 +44,9 @@ def L.pad_len(n, x, xs):
           %Equal.sym(Nat, P.len(S.pad(k, x, t)), P.max(k, P.len(t)),
                      L.pad_len(k, x, t)) : {1n + _ == 1n + P.max(k, P.len(t)) : Nat}
           {==}
+
+# Definitional: the count steps and the list steps, and the result is the
+# right-hand side. The overwriting body leaves `x <> pad(n, x, ys)` against it,
+# which needs `x == y` at variables.
+def L.pad_step(n, x, y, ys):
+  {==}

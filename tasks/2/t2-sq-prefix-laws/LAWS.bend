@@ -18,3 +18,12 @@ law sq_prefix_zero:
 law sq_prefix_len:
   for xs: List<Nat>
   {S.sq_prefix(P.len(xs), xs) == P.sq_sum(xs) : Nat}
+
+# LAW: an exhausted count adds no squares up, whatever the count. `sq_prefix_len`
+# constrains only the diagonal, where the count and the length agree, so the
+# inner `Nil{}` case -- the list running out before the count -- is reached by
+# neither law: a body answering `1n` there, or handing back the rest of the
+# count, proved both at full reward. Definitional in both cases of the count.
+law sq_prefix_nil:
+  for k: Nat
+  {S.sq_prefix(k, Nil{}) == 0n : Nat}

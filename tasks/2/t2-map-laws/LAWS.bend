@@ -18,3 +18,13 @@ law map_cons:
   for h: Nat
   for t: List<Nat>
   {S.map(h <> t) == (1n+h) <> S.map(t) : List<Nat>}
+
+# LAW: a one-element list has length one. `len_map_cons` relates `len` to
+# itself through `map`, so its value at the empty list is free: a `len` that
+# answered `1n` there and added one per cons proved both laws at full reward,
+# because the offset appears on both sides and cancels. This law fixes the
+# value at a closed term rather than comparing the function with itself, which
+# anchors the offset.
+law len_single:
+  for h: Nat
+  {S.len(h <> Nil{}) == 1n : Nat}

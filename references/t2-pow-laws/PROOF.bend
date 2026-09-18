@@ -17,3 +17,8 @@ def L.pow_zero(x):
 def L.pow_one(x):
   %Policy.mul_one_right(x) : {Nat.mul(x, 1n) == _ : Nat}
   {==}
+
+# Definitional: the exponent is a successor, so the match takes the step case
+# and the local `+x = a` binding makes the two sides identical.
+def L.pow_succ(x, p):
+  {==}

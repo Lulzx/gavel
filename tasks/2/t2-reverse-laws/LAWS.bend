@@ -10,10 +10,11 @@ law reverse_single:
   {S.reverse(h <> Nil{}) == h <> Nil{} : List<Nat>}
 
 # LAW: reversing `xs <> [x]` is `x` in front of the reverse of `xs`: the last
-# element comes first. Alone it is satisfied by the identity body, because
-# `snoc(xs, x)` and `x <> xs` are two ways of writing the same list; the base law
-# is what rules that body out. It is inductive in `xs`, and it is the law that
-# pins `reverse`.
+# element comes first. It is inductive in `xs`, and it is the law that pins
+# `reverse`: the identity body fails it as soon as `xs` is non-empty, because
+# `xs <> [x]` and `[x] <> xs` are different lists there. The law above is the
+# closed-value anchor beside it -- the identity body proves that one, which is
+# what makes it the weak half rather than a second way of pinning `reverse`.
 law reverse_snoc:
   for xs: List<Nat>
   for x: Nat

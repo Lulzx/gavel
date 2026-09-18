@@ -26,3 +26,15 @@ law interleave_len:
   for +xs: List<&2, Nat>
   for +ys: List<&2, Nat>
   {P.len(S.interleave(xs, ys)) == P.len(xs) + P.len(ys) : Nat}
+
+# LAW: the pair case puts the left head first. Neither nil law reaches a pair,
+# and `interleave_len` counts elements rather than reading them, so before this
+# law nothing in the set constrained the *order* of a pair: a body emitting
+# `hy <> hx <> ...` proved all three and took full reward. Definitional, and
+# admissible beside the two inductions above.
+law interleave_pair:
+  for x: Nat
+  for y: Nat
+  for tx: List<&2, Nat>
+  for ty: List<&2, Nat>
+  {S.interleave(x <> tx, y <> ty) == x <> y <> S.interleave(tx, ty) : List<&2, Nat>}

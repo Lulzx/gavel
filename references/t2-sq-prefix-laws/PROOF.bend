@@ -18,3 +18,12 @@ def L.sq_prefix_len(xs):
     case h <> t:
       %L.sq_prefix_len(t) : {P.sq(h) + S.sq_prefix(P.len(t), t) == P.sq(h) + _ : Nat}
       {==}
+
+# Definitional in both cases of the count: at zero the count case answers `0n`,
+# and at a successor the inner match on the empty list answers `0n` too.
+def L.sq_prefix_nil(k):
+  match k:
+    case 0n:
+      {==}
+    case 1n+kp:
+      {==}

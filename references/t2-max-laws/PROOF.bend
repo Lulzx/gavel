@@ -32,3 +32,17 @@ def L.max_comm(x, y):
         case 1n+q:
           %L.max_comm(p, q) : {1n+S.max(p, q) == 1n+_ : Nat}
           {==}
+
+# The zero law is not definitional: with the second argument a variable the
+# match cannot choose between the two zero patterns, so it splits on `y`.
+def L.max_zero_left(y):
+  match y:
+    case 0n:
+      {==}
+    case 1n+yp:
+      {==}
+
+# Definitional: both arguments are successors, so the match takes the last case
+# and answers `1n + max(p, q)`.
+def L.max_succ_succ(p, q):
+  {==}

@@ -24,3 +24,7 @@ def L.len_map_cons(h, t):
 # `map_cons` is what `map` computes at a cons, so it closes without induction.
 def L.map_cons(h, t):
   {==}
+
+# Definitional: the list steps to `1n + len(Nil{})`, which is `1n + 0n`.
+def L.len_single(h):
+  {==}

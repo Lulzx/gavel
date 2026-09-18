@@ -68,3 +68,8 @@ def L.interleave_nil_r(xs):
 def L.interleave_len(xs, ys):
   %Policy.interleave_len_general(xs, ys) : {P.len(S.interleave(xs, ys)) == _ : Nat}
   {==}
+
+# Definitional: both matches step on their cons cells, and the result is the
+# right-hand side. The reordered body leaves `hy <> hx <> ...` against it.
+def L.interleave_pair(x, y, tx, ty):
+  {==}

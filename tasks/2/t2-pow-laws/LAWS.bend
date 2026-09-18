@@ -15,3 +15,12 @@ law pow_zero:
 law pow_one:
   for x: Nat
   {S.pow(x, 1n) == x : Nat}
+
+# LAW: a successor exponent is the base times the power of its predecessor. The
+# two laws above fix only exponents zero and one, so a `pow` that multiplied by
+# one at every higher exponent -- `pow(x, n) = x` for every `n >= 1` -- proved
+# both at full reward. This law fixes the step at a variable exponent.
+law pow_succ:
+  for x: Nat
+  for p: Nat
+  {S.pow(x, 1n+p) == Nat.mul(x, S.pow(x, p)) : Nat}
