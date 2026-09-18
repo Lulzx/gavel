@@ -5,6 +5,9 @@
     "insert_leaf",
     "insert_le",
     "insert_gt",
+    "ins_at_tip",
+    "ins_at_left",
+    "ins_at_right",
     "insert_ordered",
     "insert_count"
   ],
@@ -16,7 +19,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "216a2df530ff9f6ce8ee5a1d3ee7e972343cce546f954d59645dcf754f258de5",
+    "laws": "3ab829fd10fda9c4a58e37b4fe47839dfb956a46efbd93d00a616e400521f8ae",
     "prelude": "9ec85b90c9924a82707e2caa4168b37be9ca6e90fa5a2e16f7fcc6c5162154c2"
   },
   "bend_version": "2.0.5"

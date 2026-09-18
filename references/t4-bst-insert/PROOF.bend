@@ -271,6 +271,18 @@ def Policy.ord_ins(+t: P.Tree, c: Bool, +k: Nat,
                                                                                Bool.and(P.ordered(l), P.ordered(r))),
                                                                       e_t)))))))
 
+# `ins_at`'s definition, one case per constructor and per decision. Each goal
+# fixes a closed constructor, so the body reduces to the case that matches it
+# and `{==}` closes the goal outright.
+def L.ins_at_tip(c, k):
+  {==}
+
+def L.ins_at_left(l, key, r, k):
+  {==}
+
+def L.ins_at_right(l, key, r, k):
+  {==}
+
 def L.insert_leaf(k):
   {==}
 

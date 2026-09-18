@@ -1,4 +1,4 @@
-Implement `ins_at`, `insert` and `count`, then prove all five laws.
+Implement `ins_at`, `insert` and `count`, then prove all eight laws.
 
 `insert(t, k)` is `t` with `k` stored in it: the keys already there are kept and
 `k` is added, so an ordered tree stays ordered. `count(t, x)` is how many keys
@@ -11,8 +11,18 @@ predicate (`P.ordered`, built from `P.all_le` and `P.all_ge`), the comparison
 `insert_leaf`, `insert_le` and `insert_gt` are definitional pins. They fix what
 `insert` does on a one-node tree -- a key at most the node's goes to its left, a
 key greater goes to its right -- and they are what rules out an implementation
-that stores the key in the wrong place on a small tree. The other two laws are
-the work.
+that stores the key in the wrong place on a small tree.
+
+`ins_at_tip`, `ins_at_left` and `ins_at_right` are also definitional, and they
+are `ins_at`'s definition written out: one case for the tip and one per
+decision at a node. They are what makes the stub's first obligation an
+obligation. `ins_at` is reached by no law about `insert`, so without them a
+submission can put the descent wherever the gate allows -- including under
+`Policy.` -- and leave `ins_at` answering its own tree for full reward. A
+submission may still delegate the work to a `Policy.` helper; what it may not
+do is hand back something `ins_at` is not.
+
+`insert_ordered` and `insert_count` are the work.
 
 `insert_ordered` is the invariant law. It is stated as an implication: the
 statement carries `for e: {P.ordered(t) == True{} : Bool}` and what is to be
@@ -50,6 +60,7 @@ parts reassembled.
 
 Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
 `def L.insert_leaf(k)`, `def L.insert_le(x, y, e)`, `def L.insert_gt(x, y, e)`,
-`def L.insert_ordered(t, k, e)` and `def L.insert_count(t, k, x)`. Proof helpers
-go under the reserved `Policy.` namespace, which the gate ignores, and none of
-them may cite a law.
+`def L.ins_at_tip(c, k)`, `def L.ins_at_left(l, key, r, k)`,
+`def L.ins_at_right(l, key, r, k)`, `def L.insert_ordered(t, k, e)` and
+`def L.insert_count(t, k, x)`. Proof helpers go under the reserved `Policy.`
+namespace, which the gate ignores, and none of them may cite a law.

@@ -828,7 +828,7 @@
       "tier": 4,
       "path": "tasks/4/t4-bst-insert",
       "reference": "references/t4-bst-insert",
-      "hash": "85b946a5874e3b519a55997b7a60c6b5b7df55558c064c5c6b76ff88e3ccbe96"
+      "hash": "245bf5fb94c425195d8896d84f8454aab17f9855fad572c06662cb72045ff663"
     },
     {
       "task_id": "t4-nth-maybe",
