@@ -452,23 +452,51 @@ three tier-4 tasks before it each gave up something to get — the queue by
 consuming its premise in the proof, this one by declining to state the case the
 law already covers.
 
-A fifth tier-4 task is in flight and it is worth recording how it was almost two.
-The shape is a predicate transport between structures: a `Tree` fold and a list
-fold over the same traversal, with the tree's bound predicate moved onto the list
-the traversal produces, and the accumulator threaded identically on both sides so
-the step is convertible without Boolean algebra. Both authoring agents proposed
-it the same day, independently, each having checked that `inorder` was free at
-HEAD and each having found it free — because neither had registered it, and the
-prototypes lived in `/tmp`, which the other cannot see. tier3-author's scratch
-version even reused `t4-bst-insert`'s own `ordered`, `all_le` and `all_ge`
-verbatim, so the two were the same task twice rather than two tasks. Ruled one:
-tier2-author owns it, because their version carries an order-sensitive law that
-is not a definitional unfolding (`inorder_head`, measured with a negative
-control) whereas the other version's only order sensitivity was its shape pins,
-which its own author predicted would be the eleventh instance of the finding
-above. The lesson is not about this task — it is that the distinctness check has
-to run against *unregistered* work too, and a scratch prototype is invisible to
-a grep of the manifest, so two agents can pass the same check and still collide.
+A fifth tier-4 task is in flight and it is worth recording how it was almost two,
+and then what it took to settle which one. The shape is a predicate transport
+between structures: a `Tree` fold and a list fold over the same traversal, with
+the tree's predicate moved onto the list the traversal produces, and the
+accumulator threaded identically on both sides so the step is convertible without
+Boolean algebra. Both authoring agents proposed it the same day, independently,
+each having checked that `inorder` was free at HEAD and each having found it free
+— because neither had registered it, and the prototypes lived in `/tmp`, which
+the other cannot see. tier3-author's scratch version even reused `t4-bst-insert`'s
+own `ordered`, `all_le` and `all_ge` verbatim, so the two were the same task twice
+rather than two tasks. The lesson is not about this task — it is that the
+distinctness check has to run against *unregistered* work too, and a scratch
+prototype is invisible to a grep of the manifest, so two agents can pass the same
+check and still collide.
+
+The first ruling was wrong, and how it was wrong is the part worth keeping. It
+went to tier2-author, on the strength of a law (`inorder_head`) that is
+order-sensitive without being a definitional unfolding, against a version whose
+only order sensitivity was its two shape pins. That reasoning rested on a
+verification I ran myself — the reference closes, and a right-subtree-first
+traversal is rejected — and the verification had a hole: it tested right-first
+and not **root-first**. tier2-author found the preorder body, and it passes all
+three laws of that set (the transport is a conjunction over a permutation-blind
+fold; `inorder_head`'s premise empties the left traversal, which collapses a
+preorder LHS onto the head law's right-hand side exactly; the measure counts
+without looking at where anything sits). So the set did not pin the traversal at
+all. tier2-author rebuilt it with a definitional unfolding pin, measured that the
+pin then carried the whole corpus weight with the transport — the law the task is
+about — catching nothing alone, and reported that plainly rather than shipping it
+as green. That is `t3-sum-acc`/`t4-stack-wf` again, now self-diagnosed.
+
+The resolution is the design tier3-author had measured while that was happening:
+`inorder`, `bst` and the two decision-parameterised folds as **four** policy
+targets, with the sortedness law `bst(t, lo, hi) ⟹ sorted_put(inorder t, lo,
+True{})` beside the two bound transports. The mutant-to-law table is measured,
+one body per group: `inorder` mutants die on the pins, `bst` mutants (weakened
+*and* strengthened) on `inorder_sorted` alone because the reference proof
+projects the invariant's conjuncts, and each fold mutant on its own transport.
+That is four law groups each carrying a kill, which is the property no tier-4
+task in the bank has — every one of them collapses onto its pins. It is also why
+the competing version was worth rejecting: Option A (`inorder` alone, either
+law set) can only ever put the weight on an unfolding. tier3-author authors the
+task, not because of the ruling but because they hold the green six-law proof and
+the proof is the expensive artifact; tier2-author's staged version is parked under
+`_abandoned/`, and their finding is what forced the better design.
 
 None of the four tier-4 tasks carries a review record. Tier 4 is gated on one in M4, and
 not writing one is the point of Fact 27: the field is not evidence, so leaving
