@@ -675,6 +675,33 @@ and the resulting verdicts say `dev_only: true`.
    eight, `t3-split-even-odd` and `t3-sum-to-double`, sit one authored file
    short of the rule's floor of four and are being brought up to it.
 
+   **The rule names tier 3 and the defect is not tier-specific.** Counting every
+   tier rather than one: tiers 4 and 5 are fully hand-authored (7 tasks, 44
+   authored files between them), and tiers 1–3 are mostly not — **8 of the 20
+   tier-1 tasks and all 66 of the tier-2 tasks carry no hand-authored mutant
+   either**, so 92 of the 117 tasks at tiers 1–3 are in the shape the rule was
+   written to prevent. Sampled over seven of them rather than assumed —
+   `t2-add-laws`, `t2-rev-append`, `t2-map-laws`, `t2-sum-laws`, `t2-drop-laws`,
+   `t1-mul-zero`, `t1-double` — the generated corpora are **14 strong out of 66
+   files, 21%**, against 4/4 and 7/7 for authored ones, and the strongest of the
+   seven is 4/11. Every one of the seven is still `valid` with no problems,
+   because V2 asks only that *a* mutant type-checks and none escapes: a green
+   light over those corpora rests on one or two files. The tiers also say why
+   the generated files are dead weight rather than weak evidence — most of them
+   come back tier 1, which is "did not type-check bare", so the law was never
+   consulted on them at all. That is the linearity limit Fact 18 records
+   (a binder may be consumed once, so `recursion-arg`-shaped mutants are parse
+   errors), and it means the generator's reach is bounded by the language
+   rather than by the rule list.
+   The letter of the rule stops at tier 3 and this document does not silently
+   extend it: whether tiers 1–2 owe a hand-authored corpus too is a scope
+   decision with a real cost (86 tasks), and it is recorded here as open rather
+   than taken. What is not open is the measurement above, which is why it is
+   written down: the plan's own justification for the rule — that a corpus is
+   V2's evidence and the part of a task a person does better than a generator —
+   does not mention tiers, and a reader of the 200-task target should know that
+   92 of its 117 existing tasks are evidenced by one or two mutants apiece.
+
    The related finding from `t3-zip-len` is worse and was caught before it
    shipped. A corpus is not the only thing that can be thin. Its original two
    nil pins plus a length law were satisfied by a `zip` that built
