@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-all-zero-laws",
+  "tier": 2,
+  "laws": [
+    "all_zero_nil",
+    "all_zero_snoc"
+  ],
+  "policy_targets": [
+    "all_zero"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "6509d83e2d0901c9c0c9e810ef620114ff0da4fdb7b02a34b6daf1781ac021a6",
+    "prelude": "8312b62b75381927a58820a57c7e9ffcda9fcf92d6f294dab3befc0085ce030a"
+  },
+  "bend_version": "2.0.5"
+}

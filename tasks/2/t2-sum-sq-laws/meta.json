@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sum-sq-laws",
+  "tier": 2,
+  "laws": [
+    "sq_sum_nil",
+    "sq_sum_snoc"
+  ],
+  "policy_targets": [
+    "sq_sum"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3fb0b9d031152d24a8aba3473d343c9ed49cc92366b398da9db851187a3a360c",
+    "prelude": "36ad5b0895781c329a5c6a60bf1f8a23f7966c55ee3fc35a53cbf3b55b438189"
+  },
+  "bend_version": "2.0.5"
+}

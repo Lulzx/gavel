@@ -1,0 +1,10 @@
+import Base
+import ./prelude.bend as P
+
+def has_odd(xs: List<Nat>) -> Bool:
+  match xs:
+    case Nil{}:
+      Bool.or(P.is_odd_b(h), has_odd(t))
+
+    case h <> t:
+      False{}

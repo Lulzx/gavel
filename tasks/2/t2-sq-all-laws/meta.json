@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sq-all-laws",
+  "tier": 2,
+  "laws": [
+    "sq_all_single",
+    "sq_all_append"
+  ],
+  "policy_targets": [
+    "sq_all"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "c53937ed7c1ad69573930bd834e1be2fe3d0c9fecf2393d8e437959f40f551a1",
+    "prelude": "dd5575fb1ae73de2d5d0ee296da9009c86696ec713c0df5b7dc2edad37f019cc"
+  },
+  "bend_version": "2.0.5"
+}

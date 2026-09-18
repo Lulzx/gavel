@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-min-all-laws",
+  "tier": 2,
+  "laws": [
+    "min_all_single",
+    "min_all_append"
+  ],
+  "policy_targets": [
+    "min_all"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7485006516c264f372e347e2ee1122093f8a6a6f528de63fbe67d5efcbe40eb6",
+    "prelude": "102d91d650e323c0db48963ab6a4cdd24f8279d4f7cd23ac7ef9eedf8bc7036d"
+  },
+  "bend_version": "2.0.5"
+}

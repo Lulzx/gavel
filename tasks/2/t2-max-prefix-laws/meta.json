@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-max-prefix-laws",
+  "tier": 2,
+  "laws": [
+    "max_prefix_zero",
+    "max_prefix_len"
+  ],
+  "policy_targets": [
+    "max_prefix"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "712cd665d3212c365c65ca21e70b5108d647f4629f2cde5cda6a238d7e72ef07",
+    "prelude": "b6951d0551b09f1c22e851f57189b9805a6cdf96fca9baaee306f798d56d58a5"
+  },
+  "bend_version": "2.0.5"
+}

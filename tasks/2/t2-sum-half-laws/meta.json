@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sum-half-laws",
+  "tier": 2,
+  "laws": [
+    "sum_half_nil",
+    "sum_half_snoc"
+  ],
+  "policy_targets": [
+    "sum_half"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "4e2b90ed9d77b0e5a7569b7dfa2eeb1ff967b0b84051ebeac2c10b16828b5f1c",
+    "prelude": "20e61e1025a8397252dcddc4b610778fdf2e7d39d82c477a07b8ce26541cefb8"
+  },
+  "bend_version": "2.0.5"
+}

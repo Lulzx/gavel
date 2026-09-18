@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sum-nonzero-laws",
+  "tier": 2,
+  "laws": [
+    "sum_nonzero_nil",
+    "sum_nonzero_snoc"
+  ],
+  "policy_targets": [
+    "sum_nonzero"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "2157cd448848f9b1e6598425bd4e7757ab8a65e1f15391f1c279a1e650bb5e50",
+    "prelude": "4e6a5735a3e562c35e57c79880cb59565b7d3d3083fe4fcc08009e9bf092e9ef"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sq-prefix-laws",
+  "tier": 2,
+  "laws": [
+    "sq_prefix_zero",
+    "sq_prefix_len"
+  ],
+  "policy_targets": [
+    "sq_prefix"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "2b12bfeeb674e20ab32ab2e54df1c6c58f9ae812104f79cd07527dd93ea1a2cb",
+    "prelude": "6447f7259d5f2c864de9770ccb7428eb7c089e8ccc2b8a20d322c9904b4e3faf"
+  },
+  "bend_version": "2.0.5"
+}

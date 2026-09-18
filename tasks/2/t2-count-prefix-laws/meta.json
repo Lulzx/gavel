@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-count-prefix-laws",
+  "tier": 2,
+  "laws": [
+    "count_odd_prefix_zero",
+    "count_odd_prefix_len"
+  ],
+  "policy_targets": [
+    "count_odd_prefix"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "1c189047e85c6e79976436edb1c5fb75e8d86e5cf81bb762b3cef1226a9ae98b",
+    "prelude": "fe770993992a8733ac731eb9dece65449678b094ae94ae53af63cb7c00b40086"
+  },
+  "bend_version": "2.0.5"
+}

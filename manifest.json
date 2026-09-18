@@ -159,11 +159,32 @@
       "hash": "dbff4f212496fac985d04c4f365b76bbfec5f2cf0a58e348de739eba0445d5a9"
     },
     {
+      "task_id": "t2-all-even-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-all-even-laws",
+      "reference": "references/t2-all-even-laws",
+      "hash": "0dff60012f65bc551109489f86d04f0711469a4c3daee6563410f27a86550af7"
+    },
+    {
       "task_id": "t2-all-nonzero-laws",
       "tier": 2,
       "path": "tasks/2/t2-all-nonzero-laws",
       "reference": "references/t2-all-nonzero-laws",
       "hash": "598e2e9f664ebaff3ed9745026b7757e38235bc4e9c8f7828f826151111e3429"
+    },
+    {
+      "task_id": "t2-all-one-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-all-one-laws",
+      "reference": "references/t2-all-one-laws",
+      "hash": "7bd5388f829146d6bd0a30ca10c91308d844453d8b5973fdcd548492674beb27"
+    },
+    {
+      "task_id": "t2-all-zero-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-all-zero-laws",
+      "reference": "references/t2-all-zero-laws",
+      "hash": "1d42b2bae6783975d6ccc4b20053d811d94621a3f063c90c9091efb7267314c3"
     },
     {
       "task_id": "t2-append-laws",
@@ -180,6 +201,20 @@
       "hash": "f46f2a677c193546247e49e624f3516139e788fd2b7c14329adc0e48db8bac60"
     },
     {
+      "task_id": "t2-count-odd-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-count-odd-laws",
+      "reference": "references/t2-count-odd-laws",
+      "hash": "888eb9c8269cb26b505d31094601c0d40261e1acc228e2aa7f6ea5bbffd7bf57"
+    },
+    {
+      "task_id": "t2-count-prefix-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-count-prefix-laws",
+      "reference": "references/t2-count-prefix-laws",
+      "hash": "76d20b309d828f07054b395ac453f437b9662ab96bb01a1624de0afde56cca86"
+    },
+    {
       "task_id": "t2-double-all-laws",
       "tier": 2,
       "path": "tasks/2/t2-double-all-laws",
@@ -194,11 +229,39 @@
       "hash": "ecc00a5e6456e3276816a26088e5eb75f553e2195e750d8030731f139435d0dd"
     },
     {
+      "task_id": "t2-dup-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-dup-all-laws",
+      "reference": "references/t2-dup-all-laws",
+      "hash": "9413c14e22dd1eabaabf1ab9f1a898391ff9383e7e8bc554e365eb2660e7fd66"
+    },
+    {
       "task_id": "t2-elem-laws",
       "tier": 2,
       "path": "tasks/2/t2-elem-laws",
       "reference": "references/t2-elem-laws",
       "hash": "9b5d0c25ca47f4ec1fd76d8b6f632876550d840a8fa11515155544f023f0123b"
+    },
+    {
+      "task_id": "t2-has-odd-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-has-odd-laws",
+      "reference": "references/t2-has-odd-laws",
+      "hash": "2cbcb8da29526b5dc212a4757f2eda209309f9e129ce5e2cd24b8d9932c72936"
+    },
+    {
+      "task_id": "t2-has-one-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-has-one-laws",
+      "reference": "references/t2-has-one-laws",
+      "hash": "5679406039d6b77f5935e66639cccfd704f0bc110d201454023382acd53b9029"
+    },
+    {
+      "task_id": "t2-inc-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-inc-all-laws",
+      "reference": "references/t2-inc-all-laws",
+      "hash": "4625385079be2ecba3657c3bcb69be344003ac24c392b31357a053d6aa1503f4"
     },
     {
       "task_id": "t2-init-laws",
@@ -222,11 +285,32 @@
       "hash": "fec3a6e71665f7aed329038b807cc835f83607c71807f8e4f4b4487571bf96a2"
     },
     {
+      "task_id": "t2-max-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-max-all-laws",
+      "reference": "references/t2-max-all-laws",
+      "hash": "b8d1767bb9e8cd9bae6a38fb034cad2b60413458819a94f133810846f1cfc150"
+    },
+    {
       "task_id": "t2-max-laws",
       "tier": 2,
       "path": "tasks/2/t2-max-laws",
       "reference": "references/t2-max-laws",
       "hash": "583b2a5cb4bbb7eb37097479d62f2c7fc90ba99226984ebc7a890629c874f405"
+    },
+    {
+      "task_id": "t2-max-prefix-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-max-prefix-laws",
+      "reference": "references/t2-max-prefix-laws",
+      "hash": "5a4563bacf3e5ae5183ee89a5864d719c77f51be97a7d365a3d0a7b4fd6e28ec"
+    },
+    {
+      "task_id": "t2-min-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-min-all-laws",
+      "reference": "references/t2-min-all-laws",
+      "hash": "86fb579923094710752c3e29d6be7aab507b8f5a71338400ddb531edc0e1ea46"
     },
     {
       "task_id": "t2-min-laws",
@@ -255,6 +339,13 @@
       "path": "tasks/2/t2-pow-laws",
       "reference": "references/t2-pow-laws",
       "hash": "9a20fd168c28fd7bf3b8c73f42e80cd132fb5751c9c336ce17aabb46c85d9afc"
+    },
+    {
+      "task_id": "t2-pred-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-pred-all-laws",
+      "reference": "references/t2-pred-all-laws",
+      "hash": "5cd69a9d746179c943a9bbdee89a27b2d714a38d3b74449033d93d75c1dce52a"
     },
     {
       "task_id": "t2-pred-laws",
@@ -292,6 +383,27 @@
       "hash": "7052305770aa1fc4ddf15de25721892c9ab06d6111b07cf0b27492016761021b"
     },
     {
+      "task_id": "t2-sq-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sq-all-laws",
+      "reference": "references/t2-sq-all-laws",
+      "hash": "196b8237c89d058d4f0b3a1b2e4940ebfbc225e6b09602b15fe238d95709f34a"
+    },
+    {
+      "task_id": "t2-sq-prefix-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sq-prefix-laws",
+      "reference": "references/t2-sq-prefix-laws",
+      "hash": "6b7449750b9319438a94337f3fae8c29409cb194fd8f2615e98279d476558190"
+    },
+    {
+      "task_id": "t2-sub-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sub-all-laws",
+      "reference": "references/t2-sub-all-laws",
+      "hash": "82bf4f25cba5ed40f06dcea46c0e1965f1cba7783174f351eb1fa17ba1dc1a24"
+    },
+    {
       "task_id": "t2-sub-laws",
       "tier": 2,
       "path": "tasks/2/t2-sub-laws",
@@ -306,6 +418,13 @@
       "hash": "9d71c22206fc7476dabea8fe84c348fb766d6c99ba8f8dfd826050408e2dca8c"
     },
     {
+      "task_id": "t2-sum-half-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-half-laws",
+      "reference": "references/t2-sum-half-laws",
+      "hash": "fb876e4f6dc66155c27e5b16cdf522a037c97ce008ce3995fc1a71c99593b2a0"
+    },
+    {
       "task_id": "t2-sum-laws",
       "tier": 2,
       "path": "tasks/2/t2-sum-laws",
@@ -313,11 +432,25 @@
       "hash": "5a1c31140343bbe45dd143870aa32025f4aa1be31a6b96cad905392a28a425d2"
     },
     {
+      "task_id": "t2-sum-nonzero-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-nonzero-laws",
+      "reference": "references/t2-sum-nonzero-laws",
+      "hash": "19e75d76b4056b704546b0aaf3662f55af7db0b80ae900b7bd42b90a87e53e59"
+    },
+    {
       "task_id": "t2-sum-prefix-laws",
       "tier": 2,
       "path": "tasks/2/t2-sum-prefix-laws",
       "reference": "references/t2-sum-prefix-laws",
       "hash": "82978d8d7cacc60da8d3644c4589e9e36c77fc9c874f168f2d0d4a4eb50fc751"
+    },
+    {
+      "task_id": "t2-sum-sq-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-sq-laws",
+      "reference": "references/t2-sum-sq-laws",
+      "hash": "338dcfab7edf1353c02a75de3e7a26b43290073e6338bf0e57a41d628d605a80"
     },
     {
       "task_id": "t2-take-laws",

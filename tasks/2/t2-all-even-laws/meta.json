@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-all-even-laws",
+  "tier": 2,
+  "laws": [
+    "all_even_nil",
+    "all_even_snoc"
+  ],
+  "policy_targets": [
+    "all_even"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "47099143b52dcce3a1addb97daa8456af7ae9e74150d6bdba72f8b979d1a2b5b",
+    "prelude": "62f4e77d426c16ec79e3d10472354a3be9df794347851c56ad96183efd120181"
+  },
+  "bend_version": "2.0.5"
+}

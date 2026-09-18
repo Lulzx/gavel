@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-pred-all-laws",
+  "tier": 2,
+  "laws": [
+    "pred_all_single",
+    "pred_all_append"
+  ],
+  "policy_targets": [
+    "pred_all"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "85d1e387496d4a35b219a87e87552978e671dd01d8eb719ceb8452f8c926ac52",
+    "prelude": "22c8087ed5a94a0776b65c035b64c3e0649969df9711f6c596560eacf419b6a7"
+  },
+  "bend_version": "2.0.5"
+}

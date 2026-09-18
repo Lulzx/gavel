@@ -1,0 +1,9 @@
+import Base
+import ./prelude.bend as P
+
+def all_even(xs: List<Nat>) -> Bool:
+  match xs:
+    case Nil{}:
+      True{}
+    case h <> t:
+      Bool.and(P.is_even_b(h), all_even(t))

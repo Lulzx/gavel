@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-dup-all-laws",
+  "tier": 2,
+  "laws": [
+    "dup_all_single",
+    "dup_all_append"
+  ],
+  "policy_targets": [
+    "dup_all"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3b5fad4f1103387c0d7684d383eb08f643e8640d7b07e609100def588b885a9f",
+    "prelude": "19489eda9adb773d2484c4431cf4143d49cd3c6bdbf69081b5c78343d3ce899a"
+  },
+  "bend_version": "2.0.5"
+}

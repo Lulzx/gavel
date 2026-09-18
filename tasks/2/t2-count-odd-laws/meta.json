@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-count-odd-laws",
+  "tier": 2,
+  "laws": [
+    "count_odd_nil",
+    "count_odd_snoc"
+  ],
+  "policy_targets": [
+    "count_odd"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "f0ae53d8afa55e80d223e11888f778dde65a9969c2f08c5691994066ac9265e9",
+    "prelude": "37865d6a3f4d3a818bf9273569b3914b63b4ecb894b2de4ba240f3b2ba25e1fd"
+  },
+  "bend_version": "2.0.5"
+}

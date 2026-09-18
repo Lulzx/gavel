@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-has-odd-laws",
+  "tier": 2,
+  "laws": [
+    "has_odd_nil",
+    "has_odd_snoc"
+  ],
+  "policy_targets": [
+    "has_odd"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "38bf248589fc0e23df1b5581315fc133ca43d5e2728245bc10292b3ced42a1e8",
+    "prelude": "e192044fb03ada8e3b85c7e25be82d8db6ee53f5e0ea9b3f1670915fceaddb90"
+  },
+  "bend_version": "2.0.5"
+}
