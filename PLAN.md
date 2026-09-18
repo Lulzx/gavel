@@ -737,6 +737,13 @@ and the resulting verdicts say `dev_only: true`.
    have been defensible; doing both is the choice because neither the evidence
    nor the count is worth having alone.
 
+   The 92 is the census as measured, not a running total, and the first batch
+   against it landed the same day (`5187735`): six of the 66 tier-2 tasks —
+   `t2-add-laws`, the three `all-*` tasks, `t2-at-laws` and
+   `t2-count-prefix-laws` — now carry four authored mutants each, all strong
+   (6/6 valid, problems empty). The ratio is what moved; the finding stands
+   until the count reaches zero.
+
    The related finding from `t3-zip-len` is worse and was caught before it
    shipped. A corpus is not the only thing that can be thin. Its original two
    nil pins plus a length law were satisfied by a `zip` that built
