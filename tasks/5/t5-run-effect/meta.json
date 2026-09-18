@@ -1,0 +1,27 @@
+{
+  "task_id": "t5-run-effect",
+  "tier": 5,
+  "laws": [
+    "step_inc",
+    "step_add",
+    "run_inc",
+    "run_add",
+    "effect_inc",
+    "effect_add",
+    "run_compose",
+    "effect_hom",
+    "run_effect"
+  ],
+  "policy_targets": [
+    "step",
+    "run",
+    "effect"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ab2693a4d0910b426a7902886fec1b261e7b12fbbd1a1853a7658a7a678db05d",
+    "prelude": "882e8e04c7e45cd47e4b2e036dc3c0e061b60899b37223b44c5e2ece43676aa6"
+  },
+  "bend_version": "2.0.5"
+}

@@ -584,6 +584,13 @@
       "path": "tasks/4/t4-stack-wf",
       "reference": "references/t4-stack-wf",
       "hash": "3374547a5361cfeeaaec0497e49c7c2c14911ae12fcf45ea3d3700a997e35114"
+    },
+    {
+      "task_id": "t5-run-effect",
+      "tier": 5,
+      "path": "tasks/5/t5-run-effect",
+      "reference": "references/t5-run-effect",
+      "hash": "6c2436c8c9741345b6861976d6d9509c441b75aeb1069fb8c9c7c197ed4ac31f"
     }
   ]
 }

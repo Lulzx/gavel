@@ -331,13 +331,11 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 2 | Single structural induction, one rewrite | `t2-rev-append` |
 | 3 | Induction with auxiliary lemmas the policy must state | `t3-tree-flatten` |
 | 4 | Invariant preservation over a data structure | `t4-stack-wf` |
-| 5 | Program-level laws with state and multiple interacting functions | — |
+| 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 4.** Of the 83 registered tasks, 20 are tier 1, 46
-are tier 2, 15 are tier 3 and 2 are tier 4; no task is tier 5. A tier is not
-part of the curriculum until a task exists at it and a reference proves it, so
-M4's 200 and its "including tier 5" are currently unmet by construction rather
-than by oversight.
+**The bank's ceiling is tier 5.** Of the 84 registered tasks, 20 are tier 1, 46
+are tier 2, 15 are tier 3, 2 are tier 4 and 1 is tier 5. The 200 of M4 is still
+short by construction; tier 5 is no longer missing for that reason.
 
 Tier 4 is the first tier whose *law* is about a predicate the task declares
 rather than about a function it defines. `t4-stack-wf` states it in the
@@ -349,13 +347,29 @@ that the input was ordered), plus `insert_count` to pin the key that goes in.
 Both are minimal on purpose: the law is the invariant, and the side condition is
 what makes it a conditional rather than a claim the checker should reject.
 
-Neither carries a review record. Tier 4 is gated on one in M4, and not writing
-one is the point of Fact 27: the field is not evidence, so leaving it absent is
-the only honest state until review happens somewhere the pipeline cannot write. Tier 5's two
-canonical examples in SPEC §10 (`you_cant_win`, a ledger summing to zero) are
-not in the vendored tree: `toolchain/2.0.5/bend2/` is `main.ts`, `bend.ts`,
-`comp.ts`, `base.bend` and `effs/`, with no `demos/`, so tier 5 has to be
-written fresh rather than ported.
+None of the three carries a review record. Tier 4 is gated on one in M4, and
+not writing one is the point of Fact 27: the field is not evidence, so leaving
+it absent is the only honest state until review happens somewhere the pipeline
+cannot write.
+
+Tier 5's two canonical examples in SPEC §10 (`you_cant_win`, a ledger summing
+to zero) are not in the vendored tree: `toolchain/2.0.5/bend2/` is `main.ts`,
+`bend.ts`, `comp.ts`, `base.bend` and `effs/`, with no `demos/`. Tier 5
+therefore had to be written fresh, and `t5-run-effect` is that task: a
+two-instruction machine whose program text is read two ways, `run` executing it
+and `effect` summarising it without running it. The law that carries the tier
+is `run_effect`, `run(prog, s) == s + effect(prog)` — that the summary is
+correct — and it is the only law here that is not as strong as it looks. The
+first draft had only the three program-level laws, and measurement found them
+jointly satisfiable by the degenerate pair `run = λp s. s` with
+`effect = λp. 0n`, which reaches tier 4 while proving nothing: `effect_hom`
+becomes `0n == 0n + 0n` and `run_effect` becomes `s == s + 0n`. Six
+definitional pins were added (`step_inc`, `step_add`, `run_inc`, `run_add`,
+`effect_inc`, `effect_add`) so that each function is named on a program whose
+answer is written down rather than related to the other function. The lesson is
+general and is why the tier table now has a second row worth reading: a
+program-level law between two functions the policy writes is vacuous unless
+something else in the file pins each function alone.
 
 ## 4. Milestones and work packages
 
@@ -436,12 +450,13 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 83 tasks (20 tier 1, 46 tier 2, 15 tier 3, 2 tier 4), together
-   rather than per task, because a task is sound only against a corpus that
-   shares the degenerate generator with it: **83/83 valid over 1544 checker
-   runs** in CI (run `35350369509`). Tier 5 is empty
-   (§3.9), so the 200 has a ceiling on what the bank can currently contribute to
-   it.
+   progress** — 84 tasks (20 tier 1, 46 tier 2, 15 tier 3, 2 tier 4, 1 tier 5),
+   validated together rather than per task, because a task is sound only against
+   a corpus that shares the degenerate generator with it. The last CI run over a
+   whole bank was at 83 tasks: **83/83 valid over 1544 checker runs** (run
+   `35350369509`). `t5-run-effect` is the 84th and was validated locally
+   (`1/1 valid ... 20 checker runs`); CI re-measures on push. The 200 is short by
+   116 and every one of them is a scale problem rather than a design one.
 
    The CI job is `uv run python -m tools.validate`, deliberately without
    `--strict`. Every task in the bank carries the same warning — calibration
@@ -639,16 +654,17 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 83, of which two are tier 4.** The ceiling is
-   §3.9: no tier-5 task exists, so this is a scale problem and not a design one
-   -- the pipeline is the one that already produced 83 tasks, and the check that
+1. **500+ tasks including tier 5. 84, of which two are tier 4 and one is tier
+   5.** None of the five tiers is empty, so what is left here is volume: the
+   pipeline that produced 83 tasks produced the 84th as well, and the check that
    keeps it honest (a manifest entry must resolve to a directory inside the same
-   commit) exists and has already caught its own failure once. `t4-stack-wf` and
-   `t4-bst-insert` were authored a task at a time and both validate; tier 4 is
-   no longer empty and the remaining 417 are volume. Tier 5 has no reference
-   implementation anywhere in the vendored tree and has to be written from
-   SPEC §10's description, so it is the one part of this item that is not a
-   waiting room.
+   commit) exists and has already caught its own failure once. The tier-5 task
+   was the one part of this item that was not a waiting room, and it is now
+   written: `t5-run-effect`, authored from SPEC §10's description because the
+   vendored tree has no tier-5 reference to port. The remaining 416 are volume,
+   and the interesting question the first one answered — whether a program-level
+   law between two policy-written functions can be sound at all — is the one
+   §3.9 now records.
 2. **Human-reviewed laws for tier ≥ 3. Not satisfied, and the bank says it
    is** -- see below.
 3. **Published throughput benchmark. Blocked on a quiet machine, not on the
