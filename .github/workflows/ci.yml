@@ -53,9 +53,9 @@ jobs:
   sandbox:
     name: adversarial corpus under bubblewrap
     runs-on: ubuntu-latest
-    # Not yet verified on a Linux host, and the flags below are where that shows.
-    # A nested sandbox needs the outer container to be permissive, and the three
-    # obstacles were met one at a time, each verified against the real job:
+    # Verified on a Linux host now, and it took four flags to get there. A
+    # nested sandbox needs the outer container to be permissive, and the four
+    # obstacles were met one at a time, each measured against the real job:
     #
     #   seccomp          blocks the clone(CLONE_NEWUSER) bwrap starts with
     #   capabilities     no CAP_SYS_ADMIN, so `mount / slave` is refused
@@ -72,9 +72,13 @@ jobs:
     # CI container so that it can host a sandbox; the inner bwrap still unshares
     # every namespace and is the thing the adversarial corpus is attacking.
     #
-    # Left non-blocking until a green run exists, then flip this to false: a job
-    # that is allowed to fail is a job nobody reads.
-    continue-on-error: true
+    # Green in 35338052842, and green in every run since 35337093806 -- which is
+    # the run worth remembering, because the first time the sandbox actually
+    # ran it failed a test that had passed on the plain backend for its whole
+    # life: a stand-in checker written into pytest's tmp_path, which the sandbox
+    # shadows with a fresh tmpfs on /tmp. A job that is allowed to fail is a job
+    # nobody reads, and that bug is the whole argument for this one.
+    continue-on-error: false
     steps:
       - uses: actions/checkout@v4
 

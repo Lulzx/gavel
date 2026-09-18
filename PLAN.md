@@ -75,6 +75,27 @@ Added while implementing M0, each with a test in `tests/`:
 
     The numbers are also only comparable within one measurement. The 10k soak below reports p50 320 ms against the ~180 ms measured here quiet, because the soak ran on 8 jobs on the same machine while this session was building, testing, and committing. The honest reading of the soak latency is "contended"; the honest reading of ~180 ms is "idle".
 
+25. **Bubblewrap inside Docker needs `--privileged`, and it fails four different ways getting there.** Measured one flag at a time against the real CI job, because each failure named a different obstacle and only the fourth was the one that mattered:
+
+    | flags | result |
+    |---|---|
+    | `seccomp=unconfined` | `Failed to make / slave: Permission denied` |
+    | `+ --cap-add SYS_ADMIN` | same message, unchanged |
+    | `+ apparmor=unconfined` | `Can't mount proc on /proc: Operation not permitted` |
+    | `--privileged` | the reference reaches tier 4 and the corpus runs |
+
+    The messages are the useful part. seccomp blocks the `clone(CLONE_NEWUSER)` bwrap opens with; the capability set omits `CAP_SYS_ADMIN` so the propagation mount is refused; and after those two are fixed, AppArmor's `docker-default` profile denies `mount` outright *regardless of capabilities* — which is why adding SYS_ADMIN changed nothing and why the same sentence twice was not a wasted measurement. The fourth is not a capability at all: Docker remounts `/proc` and masks paths inside the container, so a fresh procfs cannot be mounted over it. `--privileged` subsumes all four, which is why it replaced the three narrower flags rather than joining them.
+
+    The privilege is granted to the CI container so it can *host* a sandbox; the inner bwrap still unshares every namespace, and that is what the adversarial corpus attacks. Also measured, and the reason this was worth doing rather than asserting: once the sandbox actually ran, one of 78 checker tests failed — the timeout test, whose stand-in checker lived in `/tmp`, which the sandbox shadows with a fresh tmpfs. It had passed for its whole life on the plain backend.
+
+26. **A task's prelude is elaborated in every book in that task, whether or not anything calls it.** The law file imports it, so the checker type-checks it as part of the reference, the mutants, the degenerate corpus, and the policy's submission. A defect inside it therefore fails *everything* — and the symptom points at the wrong file: the first invariant to complain is V1 reporting that the **reference** is tier 1, and the `Location:` naming the prelude is several lines into an error block nobody reads that far down.
+
+    Measured twice in a bank of 58. Both were the same defect, a binder consumed twice: `(h + h) <> double_all(t)` in `t3-zip-sum`, and `x <> replicate(k, x)` plus `b + mul(p, b)` in `t3-sum-replicate` — a `case h <> t:` binder and a function parameter are both Lone, and using either twice is a linearity error, not a warning. Two authors spent an afternoon each on tasks that could never check, and one of them diagnosed it correctly and could not fix it, because `tasks/` is not the author's to edit.
+
+    Two spellings fix it and both are in the bank. `references/t2-double-all-laws/solution.bend` duplicates: `+h2 = h`, then uses `h2` the second time. The shipped fix marks the binder instead — `def replicate(n: Nat, +x: Nat)` and `case +h <> t:` — which says the same thing in the signature rather than in a line of the body, and is what `double_all`/`replicate`/`mul` now carry. `+` on a binder is the declaration that it may be consumed more than once; the duplication makes a second binder of the same value. Neither is wrong, but the `+` form is the one that reads as a type and not as a trick, so it is the one to reach for first.
+
+    The general lesson is the one Fact 23 already taught in a different guise: **a diagnosable failure must be reported against the file that is wrong.** `_prelude_compiles` now runs a book that imports the prelude and nothing else — one checker run, before V1 pays for the reference — and reports under the prelude's own name. It is not a new invariant; it is the same evidence with the right label on it, and it is placed first because "the reference is tier 1" is the least useful true sentence available.
+
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
 ## 1. Deviations from SPEC.md
@@ -291,20 +312,27 @@ Exit: 20 tasks tiers 1–3, `gavel check` CLI, p50 < 1 s, zero-shot solve rate 1
 1. Full tokenizer port with `base.bend` round-trip test. **Done** (M1.1).
 2. `gate.py` all rules; `tests/adversarial/` corpus (≥ 30 files). **Done** — 42 payloads.
 3. `tools/mutate.py`, `tools/degenerate.py`; V2/V3 wired into `validate.py`; all 20 tasks pass. **Done.**
-4. Linux bubblewrap backend + Dockerfile that installs pinned bun and copies `toolchain/`; CI runs the adversarial corpus inside it. **Written, not yet run on a Linux host** — see below.
+4. Linux bubblewrap backend + Dockerfile that installs pinned bun and copies `toolchain/`; CI runs the adversarial corpus inside it. **Done, and blocking** — green in run `35338052842`; see below.
 5. Mutant-consistency tripwire (§7.4.2) in `check.py`. **Done** (M1.5). The tripwire compares whole files rather than hashes, because a policy is free to submit a different proof for the same solution; a digest match would have to be a digest of the solution alone, which is the same comparison with less to read in the log.
 
 **M1.4 status.** `runner.BwrapBackend` (`--unshare-all`, read-only root with the
 check's directory bound back over it, `--die-with-parent`), `select_backend`,
 the `backend` field on every `CheckResult`, `Dockerfile`, `.dockerignore`, CI,
-and `tools/sandbox_check.py` are all in place. What is missing is the run: this
-machine is macOS, so there is no bubblewrap and no way to execute the path
-here, and a unit test of the argv would pass on a host where bubblewrap cannot
-create a user namespace at all — which is the failure that matters, because it
-is silent. `tools/sandbox_check.py` closes that gap by requiring a *real* check
-to reach tier 4 under the sandbox rather than by asserting on flags, and the CI
-`sandbox` job runs it plus the adversarial corpus in the container. That job is
-`continue-on-error: true` until a green run exists; flip it to blocking then.
+and `tools/sandbox_check.py` are all in place, and as of run `35338052842` the
+job that runs them is green and blocking.
+
+The run was the part that could not be substituted. This machine is macOS, so
+there is no bubblewrap and no way to execute the path here, and a unit test of
+the argv would pass on a host where bubblewrap cannot create a user namespace at
+all — which is the failure that matters, because it is silent.
+`tools/sandbox_check.py` closes that gap by requiring a *real* check to reach
+tier 4 under the sandbox rather than by asserting on flags, and the CI `sandbox`
+job runs it plus the adversarial corpus in the container. Getting the container
+permissive enough took four flags, measured one at a time (Fact 25), and the
+first run that got through failed a test — a stand-in checker in `tmp_path` that
+the sandbox shadows with a fresh tmpfs on `/tmp`, which had passed on the plain
+backend for its whole life. That failure is the argument for making the job
+blocking, so it is now `continue-on-error: false`.
 
 Fail-closed is the design decision worth naming: `select_backend("bwrap")`
 raises when bubblewrap is absent, and `auto` raises on Linux rather than
@@ -319,10 +347,19 @@ and the resulting verdicts say `dev_only: true`.
    reference → mutants → calibrate → publish), with human review checkpoint for
    tier ≥ 3. **Done, as a driver rather than as a generator.** `tools/author.py`
    runs the stages in order and refuses to carry a task past one it has not
-   passed: files → derive → V1–V5 → episode → review → publish. Two of the six
-   are model work — nothing here translates a module or invents a law — so what
-   is automated is the part the plan can hold to a rule, and what is not is
-   named as not.
+   passed: files → derive → mutants → V1–V5 → episode → review → publish. Two
+   of the seven are model work — nothing here translates a module or invents a
+   law — so what is automated is the part the plan can hold to a rule, and what
+   is not is named as not.
+   The mutants stage was added after the fact and is the clearest evidence the
+   stage list was wrong: SPEC's loop has mutants between the reference and
+   calibrate, the driver went straight from the reference to V1–V5, and so every
+   fresh task died at `invariants` on "V2: no mutants authored" — a verdict
+   about a task that was really a step nobody ran, for the one part of the loop
+   already mechanised in `tools/mutate.py`. It generates a corpus only when
+   `references/<task>/mutants/` is empty, because a corpus is the one part of a
+   task a person can improve by hand and re-running the pipeline must not
+   silently replace it.
    The episode stage is not a duplicate of V1. V1 asks whether the checker
    accepts the reference; the episode asks whether the task *rewards* it — gate
    open, tier 4, reward 1.0, done on the first turn — through the same

@@ -125,7 +125,9 @@ def test_a_sound_task_passes_every_invariant(task, toolchain):
     assert report.valid, report.problems
     assert report.warnings == ["calibration: no zero_shot_solve_rate recorded"]
     assert report.reference_ms > 0
-    assert report.checked[0] == "reference"
+    # The prelude is elaborated by every book in the task, so it is checked
+    # first: one run, before V1 pays for the reference.
+    assert report.checked[:2] == ["prelude", "reference"]
     assert "degenerate:reference+holed-proof" in report.checked
     assert report.mutant_tiers and all(t != TIER_COMPLETE for t in report.mutant_tiers)
 

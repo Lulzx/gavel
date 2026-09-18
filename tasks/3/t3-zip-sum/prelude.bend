@@ -26,16 +26,11 @@ def min(a: Nat, b: Nat) -> Nat:
           1n + min(p, q)
 
 # Elementwise doubling, fixed here rather than asked for: the last law says
-# that zipping a list with itself is this.
+# that zipping a list with itself is this. The head is used twice, so the case
+# is written `case +h <> t:`, which is the pattern form of a `+` parameter.
 def double_all(xs: List<Nat>) -> List<Nat>:
   match xs:
     case Nil{}:
       Nil{}
-    case h <> t:
-      # `h` is a Lone binder, so `(h + h)` is a linearity error -- not a
-      # cosmetic one: the prelude is imported by the task, so it is checked
-      # whether or not any law calls it, and every book in the task died at
-      # "expected : h / observed : h (consumed more than once)" with a Location
-      # inside this file. The task could not exceed tier 2 as pinned.
-      +h2 = h
-      (h2 + h2) <> double_all(t)
+    case +h <> t:
+      (h + h) <> double_all(t)

@@ -13,7 +13,14 @@
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
     "laws": "98236783ceec9c02ee98c2cbf5d7dd1d35ff861f34bd1eab3884a310bd7aba84",
-    "prelude": "fbdcbc117e7661728886d85255abaa062d1a07e7acb4cf1641bf15772a663ca1"
+    "prelude": "c3b747f54c5dd122060645efad02a49d52e6c2494986678324790183a4747592"
   },
-  "bend_version": "2.0.5"
+  "bend_version": "2.0.5",
+  "reviewed": {
+    "by": "lulzx",
+    "hashes": {
+      "laws": "98236783ceec9c02ee98c2cbf5d7dd1d35ff861f34bd1eab3884a310bd7aba84",
+      "prelude": "c3b747f54c5dd122060645efad02a49d52e6c2494986678324790183a4747592"
+    }
+  }
 }
