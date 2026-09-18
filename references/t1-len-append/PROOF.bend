@@ -27,3 +27,8 @@ def L.len_nil_right(xs):
 # the goal is `ys == ys`.
 def L.append_nil_left(ys):
   {==}
+
+# `append` matches on its first argument, so with a cons cell on the left it
+# steps straight to `h <> append(t, ys)`, which is the right-hand side.
+def L.append_cons(h, t, ys):
+  {==}

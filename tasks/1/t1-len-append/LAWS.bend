@@ -27,3 +27,14 @@ law len_nil_right:
 law append_nil_left:
   for ys: List<Nat>
   {S.append(Nil{}, ys) == ys : List<Nat>}
+
+# LAW: the second argument survives the cons step. None of the laws above ever
+# applies `append` to a non-empty second argument in a cons step -- they count,
+# or they fix the empty first argument -- so a body whose cons step recurses
+# against `Nil{}` instead of `ys` satisfies all four at tier 4, reward 1.000
+# (it answers `xs` whenever `xs` is non-empty). This law is what sees `ys`.
+law append_cons:
+  for h: Nat
+  for t: List<Nat>
+  for ys: List<Nat>
+  {S.append(h <> t, ys) == h <> S.append(t, ys) : List<Nat>}

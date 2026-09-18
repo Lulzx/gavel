@@ -17,3 +17,8 @@ def L.len_snoc(xs, x):
     case h <> t:
       %L.len_snoc(t, x) : {1n + S.len(S.snoc(t, x)) == 1n + _ : Nat}
       {==}
+
+# `snoc` matches on its first argument, so with a cons cell on the left it steps
+# straight to `h <> snoc(t, x)`, which is the right-hand side: definitional.
+def L.snoc_cons(h, t, x):
+  {==}
