@@ -22,6 +22,20 @@ jobs:
         with:
           enable-cache: true
 
+      # The checker is the reward signal and it runs on bun, so a job without
+      # bun cannot run a single check -- which is what this job was doing: every
+      # checker test errored at the `toolchain` fixture and the suite reported
+      # it as 140 test errors rather than as a missing runtime.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          # A second copy of the pin in toolchain/bun.version. The step below is
+          # what makes that safe: two homes for one pin are fine as long as they
+          # cannot disagree without the build saying so.
+          bun-version: 1.3.14
+
+      - name: The bun pin is the one the toolchain pins
+        run: test "$(bun --version)" = "$(cat toolchain/bun.version)"
+
       - name: Install
         run: uv sync --frozen
 

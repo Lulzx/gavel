@@ -28,7 +28,10 @@ COPY --from=ghcr.io/astral-sh/uv:0.8 /uv /usr/local/bin/uv
 WORKDIR /gavel
 
 # Dependencies first: they change far less often than the harness does.
-COPY pyproject.toml uv.lock ./
+# README.md comes with them because pyproject.toml names it as the project's
+# readme, and hatchling reads it while building the editable install -- without
+# it the build fails here, one layer before the file would have arrived.
+COPY pyproject.toml uv.lock README.md ./
 RUN uv sync --frozen --no-dev
 
 COPY . .
