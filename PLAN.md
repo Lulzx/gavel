@@ -338,8 +338,9 @@ are tier 2, 30 are tier 3, 3 are tier 4 and 3 are tier 5. No tier is empty, so
 what M2's 200 and M4's 500 are short of is volume rather than a design nobody
 has done yet.
 
-The last 36 of those are a 35-task batch from the two authoring agents plus
-`t5-opt-drop`, and the tier-2 half of the batch is a *family*.
+The last 37 of those are a 35-task batch from the two authoring agents, the
+third tier-5 task (`t5-opt-drop`) and the third tier-4 one (`t4-queue-rep`), and
+the tier-2 half of the batch is a *family*.
 Its twenty tasks are four list functions — `all_<f>`, `sum_<f>`, `has_<f>` and
 `<f>_all` — instantiated at ten arithmetic predicates (`mult3`, `mult5`, `cube`,
 `dec2`, `mod3`, `mod5`, `pow2`, `sq-inc`, `succ2`, `triple`), each carrying the
@@ -799,8 +800,9 @@ waiting room.
 1. **500+ tasks including tier 5. 122, of which three are tier 4 and three are
    tier 5.** None of the five tiers is empty, so what is left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
-   the same shape of work has since produced 36 more (a 35-task batch from two
-   authoring agents and the third tier-5 task), so the remaining 378 are volume
+   the same shape of work has since produced 37 more (a 35-task batch from two
+   authoring agents, the third tier-5 task and the third tier-4 one), so the
+   remaining 378 are volume
    and nothing else. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
