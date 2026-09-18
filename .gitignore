@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# The runner writes these into a check's working directory, and they should
+# never survive into a task tree.
+.gavel.stdout
+.gavel.stderr
+.gavel-work/
+
+# OS
+.DS_Store

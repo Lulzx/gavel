@@ -1,0 +1,28 @@
+{
+  "task_id": "t1-add-zero",
+  "tier": 1,
+  "title": "x + 0 = x",
+  "difficulty_weight": 1.0,
+  "source": {
+    "benchmark": "custom",
+    "origin": "Bend guide, laws section"
+  },
+  "tags": [
+    "nat",
+    "reflexivity",
+    "induction"
+  ],
+  "laws": [
+    "add_zero"
+  ],
+  "policy_targets": [
+    "add"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "465bcfbbc4058a8248a61bba079bb7af01627ec1f1a5e88f4776ddf1aa562d40",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

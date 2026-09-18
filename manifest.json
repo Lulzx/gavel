@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "bend_version": "2.0.5",
+  "toolchain_hash": "121c70615f2d37827a9f5489d4800358c69b824348c25be5c72545d9b29dc10d",
+  "bun_version": "1.3.14",
+  "tasks": [
+    {
+      "task_id": "t1-add-zero",
+      "tier": 1,
+      "path": "tasks/1/t1-add-zero",
+      "reference": "references/t1-add-zero",
+      "hash": "e78214df4cbe59630283d876c53c1e5f2399aed5b6bd138c8147ebfdf8a6b514",
+      "valid": true
+    }
+  ]
+}
