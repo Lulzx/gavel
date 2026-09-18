@@ -370,6 +370,16 @@ looks.
    checker is already pinned to, and covered by a test that starts a real
    server (`tests/test_server.py`).
 4. Persistent bun worker backend; publish p50/p95/p99 and verdicts/min/core.
+   **Half done: the numbers are published, the backend is not built.**
+   `tools/soak.py` reports p50/p95/p99 and verdicts/min/core from a real run,
+   but every check is still a fresh `bun bend2/main.ts`, so what those numbers
+   measure is the process-per-check design rather than a check. The soak also
+   bounds what a worker could win: the difference between its per-check time
+   and the reference's own `reference_ms` is bun startup plus one parse of
+   `base.bend`, and that constant is the whole prize. Not built because the
+   checker process *is* the thing the sandbox is a boundary around —
+   `gavel/runner.py` reasons about a process it starts, scrubs, limits, and
+   kills, and none of those apply to a worker that outlives the check.
 5. 10k-episode unattended soak with a scripted policy.
 
 ### M4 — Bank v1.0
