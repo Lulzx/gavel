@@ -782,22 +782,26 @@ and the resulting verdicts say `dev_only: true`.
    `t2-init-laws` — all strong, 12/12 valid with no problems. Tier 3: the
    background backlog starts at `26aca27` (five authored mutants each into
    `t3-absdiff-comm`, `t3-merge-len` and `t3-rle-expand`) and continues at
-   `db3543b` (`t3-bin-inc`, `t3-concat-len`) and `56e04da` (`t3-count-append`).
-   That is **six of the 18 repaired and
-   twelve still carrying no hand-authored file** — measured by re-running the
-   classifier over the manifest, which is also how the two numbers this
-   paragraph carried before were found to be wrong: it said the count moved
-   from 8 of 18 to 11 of 18, and the commit message on `db3543b` says nine of
-   the 18 now carry an authored corpus. Both were tallies carried forward from
-   previous tallies rather than re-measured, and both overstate the work by
-   three tasks. `db3543b` is on `origin/master`, so the correction is here
-   rather than in the commit, and the check that would have caught it is the
-   classifier run, not the running total. The twelve outstanding are
-   `t3-filter-bound`, `t3-interleave-nil`, `t3-isort-perm`, `t3-isort-sorted`,
-   `t3-mul-comm`, `t3-pad`, `t3-replicate-append`, `t3-rev-rev`,
-   `t3-sum-replicate`, `t3-take-drop-split`, `t3-zip-len` and `t3-zip-sum`,
-   with `t3-split-even-odd` and `t3-sum-to-double` one authored file each under
-   the floor of four. The ratios are what moved; the finding stands until the
+   `db3543b` (`t3-bin-inc`, `t3-concat-len`) and `56e04da` (`t3-count-append`),
+   then `562cbce` (`t3-filter-bound`, `t3-interleave-nil`, `t3-isort-perm`,
+   `t3-isort-sorted`) and `0eeeacb` (`t3-mul-comm`). That is **eleven of the 18
+   repaired and seven still carrying no hand-authored file** — measured by
+   re-running the classifier over the manifest, which is also how the numbers
+   this paragraph carried before were found to be wrong: it said the count
+   moved from 8 of 18 to 11 of 18, and the commit message on `db3543b` says
+   nine of the 18 now carry an authored corpus. Those were tallies carried
+   forward from previous tallies rather than re-measured, and both overstate
+   the work by three tasks. `db3543b` is on `origin/master`, so the correction
+   is here rather than in the commit, and the check that would have caught it
+   is the classifier run, not the running total. The same race produced a
+   second, smaller error the honest way: `562cbce` says the count went from six
+   to ten, which was true when it was written and false a few minutes later,
+   because `t3-mul-comm`'s corpus landed while the commit message was being
+   typed — `0eeeacb` carries the correction. The seven outstanding are
+   `t3-pad`, `t3-replicate-append`, `t3-rev-rev`, `t3-sum-replicate`,
+   `t3-take-drop-split`, `t3-zip-len` and `t3-zip-sum`, with
+   `t3-split-even-odd` and `t3-sum-to-double` one authored file each under the
+   floor of four. The ratios are what moved; the finding stands until the
    counts reach zero.
 
    The related finding from `t3-zip-len` is worse and was caught before it
