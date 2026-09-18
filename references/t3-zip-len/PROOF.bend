@@ -29,6 +29,12 @@ def L.zip_nil_r(xs):
     case hx <> tx:
       {==}
 
+# One step of the pairing. Definitional, and the only law that inspects the
+# inside of a pair -- without it a body that swapped the two components would
+# satisfy every other law in the file.
+def L.zip_cons(hx, tx, hy, ty):
+  {==}
+
 def L.zip_len(xs, ys):
   %Policy.zip_len_general(xs, ys) : {P.zlen(S.zip(xs, ys)) == _ : Nat}
   {==}

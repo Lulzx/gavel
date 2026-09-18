@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-rle-expand",
+  "tier": 3,
+  "laws": [
+    "expand_nil",
+    "expand_cons",
+    "expand_len"
+  ],
+  "policy_targets": [
+    "expand"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3f29bf17a04481b9c00ad9f5647fb0f925c70b06b877df80937e74bbabd96570",
+    "prelude": "89674f7effb6c7e237fa5180505d68df25c254c59cdd51766515bc48b8e775c5"
+  },
+  "bend_version": "2.0.5"
+}

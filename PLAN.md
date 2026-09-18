@@ -333,12 +333,12 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf` |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 117 registered tasks, 20 are tier 1, 66
-are tier 2, 26 are tier 3, 2 are tier 4 and 3 are tier 5. No tier is empty, so
+**The bank's ceiling is tier 5.** Of the 122 registered tasks, 20 are tier 1, 66
+are tier 2, 30 are tier 3, 3 are tier 4 and 3 are tier 5. No tier is empty, so
 what M2's 200 and M4's 500 are short of is volume rather than a design nobody
 has done yet.
 
-The last 32 of those are a 31-task batch from the two authoring agents plus
+The last 36 of those are a 35-task batch from the two authoring agents plus
 `t5-opt-drop`, and the tier-2 half of the batch is a *family*.
 Its twenty tasks are four list functions — `all_<f>`, `sum_<f>`, `has_<f>` and
 `<f>_all` — instantiated at ten arithmetic predicates (`mult3`, `mult5`, `cube`,
@@ -349,9 +349,23 @@ bank, and each one validated on its own. But a policy that solves one of them
 has learnt nearly all of the others, so they are closer to twenty lessons on one
 template than to twenty lessons, and that is a fact about the bank's *effective*
 size. It is recorded here rather than left inside the count, because the count
-is what M2 is measured by and the difference between 117 tasks and 97 distinct
+is what M2 is measured by and the difference between 122 tasks and 102 distinct
 problems is exactly the kind of gap that reads as progress in a total and
 disappears in a curriculum.
+
+One task in the batch is the same function as a committed one at another tier,
+and the distinctness rule that would have parked it is deliberately not applied.
+`t3-sum-acc` and `t2-sum-acc` both ask for `sum_acc(xs, acc)`; what differs is
+the proof. The tier-2 laws carry the accumulator universally quantified so that
+it passes through the step unchanged, while the tier-3 laws need the solver to
+invent the *generalized* invariant, because their step needs the hypothesis at
+`a + h` and the law as written only gives it at `0n`. That is what a tier
+boundary buys, and the bank already ships one function across tiers on the same
+basis (`append` at 1 and 2, `sum` at 1, 2 and 3). It is recorded as a judgement
+rather than a rule because the rule applied literally — any name that occurs as
+another task's target is a variation — would strike those too. Its cost is the
+one `t4-stack-wf` carries: the two pin laws determine the body, so every mutant
+dies on a pin and the value laws take no independent mutant weight.
 
 Tier 4 is the first tier whose *law* is about a predicate the task declares
 rather than about a function it defines. `t4-stack-wf` states it in the
@@ -363,7 +377,38 @@ that the input was ordered), plus `insert_count` to pin the key that goes in.
 Both are minimal on purpose: the law is the invariant, and the side condition is
 what makes it a conditional rather than a claim the checker should reject.
 
-None of the four carries a review record. Tier 4 is gated on one in M4, and
+`t4-queue-rep` is the third, and it changes what the invariant is *about*. The
+first two state theirs over a value the policy built by recursion — a stack's
+bracket count, a tree's ordering — while this one states it over a
+*representation*: the queue is two lists, `P.Q{front, back}`, and `P.wf` says the
+front is empty only when the whole queue is empty. The distinction is not
+decorative. A representation invariant makes an operation's *shape* provable
+rather than its output merely checkable: `push_wf` rejects a push that conses
+onto the back unconditionally even though the result is right as a sequence, and
+`pop_wf` rejects a pop that leaves the front empty. Together they force the
+two-list queue's actual algorithm — push into an empty front, and reverse the
+back into the front when the front runs out — without any law mentioning the
+amortised cost that motivates it.
+
+`push_contents` is the conditional in the shape the first two established (a
+premise binder on the invariant), and its premise is load-bearing in the strong
+sense: the law is false without it at the empty-front queue, and inside the proof
+the premise is *consumed* — that branch has to derive `b = Nil` from
+`P.wf(Q{Nil, b})` and otherwise transport along `False == True`. That only one of
+the five laws needs it is what the mutants measure: `push-to-front-1` fails
+`push_contents` alone, `push_wf` alone rejects the always-to-the-back and the
+dropping bodies, and the pop bodies are rejected by `pop_wf` and `pop_contents`.
+The pop attribution carries a caveat worth recording. V2 measures a mutant
+against the *reference proof*, so a mutant can fail a law because the reference
+proof's body no longer type-checks against the mutant's goal rather than because
+the law refutes the mutant's body. `pop-back-unreversed-1` is that case — running
+its isolation file by hand gives `expected : {imp(is_nil(b), True) == True} /
+observed : {imp(is_nil(rev_go(b, [])), True)}`, the reference proof failing to
+apply — and the law does refute the body too, but by a route the V2 number alone
+does not show. The corpus is strong in V2's sense on all seven mutants (each
+type-checks bare, none reaches tier 4) and measures tier 3.
+
+None of the three tier-4 tasks carries a review record. Tier 4 is gated on one in M4, and
 not writing one is the point of Fact 27: the field is not evidence, so leaving
 it absent is the only honest state until review happens somewhere the pipeline
 cannot write.
@@ -521,14 +566,14 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 117 tasks (20 tier 1, 66 tier 2, 26 tier 3, 2 tier 4, 3 tier 5),
+   progress** — 122 tasks (20 tier 1, 66 tier 2, 30 tier 3, 3 tier 4, 3 tier 5),
    validated together rather than per task, because a task is sound only against
    a corpus that shares the degenerate generator with it. The whole bank was
-   measured locally as **117/117 valid over 2057 checker runs**, with no
+   measured locally as **122/122 valid over 2172 checker runs**, with no
    problems and one warning per task — the missing calibration measurement, which
    is the warning `--strict` would promote (the last CI run over a whole bank was
-   at 83, `83/83` over 1544, run `35350369509`). The 114 tasks at tiers 1–4 are
-   short of the 200 by 86, and 20 of the 117 are the tier-2 family §3.9 records:
+   at 83, `83/83` over 1544, run `35350369509`). The 119 tasks at tiers 1–4 are
+   short of the 200 by 81, and 20 of the 122 are the tier-2 family §3.9 records:
    the count and the number of distinct problems are not the same number, and
    only one of the two is what a curriculum buys.
 
@@ -546,6 +591,29 @@ and the resulting verdicts say `dev_only: true`.
    than a generator, which is why `tools/author.py`'s mutants stage keeps one
    rather than replacing it. Registering a task that fails validation is worse
    than leaving it out, since the manifest is what a training loop trusts.
+
+   That rule was written for tasks authored one at a time, and the batch above
+   is the first that has not met it. Ten of its tier-3 tasks carry a corpus
+   generated by the mutants stage into an empty `mutants/` rather than one
+   written by hand. None of them is unsound by it — every mutant type-checks
+   bare and none reaches tier 4, which is the sense V2 measures — but the
+   *ratio* is the tell: a hand-authored corpus runs 4/4 or 7/7 strong, and these
+   run as low as 1/6, because a rule-shaped mutant that fails to type-check is a
+   coverage error and not evidence about a law. The thinnest are
+   `t3-last-snoc`, `t3-height-mirror`, `t3-tree-sum-mirror`, `t3-sum-to-double`,
+   `t3-prefixes-len`, `t3-any-append`, `t3-split-even-odd` and `t3-nappend-len`,
+   and they are being hand-authored up to the rule rather than left as an
+   exception to it.
+
+   The related finding from `t3-zip-len` is worse and was caught before it
+   shipped. A corpus is not the only thing that can be thin. Its original two
+   nil pins plus a length law were satisfied by a `zip` that built
+   `P.Mk{hy, hx}` — every pair's components swapped — because the length law
+   counts pairs and nothing else in the file looks inside one. A definitional
+   `zip_cons` pin closes it. The shape generalizes: a law that counts or
+   emptiness-tests a constructed value never inspects it, so a component-swap
+   body proves every law that treats the value as opaque, and the fix is one
+   `{==}`-closed pin that destructures the constructor.
 
    **The CI gate outgrew a serial pass, and that was measured rather than
    foreseen.** At 58 tasks, "The bank validates" ran for over 18 minutes with
@@ -728,11 +796,11 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 117, of which two are tier 4 and three are
+1. **500+ tasks including tier 5. 122, of which three are tier 4 and three are
    tier 5.** None of the five tiers is empty, so what is left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
-   the same shape of work has since produced 32 more (a 31-task batch from two
-   authoring agents and the third tier-5 task), so the remaining 383 are volume
+   the same shape of work has since produced 36 more (a 35-task batch from two
+   authoring agents and the third tier-5 task), so the remaining 378 are volume
    and nothing else. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
@@ -767,6 +835,10 @@ The records are left in place rather than deleted so the defect stays visible,
 but they must not be counted as review, and the fix is not in the checker:
 either review is recorded somewhere the pipeline cannot write, or the laws are
 read and the records are made true. Until then this line stays in M4.
+
+The five tasks added since (`t3-is-pal-rev`, `t3-merge-len`, `t3-rle-expand`,
+`t3-sum-to-double`, `t4-queue-rep`) carry no record either, so the count stays at
+eleven while the bank grew by five: the defect is bounded, not spreading.
 
 ## 5. Risks
 

@@ -18,6 +18,18 @@ law zip_nil_r:
   for +xs: List<&2, Nat>
   {S.zip(xs, Nil{}) == Nil{} : List<&2, P.P2>}
 
+# LAW: one step of the pairing, with both lists conses. Both sides compute, so
+# this is definitional, and it is the law that says *which* element goes into
+# which component of the pair. Without it the set does not pin the body at all:
+# the swapped body `P.Mk{hy, hx}` satisfies both nil laws and the length law
+# below, because none of them ever looks inside a pair.
+law zip_cons:
+  for hx: Nat
+  for tx: List<&2, Nat>
+  for hy: Nat
+  for ty: List<&2, Nat>
+  {S.zip(hx <> tx, hy <> ty) == P.Mk{hx, hy} <> S.zip(tx, ty) : List<&2, P.P2>}
+
 # LAW: `zip` stops at whichever list runs out first, so it has as many elements
 # as the shorter one. This is the work, and it is the law that says which list
 # runs out: a body that dropped the shorter list's length and answered the

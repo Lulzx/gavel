@@ -1,0 +1,22 @@
+{
+  "task_id": "t4-queue-rep",
+  "tier": 4,
+  "laws": [
+    "push_wf",
+    "pop_wf",
+    "pop_empty",
+    "push_contents",
+    "pop_contents"
+  ],
+  "policy_targets": [
+    "push",
+    "pop"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "b0c99aec1c14db7facf1f810beb9e707a2c8d143a6998f007b18684f70b3d96f",
+    "prelude": "161868faf27595fb80f39ac6f44f431112de351c050509fdf831a942acd55bdd"
+  },
+  "bend_version": "2.0.5"
+}

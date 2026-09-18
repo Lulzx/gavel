@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-sum-to-double",
+  "tier": 3,
+  "laws": [
+    "sum_to_zero",
+    "sum_to_succ",
+    "sum_to_double"
+  ],
+  "policy_targets": [
+    "sum_to"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "b7d952458d22304cc89172f799ac1ad3f5f0060b6ca940b4eb861c62bce4e6d8",
+    "prelude": "b39a7390bf21268cd70593bd1d9c5927fd7d232d01ad56fb5420a3aabdc3fabe"
+  },
+  "bend_version": "2.0.5"
+}

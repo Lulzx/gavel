@@ -1,0 +1,20 @@
+{
+  "task_id": "t3-is-pal-rev",
+  "tier": 3,
+  "laws": [
+    "is_pal_nil",
+    "is_pal_single",
+    "is_pal_two_distinct",
+    "is_pal_rev"
+  ],
+  "policy_targets": [
+    "is_pal"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "b5bb6616e02867534c75e42139f4a0dedf63d78e6585631b2102fb6297f6c0d4",
+    "prelude": "99ebad3a44bfb8229571db4734b5085f1762ef32b5118ca199ba824cc1fbdf59"
+  },
+  "bend_version": "2.0.5"
+}

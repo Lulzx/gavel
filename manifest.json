@@ -663,6 +663,13 @@
       "hash": "a1a6215f24e369bae2f08b8bcf5785c15e0a06e853d4429ce82ca2abe9c96306"
     },
     {
+      "task_id": "t3-is-pal-rev",
+      "tier": 3,
+      "path": "tasks/3/t3-is-pal-rev",
+      "reference": "references/t3-is-pal-rev",
+      "hash": "669d12592b2aaac670bdef03e1f5ae9fff3696dc2fd8a0340c98af3b90190e22"
+    },
+    {
       "task_id": "t3-isort-perm",
       "tier": 3,
       "path": "tasks/3/t3-isort-perm",
@@ -682,6 +689,13 @@
       "path": "tasks/3/t3-last-snoc",
       "reference": "references/t3-last-snoc",
       "hash": "60e59f48c9f0ab428bc25cee4ec5b7386a7e449a2ca3a19fd62769bda7b6f676"
+    },
+    {
+      "task_id": "t3-merge-len",
+      "tier": 3,
+      "path": "tasks/3/t3-merge-len",
+      "reference": "references/t3-merge-len",
+      "hash": "0a2170244d399cbd3fbe2279a0ab8aeb49630212d40c97e9703b25ba1a9d0e14"
     },
     {
       "task_id": "t3-mul-comm",
@@ -726,6 +740,13 @@
       "hash": "22704f38da3e2b6b8f6351f8536927afa465b1b9389cecfdb751aebe53cb6d59"
     },
     {
+      "task_id": "t3-rle-expand",
+      "tier": 3,
+      "path": "tasks/3/t3-rle-expand",
+      "reference": "references/t3-rle-expand",
+      "hash": "e1bf6b68d4221bddd89bf9f07c82971382a7c8a8a04e091888d1afdb0b2c3dd1"
+    },
+    {
       "task_id": "t3-split-even-odd",
       "tier": 3,
       "path": "tasks/3/t3-split-even-odd",
@@ -745,6 +766,13 @@
       "path": "tasks/3/t3-sum-replicate",
       "reference": "references/t3-sum-replicate",
       "hash": "07c57fd4b51d3e1daf06df7c7650c43a85627f5ec01700936d99d1d8dbd159fb"
+    },
+    {
+      "task_id": "t3-sum-to-double",
+      "tier": 3,
+      "path": "tasks/3/t3-sum-to-double",
+      "reference": "references/t3-sum-to-double",
+      "hash": "d2f68e81c01ae76885d4064c1ae113cf563bb24ed1af10fc51cdcb799da98728"
     },
     {
       "task_id": "t3-take-drop-split",
@@ -779,7 +807,7 @@
       "tier": 3,
       "path": "tasks/3/t3-zip-len",
       "reference": "references/t3-zip-len",
-      "hash": "82df9c434af20287500b855492d552a94818a770ca68099405fce7c60df16e20"
+      "hash": "33c37a752f80a440c2f2585abdeff405474126cc8378fad6b4974415a02b3ede"
     },
     {
       "task_id": "t3-zip-sum",
@@ -794,6 +822,13 @@
       "path": "tasks/4/t4-bst-insert",
       "reference": "references/t4-bst-insert",
       "hash": "85b946a5874e3b519a55997b7a60c6b5b7df55558c064c5c6b76ff88e3ccbe96"
+    },
+    {
+      "task_id": "t4-queue-rep",
+      "tier": 4,
+      "path": "tasks/4/t4-queue-rep",
+      "reference": "references/t4-queue-rep",
+      "hash": "1f19c2c69351c7021a4783e43cdd34b6fbc7500af75dcdb52f1fa0a4e1e16ded"
     },
     {
       "task_id": "t4-stack-wf",

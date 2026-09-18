@@ -1,0 +1,22 @@
+{
+  "task_id": "t3-merge-len",
+  "tier": 3,
+  "laws": [
+    "merge_nil_l",
+    "merge_nil_r",
+    "merge_go_true",
+    "merge_go_false",
+    "merge_len"
+  ],
+  "policy_targets": [
+    "merge_go",
+    "merge"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "9fde7f0259886b0ad825ace89e45f8189c6cae908e42f4e28af432cd86ac62ad",
+    "prelude": "cbe2d38658fbbde749dd1cc4405c5ebcf1a59400fb1a832101d99e5608fc4e8b"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,4 +1,4 @@
-Implement `zip` on the prelude's two list types, then prove all three laws.
+Implement `zip` on the prelude's two list types, then prove all four laws.
 
 `zip(xs, ys)` pairs the elements of `xs` and `ys` in order and stops as soon as
 either list runs out. The prelude is immutable and already has the vocabulary the
@@ -16,6 +16,14 @@ image and is *not* an unfolding when the left list is a variable: the match in
 step case is the branch the body already took. Together they say which list is
 read first and that running out on either side ends the result, which is what a
 body that paired the first elements and stopped would get wrong.
+
+`zip_cons` is definitional too -- both lists are conses, so both sides compute
+and `{==}` closes it -- and it is the law that says *which* element goes into
+which component of the pair. It is the only law in the file that looks inside a
+pair, and without it the set does not pin the body at all: a `zip` that built
+`P.Mk{hy, hx}` satisfies both nil laws and the length law below, because none of
+those three ever inspects a component. The length law counts pairs, so it cannot
+see their contents, and this pin is what does.
 
 `zip_len` is the law the task is named for, and it is the one that says *which*
 list runs out: `zip` has as many elements as the shorter of the two, not as the
@@ -38,8 +46,9 @@ live once per branch -- and the helper's lists are `+` only because the
 destructured pair is read again when the recursive call is built.
 
 The law-defs are written with no signature and bare binder names, in the fixed
-order `def L.zip_nil_l(ys)`, `def L.zip_nil_r(xs)` and `def L.zip_len(xs, ys)`,
-and the last one cites the `Policy.` helper that carries the induction. Helpers
+order `def L.zip_nil_l(ys)`, `def L.zip_nil_r(xs)`,
+`def L.zip_cons(hx, tx, hy, ty)` and `def L.zip_len(xs, ys)`, and the last one
+cites the `Policy.` helper that carries the induction. Helpers
 go under the reserved `Policy.` namespace, which the gate ignores and the credit
 path does not count; a helper may call `P.*`, `S.*` and other `Policy.*`, but
 never a law, since a helper that cited one would make an isolated law depend on a
