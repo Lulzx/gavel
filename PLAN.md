@@ -693,14 +693,20 @@ and the resulting verdicts say `dev_only: true`.
    (a binder may be consumed once, so `recursion-arg`-shaped mutants are parse
    errors), and it means the generator's reach is bounded by the language
    rather than by the rule list.
-   The letter of the rule stops at tier 3 and this document does not silently
-   extend it: whether tiers 1–2 owe a hand-authored corpus too is a scope
-   decision with a real cost (86 tasks), and it is recorded here as open rather
-   than taken. What is not open is the measurement above, which is why it is
-   written down: the plan's own justification for the rule — that a corpus is
-   V2's evidence and the part of a task a person does better than a generator —
-   does not mention tiers, and a reader of the 200-task target should know that
-   92 of its 117 existing tasks are evidenced by one or two mutants apiece.
+   The letter of the rule stops at tier 3, so extending it to tiers 1–2 is a
+   scope decision with a real cost (86 tasks) rather than something this
+   document takes on its own. **Taken deliberately, 2026-09-18: both.** The
+   corpus work and the volume target run in parallel rather than in sequence,
+   split across the two authoring agents — one takes the 18 tier-3 tasks, the
+   8 tier-1 tasks and the even-indexed half of the 66 tier-2 tasks, the other
+   the odd-indexed half — and each interleaves that with new tasks. The cost is
+   honest and so is the reason for paying it: the plan's own justification for
+   the rule — that a corpus is V2's evidence and the part of a task a person
+   does better than a generator — does not mention tiers, and a reader of the
+   200-task target should not have to discover that 92 of its 117 existing
+   tasks are evidenced by one or two mutants apiece. Sequencing the two would
+   have been defensible; doing both is the choice because neither the evidence
+   nor the count is worth having alone.
 
    The related finding from `t3-zip-len` is worse and was caught before it
    shipped. A corpus is not the only thing that can be thin. Its original two
