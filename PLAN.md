@@ -438,8 +438,8 @@ and the resulting verdicts say `dev_only: true`.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
    progress** — 83 tasks (20 tier 1, 46 tier 2, 15 tier 3, 2 tier 4), together
    rather than per task, because a task is sound only against a corpus that
-   shares the degenerate generator with it: 81/81 valid over 1507 checker runs,
-   and the two tier-4 tasks validate on their own at 37 more. Tier 5 is empty
+   shares the degenerate generator with it: **83/83 valid over 1544 checker
+   runs** in CI (run `35350369509`). Tier 5 is empty
    (§3.9), so the 200 has a ceiling on what the bank can currently contribute to
    it.
 
@@ -474,12 +474,13 @@ and the resulting verdicts say `dev_only: true`.
    were running on the same box; the runner has no neighbours, which is why the
    local figure was the pessimistic one.
 
-   The series continues, because one point is a coincidence and three are a
-   slope: at **81 tasks the step took 9 m 29 s** (run `35343671771`), which is
-   a third more bank for 12% more time. 1210 checks in 569 s on four jobs is
-   about 2.1 checks/s. That is the shape a per-check process should have --
-   throughput set by the runner's cores rather than by the bank's size -- and
-   it is also the reason a worker (M3.4) would buy a constant and not a curve.
+   The series continues, and was read at the time as a slope: at **81 tasks the
+   step took 9 m 29 s** (run `35343671771`), a third more bank for 12% more
+   time. 1210 checks in 569 s on four jobs is about 2.1 checks/s. A per-check
+   process should have that shape -- throughput set by the runner's cores
+   rather than by the bank's size -- and it is why a worker (M3.4) would buy a
+   constant and not a curve. The later runs below retract the slope, though not
+   the shape.
 
    The check count is not a property of the bank's size alone, and Fact 28 is
    why: the `vary-*` family added one run per argument-ignoring body per
@@ -487,8 +488,31 @@ and the resulting verdicts say `dev_only: true`.
    (81/81 valid, measured serially on this machine). A task with more
    same-typed parameters costs more to validate than one with fewer, so the
    cost per task now varies with the signatures and not just with the tier.
-   CI's `--jobs 4` step should be re-timed rather than extrapolated from the
-   9 m 29 s above.
+
+   Re-timed rather than extrapolated, and the extrapolation would have been
+   wrong: at **1507 checks the step took 17 m 38 s** (run `35350056234`), not
+   the ~12 m that scaling 9 m 29 s by check count predicts. But the new number
+   is not a slope either, and the reason is worth recording because it invalidates
+   the 9 m 29 s point rather than extending it.
+
+   The same commit -- 81 tasks, the old corpus, 1210 checks -- was measured
+   **four times in this window**, and the step took 569 s, 816 s, 763 s and
+   802 s: **0.47 to 0.67 s per check for identical work**, a 43% spread with no
+   change to the bank. The two 83-task runs that followed took 1058 s and
+   1084 s, which is 0.702 s per check both times -- at the top of that band and
+   not above it. So the step's cost did not move by more than the noise, and
+   the claim that the 10 m series was "a slope" was reading four points that
+   spanned the same range. It was never a slope; it was one measurement of a
+   quantity that varies by half.
+
+   What is solid is the direction and the size of the budget: 24% more checks
+   and a step that is now ~18 minutes rather than ~10-14. Every run in this
+   table overlapped at least one other, and GitHub-hosted runners are not
+   promised isolation from each other, so the variance is expected rather than
+   surprising -- which is the same lesson the local p50 320 ms vs ~180 ms
+   figures already taught, arriving on the runner instead of the laptop. The
+   worker (M3.4) is worth more than the 9 m figure priced it at, and a
+   published throughput number still needs an isolated host.
 
    `--jobs` is off by default, and that is not timidity. V4 asserts
    `reference_ms` against a wall-clock budget, so validating concurrently
