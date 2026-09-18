@@ -1,0 +1,20 @@
+{
+  "task_id": "t4-nth-maybe",
+  "tier": 4,
+  "laws": [
+    "nth_zero",
+    "nth_succ",
+    "nth_some",
+    "nth_none"
+  ],
+  "policy_targets": [
+    "nth"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "2294cb96b73ce4c374005540f20c2d0b7ab9077227247de21508f947c80d1b70",
+    "prelude": "f100d777027530398c8c8079e2ac4d79b1c785ec6c7d82593b9bb05078e878c2"
+  },
+  "bend_version": "2.0.5"
+}

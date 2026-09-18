@@ -330,17 +330,18 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 1 | Reflexivity, direct computation | `t1-add-plus` |
 | 2 | Single structural induction, one rewrite | `t2-rev-append` |
 | 3 | Induction with auxiliary lemmas the policy must state | `t3-tree-flatten` |
-| 4 | Invariant preservation over a data structure | `t4-stack-wf` |
+| 4 | Invariant preservation over a data structure | `t4-stack-wf`, `t4-queue-rep`; `t4-nth-maybe` is the same tier stated as a *domain* instead of an invariant |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 122 registered tasks, 20 are tier 1, 66
-are tier 2, 30 are tier 3, 3 are tier 4 and 3 are tier 5. No tier is empty, so
+**The bank's ceiling is tier 5.** Of the 124 registered tasks, 20 are tier 1, 66
+are tier 2, 31 are tier 3, 4 are tier 4 and 3 are tier 5. No tier is empty, so
 what M2's 200 and M4's 500 are short of is volume rather than a design nobody
 has done yet.
 
-The last 37 of those are a 35-task batch from the two authoring agents, the
-third tier-5 task (`t5-opt-drop`) and the third tier-4 one (`t4-queue-rep`), and
-the tier-2 half of the batch is a *family*.
+The last 39 of those are a 35-task batch from the two authoring agents, the
+third tier-5 task (`t5-opt-drop`), the third and fourth tier-4 ones
+(`t4-queue-rep`, `t4-nth-maybe`) and the Bool-fold duality (`t3-neg-all-dual`),
+and the tier-2 half of the batch is a *family*.
 Its twenty tasks are four list functions — `all_<f>`, `sum_<f>`, `has_<f>` and
 `<f>_all` — instantiated at ten arithmetic predicates (`mult3`, `mult5`, `cube`,
 `dec2`, `mod3`, `mod5`, `pow2`, `sq-inc`, `succ2`, `triple`), each carrying the
@@ -350,7 +351,7 @@ bank, and each one validated on its own. But a policy that solves one of them
 has learnt nearly all of the others, so they are closer to twenty lessons on one
 template than to twenty lessons, and that is a fact about the bank's *effective*
 size. It is recorded here rather than left inside the count, because the count
-is what M2 is measured by and the difference between 122 tasks and 102 distinct
+is what M2 is measured by and the difference between 124 tasks and 104 distinct
 problems is exactly the kind of gap that reads as progress in a total and
 disappears in a curriculum.
 
@@ -409,7 +410,38 @@ apply — and the law does refute the body too, but by a route the V2 number alo
 does not show. The corpus is strong in V2's sense on all seven mutants (each
 type-checks bare, none reaches tier 4) and measures tier 3.
 
-None of the three tier-4 tasks carries a review record. Tier 4 is gated on one in M4, and
+`t4-nth-maybe` is the fourth, and it changes the subject once more: not an
+invariant an operation preserves but the *domain* of a partial function. `nth`
+answers `Maybe<&2, Nat>`, and the two laws that carry the tier say where that
+answer is defined — `nth_some` under the premise `Nat.is_lt(k, P.len(xs)) ==
+True{}` and `nth_none` under the same equation against `False{}`. The premise is
+base's own comparison rather than a predicate the task invents, which matters
+because the policy cannot edit it, and it is what makes the pair a conditional
+rather than a claim the checker should refute on the empty list. The proof uses
+it rather than assuming it: at the recursive call the hypothesis has to hold at
+`p` and `t`, and it does without a lemma — `P.len` and `Nat.cmp` both reduce
+through the `1n`, measured — while in the branches where the list has run out the
+premise has reduced to `{False{} == True{}}` and the goal follows from it by
+transport along an `ite` indexed by the boolean.
+
+Its design is the answer to the limitation `t4-queue-rep`'s cost names above. The
+value half is the two clauses of the walk and together they determine the answer
+on every cons, so a bare `nth(k, Nil{}) == None{}` clause would have taken the
+domain pair's weight, exactly as the pins take `t4-stack-wf`'s, and the bodies
+wrong only on the empty list would have been killed by the clause with nothing
+left for the law the task is about. There is no such clause. The emptiness is
+pinned by `nth_none` alone, where the premise reduces to `{False{} == False{}}`,
+which holds — so every index is out of range on `Nil{}` and the law is not
+vacuous there. Measured on the seven-mutant corpus: `nth-nil-some-1` and
+`nth-step-nil-some-1` are rejected by `nth_none` and by nothing else, and
+`nth-step-none-1` is rejected by `nth_succ` and `nth_some` together. All seven
+type-check bare and none reaches tier 4 (1/1 valid, 15 checker runs). The
+conditional half therefore carries mutant weight, which is the property the
+three tier-4 tasks before it each gave up something to get — the queue by
+consuming its premise in the proof, this one by declining to state the case the
+law already covers.
+
+None of the four tier-4 tasks carries a review record. Tier 4 is gated on one in M4, and
 not writing one is the point of Fact 27: the field is not evidence, so leaving
 it absent is the only honest state until review happens somewhere the pipeline
 cannot write.
@@ -567,14 +599,14 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 122 tasks (20 tier 1, 66 tier 2, 30 tier 3, 3 tier 4, 3 tier 5),
+   progress** — 124 tasks (20 tier 1, 66 tier 2, 31 tier 3, 4 tier 4, 3 tier 5),
    validated together rather than per task, because a task is sound only against
    a corpus that shares the degenerate generator with it. The whole bank was
    measured locally as **122/122 valid over 2172 checker runs**, with no
    problems and one warning per task — the missing calibration measurement, which
    is the warning `--strict` would promote (the last CI run over a whole bank was
-   at 83, `83/83` over 1544, run `35350369509`). The 119 tasks at tiers 1–4 are
-   short of the 200 by 81, and 20 of the 122 are the tier-2 family §3.9 records:
+   at 83, `83/83` over 1544, run `35350369509`). The 121 tasks at tiers 1–4 are
+   short of the 200 by 79, and 20 of the 124 are the tier-2 family §3.9 records:
    the count and the number of distinct problems are not the same number, and
    only one of the two is what a curriculum buys.
 
@@ -600,11 +632,19 @@ and the resulting verdicts say `dev_only: true`.
    bare and none reaches tier 4, which is the sense V2 measures — but the
    *ratio* is the tell: a hand-authored corpus runs 4/4 or 7/7 strong, and these
    run as low as 1/6, because a rule-shaped mutant that fails to type-check is a
-   coverage error and not evidence about a law. The thinnest are
+   coverage error and not evidence about a law. The thinnest were
    `t3-last-snoc`, `t3-height-mirror`, `t3-tree-sum-mirror`, `t3-sum-to-double`,
    `t3-prefixes-len`, `t3-any-append`, `t3-split-even-odd` and `t3-nappend-len`,
-   and they are being hand-authored up to the rule rather than left as an
-   exception to it.
+   and they have since been hand-authored up to the rule rather than left as an
+   exception to it: thirty authored mutants across the eight, every one of them
+   strong, taking the ratios to 5/8, 5/9, 5/10, 5/11, 5/8, 4/9, 4/8 and 5/9
+   (8/8 valid, 148 checker runs, measured 2026-09-18 and committed as
+   `b483601`). The ratios are not 1.0 and should not be read as a shortfall:
+   the generated rules stay in the corpus beside the authored ones, and a
+   mutant that fails to type-check bare is dead weight the count carries and no
+   law ever saw — the same defect, now diluted rather than dominant. Two of the
+   eight, `t3-split-even-odd` and `t3-sum-to-double`, sit one authored file
+   short of the rule's floor of four and are being brought up to it.
 
    The related finding from `t3-zip-len` is worse and was caught before it
    shipped. A corpus is not the only thing that can be thin. Its original two
@@ -797,12 +837,12 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 122, of which three are tier 4 and three are
+1. **500+ tasks including tier 5. 124, of which four are tier 4 and three are
    tier 5.** None of the five tiers is empty, so what is left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
-   the same shape of work has since produced 37 more (a 35-task batch from two
-   authoring agents, the third tier-5 task and the third tier-4 one), so the
-   remaining 378 are volume
+   the same shape of work has since produced 39 more (a 35-task batch from two
+   authoring agents, the third tier-5 task, the third and fourth tier-4 ones, and
+   the Bool-fold duality), so the remaining 376 are volume
    and nothing else. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
@@ -832,15 +872,17 @@ waiting room.
 **The review half of this is not satisfied and the bank currently says it is.**
 Eleven tasks at tier 3 or above carry `"reviewed": {"by": "lulzx"}` written by
 the authoring agent through `--reviewer`, and no human has read them — Fact 27.
-The two tier-4 tasks carry no record, which is the honest state and not a fix.
+All eleven are tier 3; the four tier-4 tasks carry no record, which is the
+honest state and not a fix.
 The records are left in place rather than deleted so the defect stays visible,
 but they must not be counted as review, and the fix is not in the checker:
 either review is recorded somewhere the pipeline cannot write, or the laws are
 read and the records are made true. Until then this line stays in M4.
 
-The five tasks added since (`t3-is-pal-rev`, `t3-merge-len`, `t3-rle-expand`,
-`t3-sum-to-double`, `t4-queue-rep`) carry no record either, so the count stays at
-eleven while the bank grew by five: the defect is bounded, not spreading.
+The seven tasks added since (`t3-is-pal-rev`, `t3-merge-len`, `t3-rle-expand`,
+`t3-sum-to-double`, `t4-queue-rep`, `t3-neg-all-dual`, `t4-nth-maybe`) carry no
+record either, so the count stays at eleven while the bank grew by seven: the
+defect is bounded, not spreading.
 
 ## 5. Risks
 
