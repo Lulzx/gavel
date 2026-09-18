@@ -53,15 +53,20 @@ jobs:
   sandbox:
     name: adversarial corpus under bubblewrap
     runs-on: ubuntu-latest
-    # Not yet verified on a Linux host, and the two flags below are the whole
+    # Not yet verified on a Linux host, and these three flags are the whole
     # question. Bubblewrap has to re-mount `/` as a slave before it can unshare
-    # the mount namespace, and that needs CAP_SYS_ADMIN: Docker's default set
-    # omits it, so bwrap dies with "Failed to make / slave: Permission denied"
-    # and every check under it comes back tier 1 for a reason that has nothing
-    # to do with the submission. seccomp=unconfined is the other half -- the
-    # default profile blocks the clone(CLONE_NEWUSER) that bwrap starts with.
-    # Left non-blocking until a green run exists, then flip this to false -- a
-    # job that is allowed to fail is a job nobody reads.
+    # the mount namespace, and Docker's default set gets in the way three times:
+    # seccomp blocks the clone(CLONE_NEWUSER) bwrap starts with, capabilities
+    # omit CAP_SYS_ADMIN so the mount is refused, and AppArmor's docker-default
+    # profile denies mount outright regardless of capabilities. Measured, one at
+    # a time: seccomp alone still failed, seccomp + SYS_ADMIN still failed with
+    # "Failed to make / slave: Permission denied", which is the AppArmor
+    # signature rather than a capability one.
+    #
+    # None of this is about the sandbox being tested -- the inner bwrap still
+    # unshares everything, which is what the job exists to demonstrate. Left
+    # non-blocking until a green run exists, then flip this to false: a job that
+    # is allowed to fail is a job nobody reads.
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
@@ -74,6 +79,7 @@ jobs:
           docker run --rm \
             --cap-add SYS_ADMIN \
             --security-opt seccomp=unconfined \
+            --security-opt apparmor=unconfined \
             gavel:ci uv run python -m tools.sandbox_check --backend bwrap
 
       - name: The adversarial corpus under the sandbox
@@ -81,4 +87,5 @@ jobs:
           docker run --rm \
             --cap-add SYS_ADMIN \
             --security-opt seccomp=unconfined \
+            --security-opt apparmor=unconfined \
             gavel:ci uv run pytest -q tests/test_adversarial.py tests/test_checker.py
