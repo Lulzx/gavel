@@ -397,6 +397,13 @@
       "hash": "22704f38da3e2b6b8f6351f8536927afa465b1b9389cecfdb751aebe53cb6d59"
     },
     {
+      "task_id": "t3-sum-acc",
+      "tier": 3,
+      "path": "tasks/3/t3-sum-acc",
+      "reference": "references/t3-sum-acc",
+      "hash": "199ab5bf568e6e82a2176891940a3d748e2ff1abe5e8d7fbc22e6c66cf741d9c"
+    },
+    {
       "task_id": "t3-sum-replicate",
       "tier": 3,
       "path": "tasks/3/t3-sum-replicate",
@@ -409,6 +416,20 @@
       "path": "tasks/3/t3-take-drop-split",
       "reference": "references/t3-take-drop-split",
       "hash": "1ef82607ab37753fa65b3d8229d1e6cec673ff05aac1683129a28cc44b8fa4dc"
+    },
+    {
+      "task_id": "t3-tree-flatten",
+      "tier": 3,
+      "path": "tasks/3/t3-tree-flatten",
+      "reference": "references/t3-tree-flatten",
+      "hash": "8fc07f8293d63ad3b23bc28314db2d4705abb176aef74addb12bd781c7402839"
+    },
+    {
+      "task_id": "t3-tree-mirror",
+      "tier": 3,
+      "path": "tasks/3/t3-tree-mirror",
+      "reference": "references/t3-tree-mirror",
+      "hash": "06b8a832dd22eae164843d87c9028b72388a4edc5e9c5baec136b16dce7284a1"
     },
     {
       "task_id": "t3-zip-sum",

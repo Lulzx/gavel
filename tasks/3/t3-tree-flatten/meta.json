@@ -1,0 +1,27 @@
+{
+  "task_id": "t3-tree-flatten",
+  "tier": 3,
+  "laws": [
+    "flatten_leaf",
+    "flatten_node",
+    "flatten_leaves",
+    "flatten_mirror"
+  ],
+  "policy_targets": [
+    "flatten"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "d3cfa69eecd526e726c433e588499c84d0f8ec54bfc9d2eec03904e0ea149d0a",
+    "prelude": "5827bad44770634d958ad2064de92ce50b932c68cbdb8049509482738872b34f"
+  },
+  "bend_version": "2.0.5",
+  "reviewed": {
+    "by": "lulzx",
+    "hashes": {
+      "laws": "d3cfa69eecd526e726c433e588499c84d0f8ec54bfc9d2eec03904e0ea149d0a",
+      "prelude": "5827bad44770634d958ad2064de92ce50b932c68cbdb8049509482738872b34f"
+    }
+  }
+}

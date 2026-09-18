@@ -1,0 +1,27 @@
+{
+  "task_id": "t3-tree-mirror",
+  "tier": 3,
+  "laws": [
+    "mirror_mirror",
+    "mirror_leftmost",
+    "mirror_rightmost",
+    "mirror_size"
+  ],
+  "policy_targets": [
+    "mirror"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "0b36ae08d968a9474589180fe32d7d1f98ce5cea7afb3d96822148a4741c311d",
+    "prelude": "cfea4f6d0dbdba299b63a8797299ec17f3fb9a9e92131fbd65f3dcf2206106b1"
+  },
+  "bend_version": "2.0.5",
+  "reviewed": {
+    "by": "lulzx",
+    "hashes": {
+      "laws": "0b36ae08d968a9474589180fe32d7d1f98ce5cea7afb3d96822148a4741c311d",
+      "prelude": "cfea4f6d0dbdba299b63a8797299ec17f3fb9a9e92131fbd65f3dcf2206106b1"
+    }
+  }
+}
