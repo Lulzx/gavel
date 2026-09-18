@@ -98,22 +98,35 @@ The checker agrees: exit 0, `All terms check.` The same applies to a base-case l
 (`f(x, e) == x` is satisfied by `f(a, b) = a`). `t1-add-zero` was written that way
 and has been retired.
 
-A law pins its function only if **both sides depend on the arguments**. The inductive
-equation does:
+Having both sides depend on the arguments is necessary but not sufficient. The
+inductive law for a `Nat`-valued function does pin it:
 
 ```
-law add_succ: for x: Nat  for y: Nat         {S.add(x, 1n+y) == 1n+S.add(x, y) : Nat}
-law len_cons: for x: Nat  for xs: List<Nat>  {S.len(x <> xs) == 1n+S.len(xs) : Nat}
+law add_succ: for x: Nat  for y: Nat  {S.add(x, 1n+y) == 1n+S.add(x, y) : Nat}
 ```
 
-So the bank is built as: **tier 1 = the inductive law alone; tier 2 = a weak base law
-plus the inductive law**, where the second rules out the projection the first permits.
+but the same shape does not pin a container:
 
-`gavel/validate.py` V3 enforces this mechanically. It crosses every degenerate
-solution with every degenerate proof — a projection or a constant, paired with a
-`{==}` proof — and fails the task if any combination reaches tier 4. Checking a bad
-solution against the *reference* proof would not have caught it: that asks whether the
-reference proof is brittle, not whether the laws pin the function down.
+```
+law append_cons: for x, xs, ys  {S.append(x <> xs, ys) == x <> S.append(xs, ys) : List<Nat>}
+```
+
+The projection `append(a, b) = a` satisfies that at tier 4 with `{==}`, because it maps
+`x <> xs` to itself on both sides. What pins a container-valued function is putting the
+**empty value on the left** — `append(Nil{}, ys) == ys` becomes `Nil{} == ys` under the
+projection, which is false — not the right-hand form `append(xs, Nil{}) == xs`.
+
+So the bank is built from pairs: **tier 1 = the inductive law alone where it pins, or a
+base law and a cons law together where neither does on its own; tier 2 = a weak base law
+plus the inductive law.**
+
+The reliable test is mechanical, not a reading of the laws: **a law pins its function
+only if no argument-ignoring body satisfies it.** `gavel/validate.py` V3 applies it by
+crossing every degenerate solution with every degenerate proof — a projection or a
+constant, paired with a `{==}` proof — and failing the task if any combination reaches
+tier 4. Checking a bad solution against the *reference* proof would not have caught it:
+that asks whether the reference proof is brittle, not whether the laws pin the function
+down.
 
 ## Status
 

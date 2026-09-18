@@ -50,6 +50,23 @@ def test_an_indented_import_line_is_still_read():
     assert parse_imports('  import "x.c"\n')[0].path == '"x.c"'
 
 
+def test_an_import_spelled_inside_a_multiline_string_is_not_read():
+    """The loader stops at the first declaration and never reaches such a line.
+
+    The checker accepts the file, so a scan that rejected it would refuse an
+    honest submission. See test_a_multiline_string_can_spell_an_import_line for
+    what the file does at the gate.
+    """
+    src = ('import Base\n\ndef f() -> String:\n'
+           '  "a\nimport ./evil.bend as E\n"\n')
+    assert [spec.path for spec in parse_imports(src)] == ["Base"]
+
+
+def test_a_single_line_string_cannot_hide_a_foreign_import():
+    """`import "x.c"` is a real declaration and must stay readable."""
+    assert parse_imports('import "x.c"\n')[0].path == '"x.c"'
+
+
 def test_alias_map():
     assert alias_map(parse_imports(HEADER)) == {"P": "prelude", "S": "solution",
                                                 "L": "LAWS"}

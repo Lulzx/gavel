@@ -15,7 +15,7 @@ isolation run must preserve the submission's own declaration order.
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from . import reward as reward_mod
@@ -27,7 +27,7 @@ from .runner import DEFAULT_LIMITS, Limits, run_check
 from .tasks import (LAWS_FILE, PROOF_FILE, SOLUTION_FILE, Task, cleanup,
                     prepare_workdir, submission_hash)
 from .toolchain import Toolchain
-from .verdict import CheckResult, Verdict
+from .verdict import TIER_PARTIAL, CheckResult, Verdict
 
 ISOLATION_FILE = "PROOF_i.bend"
 
@@ -71,8 +71,41 @@ def check_submission(task: Task, toolchain: Toolchain, files: dict[str, str],
     finally:
         if not config.keep_workdir:
             cleanup(workdir)
-    return _finish(task, toolchain, files, gate, runs.results,
-                   solution_checks=solution_checks, proven=proven, began=began)
+    verdict = _finish(task, toolchain, files, gate, runs.results,
+                      solution_checks=solution_checks, proven=proven, began=began)
+    incident = _mutant_incident(task, files, verdict.tier)
+    if incident is not None:
+        return replace(verdict, reward=0.0, incident=incident)
+    return verdict
+
+
+def _mutant_incident(task: Task, files: dict[str, str], tier: int) -> str | None:
+    """SPEC.md 7.4.2: a mutant's own solution, accepted by the checker.
+
+    Each task ships solutions with one deliberate semantic bug, and V2 refuses
+    the task unless its laws reject all of them. Reaching a proving tier with a
+    solution byte-identical to one of them means that guarantee did not hold in
+    a live episode, so the reward is withheld and the verdict carries the case.
+    The tier is left as computed: it is the evidence.
+
+    The comparison is on the whole file, not on a digest of the submission,
+    because a policy is free to submit a different proof for the same solution.
+    """
+    if tier < TIER_PARTIAL:
+        return None
+    source = files.get(SOLUTION_FILE)
+    if source is None:
+        return None
+    for path in task.mutant_paths:
+        try:
+            mutant = path.read_text()
+        except OSError:
+            continue
+        if mutant == source:
+            return (f"{SOLUTION_FILE} is byte-identical to the mutant "
+                    f"{path.name}, and the checker accepted a proof for it "
+                    f"(tier {tier})")
+    return None
 
 
 def _run_protocol(task: Task, toolchain: Toolchain, files: dict[str, str],

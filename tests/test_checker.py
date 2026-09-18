@@ -332,6 +332,57 @@ def test_deriving_every_law_but_via_a_hole_earns_nothing(toolchain, two_law):
     assert verdict.reward == pytest.approx(0.1)
 
 
+# --- the mutant tripwire --------------------------------------------------------
+
+@pytest.fixture
+def self_mutated(make_task, tmp_path, task):
+    """A task whose mutant corpus contains its own reference solution.
+
+    That is the shape a checker soundness bug takes: the laws accept a solution
+    the author already recorded as wrong. V2 rejects such a task at authoring
+    time; this asks what the episode does if one gets through anyway.
+    """
+    references = tmp_path / "references"
+    (references / "mutants").mkdir(parents=True)
+    (references / SOLUTION_FILE).write_text(task.reference_solution)
+    (references / PROOF_FILE).write_text(task.reference_proof)
+    (references / "mutants" / "the-reference.bend").write_text(
+        task.reference_solution)
+    return make_task(references=references)
+
+
+def test_a_mutant_that_scores_keeps_its_tier_and_loses_its_reward(
+        toolchain, self_mutated):
+    files = {SOLUTION_FILE: self_mutated.reference_solution,
+             PROOF_FILE: self_mutated.reference_proof}
+    verdict = check_submission(self_mutated, toolchain, files)
+    # The tier is the evidence, so it is left as computed; only the reward is
+    # withheld. Filing the case needs to say how far the bug got.
+    assert verdict.tier == TIER_COMPLETE
+    assert verdict.reward == 0.0
+    assert verdict.incident is not None
+    assert "the-reference.bend" in verdict.incident
+    assert verdict.to_json()["incident"] == verdict.incident
+
+
+def test_matching_a_mutant_without_proving_anything_is_not_an_incident(
+        toolchain, self_mutated):
+    """A mutant that proves nothing has not got past the laws."""
+    files = {SOLUTION_FILE: self_mutated.reference_solution,
+             PROOF_FILE: self_mutated.proof_header}
+    verdict = check_submission(self_mutated, toolchain, files)
+    assert verdict.tier < TIER_PARTIAL
+    assert verdict.incident is None
+
+
+def test_a_solution_that_is_not_a_mutant_is_never_flagged(toolchain, task):
+    """The comparison is on the whole file, so a near miss is just a submission."""
+    files = {SOLUTION_FILE: task.reference_solution + "\n",
+             PROOF_FILE: task.reference_proof}
+    verdict = check_submission(task, toolchain, files)
+    assert verdict.incident is None
+
+
 # --- the pin -------------------------------------------------------------------
 
 def test_the_toolchain_matches_its_pin(toolchain):

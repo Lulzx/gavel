@@ -13,7 +13,8 @@ import posixpath
 import re
 from dataclasses import dataclass
 
-from .lexer import (KIND_AT, KIND_NAME, KIND_OP, KIND_STRING, LexError, tokenize)
+from .lexer import (KIND_AT, KIND_NAME, KIND_OP, KIND_STRING, LexError,
+                    blank_multiline_literals, tokenize)
 
 # bend.ts:1028 and :1030. Imports are recognised per *line*, not per token --
 # that is how the loader reads them, and matching it keeps the gate honest.
@@ -64,11 +65,26 @@ class Chunk:
 
 
 def parse_imports(src: str) -> list[ImportSpec]:
+    """The file's import lines, read the way the loader reads them.
+
+    ``book_load`` matches ``^import…`` against each trimmed line of the file
+    (bend.ts:1028), so the decision is textual and a literal body can spell an
+    import. It cannot be reached that way -- the loader stops at the first
+    declaration -- but this scan does not, so a literal spanning lines is
+    blanked first. Left alone, a string holding an ``import ./x.bend as X`` line
+    is rejected here and accepted by the checker.
+
+    The comment after ``import ./x.bend as X`` is left in ``raw``: that string is
+    what a proof header is rebuilt from, and it is line-based, not token-based.
+    """
     out: list[ImportSpec] = []
-    for i, raw in enumerate(src.split("\n"), start=1):
-        if _IMPORT_LINE.match(raw.strip()) is None:
+    stripped = blank_multiline_literals(src).split("\n")
+    original = src.split("\n")
+    for i, (blanked, raw) in enumerate(zip(stripped, original), start=1):
+        line = blanked.strip()
+        if _IMPORT_LINE.match(line) is None:
             continue
-        rest = _IMPORT_REST.match(raw.strip()[len("import"):])
+        rest = _IMPORT_REST.match(line[len("import"):])
         if rest is None:
             out.append(ImportSpec(None, None, raw.strip(), i))
         else:

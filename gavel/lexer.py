@@ -176,6 +176,28 @@ def tokenize(src: str) -> list[Token]:
         tokens.append(Token(KIND_OP, c, line, col, start, pos))
 
 
+def blank_multiline_literals(src: str) -> str:
+    """Blank the interiors of literals that span lines, preserving offsets.
+
+    A single-line literal cannot begin a line, so a decision anchored at the
+    line head is unaffected by its content -- and ``import "x.c"`` has to stay
+    readable, because that is how a def-level foreign import is spelled. A
+    literal that spans lines can begin one, and is the only way literal content
+    reaches a line-head scan; measured against 2.0.5 the checker accepts such
+    literals (``"a`` newline ``b"`` prints as ``a\nb``).
+    """
+    out = list(src)
+    for token in tokenize(src):
+        if token.kind not in (KIND_STRING, KIND_CHAR):
+            continue
+        if "\n" not in src[token.start:token.end]:
+            continue
+        for i in range(token.start + 1, token.end - 1):
+            if src[i] != "\n":
+                out[i] = " "
+    return "".join(out)
+
+
 def strip_comments_and_literals(src: str) -> str:
     """Replace comments and literal bodies with spaces, preserving offsets.
 
@@ -185,8 +207,11 @@ def strip_comments_and_literals(src: str) -> str:
     out = list(src)
     for token in tokenize(src):
         if token.kind in (KIND_STRING, KIND_CHAR):
+            # Newlines survive: a string literal may span lines (measured
+            # against 2.0.5), and callers count lines in the result.
             for i in range(token.start + 1, token.end - 1):
-                out[i] = " "
+                if src[i] != "\n":
+                    out[i] = " "
     pos = 0
     while True:
         pos = src.find("#", pos)
