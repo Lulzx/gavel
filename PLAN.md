@@ -773,8 +773,8 @@ and the resulting verdicts say `dev_only: true`.
    `t2-init-laws` — all strong, 12/12 valid with no problems. Tier 3: the
    background backlog starts at `26aca27` (five authored mutants each into
    `t3-absdiff-comm`, `t3-merge-len` and `t3-rle-expand`) and continues at
-   `db3543b` (`t3-bin-inc`, `t3-concat-len`); `t3-count-append`'s five are
-   authored on disk and uncommitted. That is **six of the 18 repaired and
+   `db3543b` (`t3-bin-inc`, `t3-concat-len`) and `56e04da` (`t3-count-append`).
+   That is **six of the 18 repaired and
    twelve still carrying no hand-authored file** — measured by re-running the
    classifier over the manifest, which is also how the two numbers this
    paragraph carried before were found to be wrong: it said the count moved
