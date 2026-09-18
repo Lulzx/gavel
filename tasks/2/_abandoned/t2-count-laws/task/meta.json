@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-count-laws",
+  "tier": 2,
+  "laws": [
+    "count_nil",
+    "count_snoc"
+  ],
+  "policy_targets": [
+    "count"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "b8b8c791dabc16c734914462245537274ed5d788108bfb734a0d1b21e3f8e5ac",
+    "prelude": "864bd0115caad5f6aeeb747f1ba6485fddac147a9f81c8947ad8a6fecae493fc"
+  },
+  "bend_version": "2.0.5"
+}

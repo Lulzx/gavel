@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-half-laws",
+  "tier": 2,
+  "laws": [
+    "half_zero",
+    "half_succ"
+  ],
+  "policy_targets": [
+    "half"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "bc4bbb4be6da7dd5098f9ad4f6be9e60a9ec2c52ffcdece6cb6622806bbde34c",
+    "prelude": "4dab57fec84a8a704112486cfe961141a5a5ca8103907742538ba3e69b4c49c8"
+  },
+  "bend_version": "2.0.5",
+  "abandoned": "V3: both laws are half's definitional unfolding, so a {==}-only proof proves every law"
+}
