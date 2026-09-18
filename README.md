@@ -60,6 +60,7 @@ uv run gavel bench -n 10                  # check latency distribution
 uv run python -m tools.mutate --check     # author mutants and see which are strong
 uv run python -m tools.calibrate --dry-run
 uv run python -m tools.sandbox_check      # prove the sandbox runs a real check
+uv run python -m tools.migrate --from ~/.bend/app/2.0.4/rRKuW7 --label 2.0.4
 ```
 
 ## Isolation

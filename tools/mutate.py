@@ -23,7 +23,7 @@ import argparse
 import json
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -78,13 +78,26 @@ def _blocks(lines: list[str], header: re.Pattern) -> list[tuple[int, int, re.Mat
 
 
 def _cases(lines: list[str], start: int, end: int) -> list[tuple[int, int]]:
-    """``(case_index, case_body_end)`` for the cases inside one match."""
+    """``(case_index, case_body_end)`` for the cases of the match at ``start``.
+
+    Only the *direct* cases. A match inside a case body is a different match,
+    and its cases are indented deeper -- reading them here would mutate them
+    with this match's subject, which is not the construct the rule thinks it is
+    looking at. Cost of getting that wrong, measured: `drop(n: Nat, xs: ...)`
+    produced one mutant replacing the inner tail with `xs` and a second
+    replacing it with the *outer* subject `n`, both named after the same line.
+    """
+    found = [i for i in range(start, end) if _CASE.match(lines[i])]
+    if not found:
+        return []
+    # The direct cases are the shallowest ones in the range: a nested match is
+    # always indented past its parent's cases.
+    depth = min(_indent(lines[i]) for i in found)
     out = []
-    for i in range(start, end):
-        found = _CASE.match(lines[i])
-        if not found:
+    for i in found:
+        if _indent(lines[i]) != depth:
             continue
-        base = _indent(lines[i])
+        base = depth
         body_end = i + 1
         while body_end < end:
             candidate = lines[body_end]
@@ -286,6 +299,27 @@ def mutants_of(src: str) -> list[Mutant]:
                 if f"def {def_name}(" not in source:
                     continue
                 out.append(Mutant(mutant.name, mutant.rule, source, mutant.strong))
+    return _unique_names(out)
+
+
+def _unique_names(mutants: list[Mutant]) -> list[Mutant]:
+    """A mutant's name is its filename, so two of them are one file.
+
+    ``write_mutants`` clears the directory and writes one file per mutant, so a
+    collision does not fail -- it loses whichever the other overwrote, and the
+    report still says both were written. The corpus V2 measures is then thinner
+    than the tool claims, and if the lost mutant was the strong one the task
+    looks better guarded than it is. Suffixing is the cheap fix; the nesting
+    bug that caused the first collision is fixed at its source, and this is what
+    keeps the next one from being silent.
+    """
+    seen: dict[str, int] = {}
+    out: list[Mutant] = []
+    for mutant in mutants:
+        seen[mutant.name] = seen.get(mutant.name, 0) + 1
+        count = seen[mutant.name]
+        out.append(mutant if count == 1 else
+                   replace(mutant, name=f"{mutant.name}-{count}"))
     return out
 
 

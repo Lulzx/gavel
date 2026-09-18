@@ -6,6 +6,8 @@ checker are marked ``checker``.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 
 from gavel.degenerate import corpus, laws_of, signatures
@@ -281,3 +283,16 @@ def test_v2_fails_when_there_are_no_mutants_at_all(make_task, toolchain, task,
 def test_the_latency_budget_is_configurable(task, toolchain):
     report = validate_task(task, toolchain, budget_ms=1)
     assert any("V4" in problem for problem in report.problems)
+
+
+# --- the task is a problem before it is a reward function ----------------------
+
+def test_a_task_with_no_prompt_is_not_valid(task, toolchain):
+    """The failure this catches is silent: every other invariant passes.
+
+    ``prompt.md`` is read with ``is_file()`` and falls back to the empty
+    string, so a task with no problem statement is a perfectly good reward
+    function -- and a policy is asked to prove a theorem it was never told.
+    """
+    report = validate_task(replace(task, prompt=""), toolchain)
+    assert any("prompt.md" in problem for problem in report.problems)

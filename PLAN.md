@@ -299,9 +299,37 @@ and the resulting verdicts say `dev_only: true`.
 
 ### M2 — Bank v0.5
 
-1. Authoring pipeline as an agent loop over the env API (translate → laws → reference → mutants → calibrate → publish), with human review checkpoint for tier ≥ 3.
-2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest.
-3. `tools/migrate.py` and a dry run against 2.0.4 to measure churn (three releases shipped in one day during probing; expect syntax drift).
+1. Authoring pipeline as an agent loop over the env API (translate → laws → reference → mutants → calibrate → publish), with human review checkpoint for tier ≥ 3. **Partly done:** three agents author tiers 1–3 today by hand through the same tools; the loop that drives them is not automated.
+2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In progress** — 20 tasks.
+3. `tools/migrate.py` and a dry run against 2.0.4 to measure churn. **Done, and the answer is not the expected one** — see below.
+
+**M2.3 churn, measured.** The plan assumed syntax drift across releases ("three
+releases shipped in one day during probing"). The bank was run against every
+checker the launcher has on disk — 2.0.3, 2.0.4, 2.0.5, three distinct trees:
+
+| candidate | tree | clean | quarantined |
+|---|---|---|---|
+| 2.0.5 (the pin, control) | `121c70615f2d` | 20/20 | 0 |
+| 2.0.4 | `ca88ac8cc948` | 20/20 | 0 |
+| 2.0.3 | `90127d834526` | 20/20 | 0 |
+
+**Zero churn across three releases.** The 2.0.x churn does not reach any
+construct this bank uses: every task is `import Base`, inductive `def`s,
+`law … for … {… == … : T}`, and `{==}` / `%e : P` proofs. That is worth stating
+plainly because it revises the risk in §5 downward — for *this* bank, at *this*
+size, the version bump is not the live hazard. It would be a mistake to read it
+as "Bend is stable": the sample is 20 tasks by three authors all working from
+the same guide, and the constructs the bank avoids are exactly the ones the
+guide does not cover. The hazard is unmeasured, not absent.
+
+`--from` takes any directory containing `bend2/`, so a candidate is measured
+without vendoring it; nothing is written to the repository except the report.
+The negative control is what makes the three zeros mean something: a copy of
+2.0.5 with the success line changed from `All terms check.` to `Everything is
+fine.` quarantines **20/20** and quotes the new line back as evidence. Both
+directions are tested in `tests/test_migrate.py`, because a dry run that reports
+"0 quarantined" for every candidate is indistinguishable from one that never
+looks.
 
 ### M3 — API
 
@@ -317,7 +345,7 @@ and the resulting verdicts say `dev_only: true`.
 
 ## 5. Risks
 
-- **Syntax churn.** Bend went 2.0.3 → 2.0.5 in under 24 h. Mitigation: the bank is pinned, `migrate.py` exists from M2, and the tokenizer is version-tagged.
+- **Syntax churn.** Bend went 2.0.3 → 2.0.5 in under 24 h. Mitigation: the bank is pinned, `migrate.py` exists from M2, and the tokenizer is version-tagged. *Revised down by M2.3:* the whole bank was re-validated against 2.0.3 and 2.0.4 with zero quarantine, so for these constructs the churn is not the live hazard. The mitigation stays because the sample is 20 tasks that all stick to the constructs the Bend guide covers — the unmeasured risk is the constructs a larger bank would reach for.
 - **Checker soundness.** The guide says the Lean model lags the implementation. Mitigation: mutant tripwire, adversarial corpus, and success keyed on exact output, not exit code.
 - **Authoring throughput.** Hand-written proofs in a no-tactics language are slow. M0 deliberately keeps 20 tasks small; M2 relies on the agent loop.
 - **Fact 8 cost.** Per-law runs multiply latency on failed turns. Bounded by n² × 0.2 s with n ≤ 5, and the persistent worker in M3 shrinks the constant.

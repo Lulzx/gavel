@@ -86,6 +86,7 @@ def validate_task(task: Task, toolchain: Toolchain, *,
                         hash=task.hash,
                         zero_shot_solve_rate=task.meta.get("zero_shot_solve_rate"))
 
+    _posed(task, report)
     _v1_reference(task, toolchain, config, report, budget_ms)
     _v2_mutants(task, toolchain, config, report)
     _v3_degenerate(task, toolchain, config, report)
@@ -102,6 +103,23 @@ def validate_task(task: Task, toolchain: Toolchain, *,
         report.problems.extend(report.warnings)
         report.warnings = []
     return report
+
+
+# --- posed: the task is a problem before it is a reward function ---------------
+
+def _posed(task: Task, report: TaskReport) -> None:
+    """Not one of V1-V5, and checked first because it is more basic than any of
+    them: a task whose prompt is missing is still a perfectly good reward
+    function, and a policy is still shown nothing.
+
+    ``prompt.md`` is read with ``is_file()`` and falls back to the empty string,
+    which is what makes this silent -- every other invariant passes, and the
+    only symptom is a model asked to prove a theorem it was never told.
+    """
+    if not task.prompt.strip():
+        report.problems.append(
+            "posed: prompt.md is missing or empty, so the policy is shown no "
+            "problem statement")
 
 
 # --- V1: the reference proves every law ----------------------------------------

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from tools.mutate import Mutant, dedupe, mutants_of
+from tools.mutate import Mutant, _unique_names, dedupe, mutants_of
 
 ADD = """\
 import Base
@@ -168,3 +168,58 @@ def test_the_reference_itself_is_not_a_mutant():
 
 def test_a_file_with_no_defs_yields_no_mutants():
     assert mutants_of("import Base\n") == []
+
+
+# --- names, and the corpus they decide ------------------------------------------
+
+NESTED = """\
+import Base
+
+def drop(n: Nat, xs: List<Nat>) -> List<Nat>:
+  match n:
+    case 0n:
+      xs
+    case 1n+k:
+      match xs:
+        case Nil{}:
+          Nil{}
+        case h <> t:
+          drop(k, t)
+"""
+
+
+def test_an_inner_match_is_not_read_as_a_case_of_the_outer_one():
+    """The bug this pins produced a mutant of the wrong construct.
+
+    ``_cases`` scans a line range, so the nested ``match xs:`` cases fall inside
+    the outer ``match n:`` range. Reading them there replaces the list's tail
+    with the *Nat* subject ``n`` -- a mutation of `drop` that no rule asked for
+    -- and, worse, names it after the same line as the one the inner match
+    legitimately produces.
+    """
+    tails = by_rule(NESTED, "tail-to-whole")
+    assert len(tails) == 1
+    assert "drop(k, xs)" in tails[0].source
+    assert "drop(k, n)" not in tails[0].source
+
+
+def test_two_mutants_never_share_a_name():
+    """A name is a filename, and two of them are one file.
+
+    ``write_mutants`` clears the directory and writes one file per mutant, so a
+    collision silently loses one -- and the report still counts both, so V2
+    measures a thinner corpus than the tool claims. The nesting bug above was
+    how it was found; this is what stops the next one.
+    """
+    names = [m.name for m in mutants_of(NESTED)]
+    assert len(set(names)) == len(names)
+
+
+def test_a_collision_is_suffixed_rather_than_dropped():
+    """Checked directly, because the fixture above no longer collides."""
+    twins = [Mutant("add-rule-3", "r", ADD, strong=True),
+             Mutant("add-rule-3", "r", APPEND, strong=True),
+             Mutant("add-rule-3", "r", ADD + "\n", strong=True)]
+    assert [m.name for m in _unique_names(twins)] == \
+        ["add-rule-3", "add-rule-3-2", "add-rule-3-3"]
+    assert len({m.source for m in _unique_names(twins)}) == 3

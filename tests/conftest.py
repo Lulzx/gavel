@@ -90,7 +90,8 @@ def make_task():
                 "policy_targets": ["add"], "hashes": {}}
         meta.update(over.pop("meta", {}))
         fields = dict(
-            task_id="t-fake", tier=1, root=REPO, references=REPO, prompt="",
+            task_id="t-fake", tier=1, root=REPO, references=REPO,
+            prompt="Prove that adding a successor is the successor of adding.\n",
             laws_src=FIXTURE_LAWS, prelude_src="import Base\n",
             stub_src=FIXTURE_STUB, meta=meta, hash="")
         fields.update(over)
