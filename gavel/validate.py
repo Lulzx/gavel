@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .check import CheckConfig, check_submission
-from .degenerate import corpus
+from .degenerate import corpus, unmodelled
 from .laws import parse_imports, split_top_level
 from .tasks import LAWS_FILE, PRELUDE_FILE, PROOF_FILE, SOLUTION_FILE, Task
 from .toolchain import Toolchain
@@ -209,6 +209,16 @@ def _v3_degenerate(task: Task, toolchain: Toolchain, config: CheckConfig,
     and more important question: is an obviously empty one caught at all. A
     task that pays tier 4 for any of these is not a task.
     """
+    # Nothing below is evidence if the corpus could not be built. A generated
+    # solution missing a function the laws call is a type error, so every
+    # attempt lands at tier 1 and V3 passes without having asked anything --
+    # which is worse than failing, because it reports "fine".
+    blind = unmodelled(task.stub_src)
+    if blind:
+        report.warnings.append(
+            f"V3: the degenerate corpus cannot rebuild {', '.join(blind)} from "
+            f"the stub, so its submissions are incomplete and V3 tested nothing")
+
     for attempt in corpus(task):
         verdict = check_submission(task, toolchain, dict(attempt.files), config)
         report.checked.append(f"degenerate:{attempt.name}")

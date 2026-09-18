@@ -1,0 +1,29 @@
+{
+  "task_id": "t2-pow-laws",
+  "tier": 2,
+  "title": "zero and one exponents",
+  "difficulty_weight": 2.0,
+  "source": {
+    "benchmark": "custom",
+    "origin": "Nat arithmetic"
+  },
+  "tags": [
+    "nat",
+    "power",
+    "helper-lemma"
+  ],
+  "policy_targets": [
+    "pow"
+  ],
+  "laws": [
+    "pow_zero",
+    "pow_one"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "79e7c97f4a6fd6a8e9c23002164629a241b88eeee0ab744bda0c47e884fdaed5",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

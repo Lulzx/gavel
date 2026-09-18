@@ -1,0 +1,30 @@
+{
+  "task_id": "t2-mul-distrib",
+  "tier": 2,
+  "title": "multiplication distributes over addition",
+  "difficulty_weight": 2.0,
+  "source": {
+    "benchmark": "custom",
+    "origin": "Nat arithmetic"
+  },
+  "tags": [
+    "nat",
+    "multiplication",
+    "distributivity",
+    "helper-lemma"
+  ],
+  "policy_targets": [
+    "mul"
+  ],
+  "laws": [
+    "mul_one_left",
+    "mul_distrib"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "4839b80dbcd3a75c9029c8b61e44f09ff72871b69c7e414164975641176efb3f",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

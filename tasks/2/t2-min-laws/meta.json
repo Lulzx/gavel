@@ -1,0 +1,29 @@
+{
+  "task_id": "t2-min-laws",
+  "tier": 2,
+  "title": "min is idempotent and commutative",
+  "difficulty_weight": 2.0,
+  "source": {
+    "benchmark": "custom",
+    "origin": "Nat arithmetic"
+  },
+  "tags": [
+    "nat",
+    "minimum",
+    "induction"
+  ],
+  "policy_targets": [
+    "min"
+  ],
+  "laws": [
+    "min_self",
+    "min_comm"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "bc3141d91ec95e7c81052bfb6c9912a44f0759b170e395c1e32e991b8a0bb76e",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

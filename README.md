@@ -168,15 +168,21 @@ base law and a cons law together where neither does on its own; tier 2 = a weak 
 plus the inductive law.**
 
 The reliable test is mechanical, not a reading of the laws: **a law pins its function
-only if no argument-ignoring body satisfies it.** `gavel/validate.py` V3 applies it by
-crossing every degenerate solution with every degenerate proof — a projection or a
-constant, paired with a `{==}` proof — and failing the task if any combination reaches
-tier 4. Checking a bad solution against the *reference* proof would not have caught it:
-that asks whether the reference proof is brittle, not whether the laws pin the function
-down.
+only if no argument-ignoring body satisfies it.** Checking a bad solution against the
+*reference* proof would not have caught it — that asks whether the reference proof is
+brittle, not whether the laws pin the function down.
+
+**A pair of laws can pin at most two functions.** V3 builds its identity solution from the
+*first* same-typed parameter, so a law set that an argument-ignoring body satisfies while
+the corpus is looking at a different argument is invisible to it, and V2 is
+proof-relative — it asks whether the reference proof happens to apply. Five shipped
+law-pairs were found to reach tier 4 for a function nobody implemented, and were
+rewritten. The decisive sweep is the cross product: every argument-ignoring body against
+a `{==}`-only proof. Prefer law sets small enough that this can be done by hand.
 
 ## Status
 
-M0 — the core harness runs end to end against a hand-authored fixture. The task bank,
-the adversarial corpus, and the multi-turn environment are in progress; see the
-milestones in `PLAN.md`.
+The core harness runs end to end: gate, check protocol, reward, multi-turn environment,
+verdict cache, JSONL trajectories, metrics, and a socket/HTTP server for non-Python
+clients. `gavel bench` reports check latency; see `PLAN.md` for what each milestone
+still owes.

@@ -53,6 +53,14 @@
       "valid": true
     },
     {
+      "task_id": "t1-even-flip",
+      "tier": 1,
+      "path": "tasks/1/t1-even-flip",
+      "reference": "references/t1-even-flip",
+      "hash": "d2173d8e9a0eaec78f6f09dbd3949a52a6af7700b2b938518bf0a39ab6e9ad8e",
+      "valid": true
+    },
+    {
       "task_id": "t1-len-append",
       "tier": 1,
       "path": "tasks/1/t1-len-append",
@@ -133,6 +141,14 @@
       "valid": true
     },
     {
+      "task_id": "t1-sub-cancel",
+      "tier": 1,
+      "path": "tasks/1/t1-sub-cancel",
+      "reference": "references/t1-sub-cancel",
+      "hash": "5022416197e045018a60a99ecf42dca2051f7fe2a72f76d1b2b14cd3f345ddd2",
+      "valid": true
+    },
+    {
       "task_id": "t1-sum-append",
       "tier": 1,
       "path": "tasks/1/t1-sum-append",
@@ -189,11 +205,35 @@
       "valid": true
     },
     {
+      "task_id": "t2-min-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-min-laws",
+      "reference": "references/t2-min-laws",
+      "hash": "7d64e00a0d944b4d06572c5df96cdf014ce831acc89dd53b175899f2d8b4dbe2",
+      "valid": true
+    },
+    {
+      "task_id": "t2-mul-distrib",
+      "tier": 2,
+      "path": "tasks/2/t2-mul-distrib",
+      "reference": "references/t2-mul-distrib",
+      "hash": "64378e4c2138b65e0717ccb55e1c98a0a31f908e1b1314db4d43f74c98952632",
+      "valid": true
+    },
+    {
       "task_id": "t2-mul-laws",
       "tier": 2,
       "path": "tasks/2/t2-mul-laws",
       "reference": "references/t2-mul-laws",
       "hash": "95597465fef16a0ce87912d0befb22d983870c85178397efba9aa1b0f1798660",
+      "valid": true
+    },
+    {
+      "task_id": "t2-pow-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-pow-laws",
+      "reference": "references/t2-pow-laws",
+      "hash": "9a20fd168c28fd7bf3b8c73f42e80cd132fb5751c9c336ce17aabb46c85d9afc",
       "valid": true
     },
     {
@@ -250,6 +290,14 @@
       "path": "tasks/3/t3-filter-bound",
       "reference": "references/t3-filter-bound",
       "hash": "f2ec160701a6a2406f5e78fc94a3e10b27647bbd46b522224a284b0bf9c1209c",
+      "valid": true
+    },
+    {
+      "task_id": "t3-isort-sorted",
+      "tier": 3,
+      "path": "tasks/3/t3-isort-sorted",
+      "reference": "references/t3-isort-sorted",
+      "hash": "de643030ffa0bdaf9bbcc0d668a13e1f98655fd216bdede9e53f35695979240a",
       "valid": true
     }
   ]

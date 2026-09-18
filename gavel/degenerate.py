@@ -25,6 +25,38 @@ from .tasks import PROOF_FILE, SOLUTION_FILE
 _SIGNATURE = re.compile(
     r"^\s*def\s+([A-Za-z_][\w.]*)\s*\(([^)]*)\)\s*->\s*([^:]+):", re.M)
 
+# Just the name. Used to notice a def the signature pattern missed entirely,
+# which is the other way the corpus can silently shrink.
+_DEF_NAME = re.compile(r"^\s*def\s+([A-Za-z_][\w.]*)", re.M)
+
+_OPEN, _CLOSE = "<({[", ">)}]"
+
+
+def _split_params(text: str) -> list[str]:
+    """Split on the commas that separate parameters, and only those.
+
+    ``def sum(xs: List<&2, Nat>, ys: Nat) -> Nat`` has one parameter. Splitting
+    it on a bare comma yields ``xs: List<&2`` and ``Nat>``, the first of which
+    parses as a parameter of type ``List<&2`` and the second of which has no
+    type at all -- so the def is dropped, the corpus rebuilds a stub missing a
+    function its laws call, and every degenerate attempt fails to type-check.
+    V3 then passes having tested nothing. Measured on ``t2-sum-laws``, which is
+    why it now uses ``List<Nat>``: the same trap under a spelling the tool
+    happened to parse.
+    """
+    out: list[str] = []
+    depth, start = 0, 0
+    for at, char in enumerate(text):
+        if char in _OPEN:
+            depth += 1
+        elif char in _CLOSE:
+            depth -= 1
+        elif char == "," and depth == 0:
+            out.append(text[start:at])
+            start = at + 1
+    out.append(text[start:])
+    return [part.strip() for part in out if part.strip()]
+
 
 @dataclass(frozen=True)
 class Degenerate:
@@ -45,7 +77,7 @@ def signatures(src: str) -> list[tuple[str, list[tuple[str, str]], str]]:
     """
     out = []
     for match in _SIGNATURE.finditer(src):
-        parts = [p for p in match.group(2).split(",") if p.strip()]
+        parts = _split_params(match.group(2))
         params = []
         for part in parts:
             if ":" not in part:
@@ -59,19 +91,46 @@ def signatures(src: str) -> list[tuple[str, list[tuple[str, str]], str]]:
     return out
 
 
+def unmodelled(src: str) -> list[str]:
+    """Defs the stub declares that :func:`signatures` could not rebuild.
+
+    A stub def this function names is one the corpus cannot model, and the
+    consequence is silent: the generated solutions omit a function the laws
+    call, so every degenerate attempt is a type error and V3 passes without
+    having asked anything. The list is returned rather than raised because a
+    task with one unparseable signature is not *wrong*, it is unguaranteed --
+    which is what ``tools.validate`` needs to say out loud.
+    """
+    declared = [m.group(1) for m in _DEF_NAME.finditer(src)]
+    parsed = {name for name, _, _ in signatures(src)}
+    seen: dict[str, None] = {}
+    for name in declared:
+        if name not in parsed:
+            seen[name] = None
+    return list(seen)
+
+
 def _render(name: str, params: list[tuple[str, str]], ret: str) -> str:
     declared = ", ".join(f"{param}: {typ}" for param, typ in params)
     return f"def {name}({declared}) -> {ret}:"
 
 
 def _zero_of(typ: str) -> str | None:
-    """The most obvious inhabitant of a type, or None if there is not one."""
+    """The most obvious inhabitant of a type, or None if there is not one.
+
+    The spelling matters more than it looks: ``Bool``'s values are ``False{}``
+    and ``True{}`` (base.bend:13), and a bare ``False`` is a type error. A
+    generator that emitted ``False`` would produce a submission that fails
+    before any law is consulted, so V3 would pass on every Bool-valued task
+    having tested none of them -- which is exactly the vacuity the last clause
+    of :func:`_ignore_arguments` exists to avoid.
+    """
     if typ == "Nat":
         return "0n"
     if typ.startswith("List<"):
         return "Nil{}"
     if typ == "Bool":
-        return "False"
+        return "False{}"
     return None
 
 
@@ -197,4 +256,4 @@ def corpus(task) -> list[Degenerate]:
     return out
 
 
-__all__ = ["Degenerate", "corpus", "laws_of", "signatures"]
+__all__ = ["Degenerate", "corpus", "laws_of", "signatures", "unmodelled"]

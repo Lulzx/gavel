@@ -10,7 +10,7 @@ from dataclasses import replace
 
 import pytest
 
-from gavel.degenerate import corpus, laws_of, signatures
+from gavel.degenerate import _zero_of, corpus, laws_of, signatures, unmodelled
 from gavel.tasks import PROOF_FILE, SOLUTION_FILE
 from gavel.validate import validate_task
 from gavel.verdict import TIER_CHECKS, TIER_COMPLETE, TIER_NO_CHECK
@@ -28,6 +28,43 @@ def test_signatures_skip_a_shape_they_do_not_understand():
     assert signatures("def f(x: Nat) -> Nat:\n  x\n") == [("f", [("x", "Nat")], "Nat")]
     assert signatures("def f(x) -> Nat:\n  x\n") == []      # no annotations
     assert signatures("type Foo\n") == []
+
+
+def test_a_comma_inside_a_type_does_not_split_the_parameter_list():
+    """The bug this pins cost V3 its meaning on every task spelled this way.
+
+    Splitting on a bare comma turns ``List<&2, Nat>`` into a parameter of type
+    ``List<&2`` and a fragment with no type at all, so the def is dropped. The
+    corpus then rebuilds a stub missing a function its laws call, every attempt
+    is a type error, and V3 passes having tested nothing -- measured on
+    ``t2-sum-laws``, which was rewritten rather than fixed at the time.
+    """
+    assert signatures("def sum(xs: List<&2, Nat>, ys: Nat) -> Nat:\n  xs\n") == \
+        [("sum", [("xs", "List<&2, Nat>"), ("ys", "Nat")], "Nat")]
+    assert signatures("def m(xs: List<List<Nat>>, n: Nat) -> List<Nat>:\n  xs\n") == \
+        [("m", [("xs", "List<List<Nat>>"), ("n", "Nat")], "List<Nat>")]
+    # A return type with a comma in it survives too.
+    assert signatures("def p(a: Nat) -> List<&2, Nat>:\n  Nil{}\n") == \
+        [("p", [("a", "Nat")], "List<&2, Nat>")]
+
+
+def test_an_unparseable_stub_def_is_named_not_silently_dropped():
+    """A corpus built from a partial parse is worse than no corpus, because it
+    reports "fine"."""
+    assert unmodelled("def f(x) -> Nat:\n  x\ndef g(a: Nat) -> Nat:\n  a\n") == ["f"]
+    assert unmodelled("def g(a: Nat) -> Nat:\n  a\n") == []
+    # A def with no parameters is parsed, not unmodelled.
+    assert unmodelled("def k() -> Nat:\n  0n\n") == []
+
+
+def test_the_bool_zero_is_a_value_not_a_constructor_name():
+    """``Bool`` is ``False{}``/``True{}`` (base.bend:13). A generator emitting
+    a bare ``False`` produces a submission that fails to type-check, so V3
+    would have passed on every Bool-valued task without asking anything."""
+    assert _zero_of("Bool") == "False{}"
+    assert _zero_of("Nat") == "0n"
+    assert _zero_of("List<Nat>") == "Nil{}"
+    assert _zero_of("SomethingElse") is None
 
 
 def test_law_binders_come_from_the_for_lines(task):

@@ -1,0 +1,22 @@
+{
+  "task_id": "t3-isort-sorted",
+  "tier": 3,
+  "laws": [
+    "isort_sorted",
+    "insert_sorted",
+    "insert_le",
+    "insert_gt",
+    "isort_swap"
+  ],
+  "policy_targets": [
+    "insert",
+    "isort"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "cf7449141ec6a926e92ab38f090c56325d9f3521d9002e266a5af0ad2a348f2b",
+    "prelude": "c3524ca849e040d66676855d043475c753ee008ed3bb5a050ed9420d8742c11a"
+  },
+  "bend_version": "2.0.5"
+}
