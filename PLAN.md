@@ -573,7 +573,34 @@ looks.
 
 ### M4 — Bank v1.0
 
-500+ tasks including tier 5, human-reviewed laws for tier ≥ 3, published throughput benchmark, external training run.
+Exit: 500+ tasks including tier 5, human-reviewed laws for tier ≥ 3, published
+throughput benchmark, an external training run reporting a solve-rate curve.
+The four have four different states, and only the first is work rather than a
+waiting room.
+
+1. **500+ tasks including tier 5. Not started beyond 81.** The ceiling is §3.9:
+   the bank holds no tier-4 task and no tier-5 task, so this is a scale problem
+   and not a design one -- the pipeline is the one that already produced 81
+   tasks, and the check that keeps it honest (a manifest entry must resolve to a
+   directory inside the same commit) exists and has already caught its own
+   failure once. Tier 4 is being authored now, a task at a time; tier 5 has no
+   reference implementation anywhere in the vendored tree and has to be written
+   from SPEC §10's description.
+2. **Human-reviewed laws for tier ≥ 3. Not satisfied, and the bank says it
+   is** -- see below.
+3. **Published throughput benchmark. Blocked on a quiet machine, not on the
+   harness.** `tools/soak.py` reports p50/p95/p99 and verdicts/min/core from a
+   real run, and M3.5's ten-thousand-episode soak produced all of them. They
+   were taken with eight jobs running while the session built and tested on the
+   same box, both runs since have been on a machine at load 100 or more, and a
+   contended latency percentile is not a published one. The measurement is one
+   command away; what it needs is an idle host.
+4. **External training run. Blocked on a model.** Nothing in this repository
+   conjures the policy, and the calibration path that would record a
+   `zero_shot_solve_rate` answers 403 (Cloudflare 1010) from here. That block is
+   deliberately left standing rather than worked around: a harness that
+   misrepresents itself to a third party to obtain a number is not a harness
+   whose numbers mean anything.
 
 **The review half of this is not satisfied and the bank currently says it is.**
 Eleven tier-3 tasks carry `"reviewed": {"by": "lulzx"}` written by the authoring
