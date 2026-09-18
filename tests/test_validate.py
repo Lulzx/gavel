@@ -333,3 +333,35 @@ def test_a_task_with_no_prompt_is_not_valid(task, toolchain):
     """
     report = validate_task(replace(task, prompt=""), toolchain)
     assert any("prompt.md" in problem for problem in report.problems)
+
+
+def test_a_law_citing_something_the_stub_does_not_define(make_task, toolchain, task):
+    """``S.len`` in a law whose stub offers only ``add``.
+
+    The law file imports ``./solution.bend as S`` and the solution does not
+    re-export the prelude, so this has to say ``P.len``. As written the checker
+    answers "expected : a defined name / observed : S.len" pointing into the
+    law, which reads like a proof that is wrong rather than a task that is --
+    and the author of the law is the person least likely to read it that way.
+    """
+    laws = ("import Base\n"
+            "import ./prelude.bend as P\n"
+            "import ./solution.bend as S\n\n"
+            "law add_succ:\n"
+            "  for x: Nat\n"
+            "  for y: Nat\n"
+            "  {S.len(S.add(x, 1n+y)) == 1n+S.add(x, y) : Nat}\n")
+    report = validate_task(make_task(laws_src=laws, references=task.references),
+                           toolchain)
+    assert any("S.len" in problem and "posed" in problem
+               for problem in report.problems)
+
+
+def test_a_comment_naming_the_prelude_is_not_a_citation(make_task, toolchain, task):
+    """The bank's laws are heavily commented, so the scan strips comments
+    first: a comment that mentions ``S.len`` while explaining the law is not a
+    citation, and failing on one would make the check unusable."""
+    laws = task.laws_src + "\n# not a citation: S.nonexistent would be P.nonexistent\n"
+    report = validate_task(make_task(laws_src=laws, references=task.references),
+                           toolchain)
+    assert not any("S.nonexistent" in problem for problem in report.problems)

@@ -15,6 +15,7 @@ acceptable answer.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -87,6 +88,7 @@ def validate_task(task: Task, toolchain: Toolchain, *,
                         zero_shot_solve_rate=task.meta.get("zero_shot_solve_rate"))
 
     _posed(task, report)
+    _law_references(task, report)
     _v1_reference(task, toolchain, config, report, budget_ms)
     _v2_mutants(task, toolchain, config, report)
     _v3_degenerate(task, toolchain, config, report)
@@ -120,6 +122,36 @@ def _posed(task: Task, report: TaskReport) -> None:
         report.problems.append(
             "posed: prompt.md is missing or empty, so the policy is shown no "
             "problem statement")
+
+
+def _law_references(task: Task, report: TaskReport) -> None:
+    """A law may cite ``S.<f>`` only for an ``f`` the stub asks the policy to
+    write.
+
+    ``LAWS.bend`` imports ``./solution.bend as S``, and the solution does not
+    re-export the prelude, so a law that means the prelude's ``len`` has to say
+    ``P.len``. Written as ``S.len`` it still parses and still reads like a law,
+    and the checker answers with "expected : a defined name / observed : S.len"
+    pointing into the law -- which reads like a proof that is wrong rather than
+    a task that is. This is the cheaper place to find out.
+
+    Checked here rather than in V1 because it is a property of the task's own
+    files, knowable without running the checker, and V1 cannot see it at all
+    when the reference happens to be broken for some other reason first.
+    """
+    defined = {c.name for c in split_top_level(task.stub_src) if c.kind == "def"}
+    # Comments stripped: the bank's laws are heavily commented, and a comment
+    # that mentions `S.len` while explaining the law is not a citation.
+    body = "\n".join(line.split("#", 1)[0] for line in task.laws_src.splitlines())
+    cited = set(re.findall(r"\bS\.([A-Za-z_][A-Za-z0-9_]*)", body))
+    unknown = sorted(cited - defined)
+    if unknown:
+        report.problems.append(
+            f"posed: LAWS.bend cites {', '.join('S.' + n for n in unknown)}, "
+            f"but solution.bend defines only {sorted(defined) or 'nothing'}. "
+            f"The law file imports solution.bend as S, which does not re-export "
+            f"the prelude: anything the policy is not being asked to write is "
+            f"P.")
 
 
 # --- V1: the reference proves every law ----------------------------------------
