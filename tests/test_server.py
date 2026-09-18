@@ -397,6 +397,12 @@ def test_http_refuses_an_unknown_route(http):
     with pytest.raises(urllib.error.HTTPError) as caught:
         http_call(http, "POST", "/nonsense", {})
     assert caught.value.code == 404
+    # ``HTTPError`` wraps the response, and the response holds the connection.
+    # Nothing in the raise path closes either -- ``do_open`` closes the socket
+    # but the response keeps a file object on it -- so an unread error leaves a
+    # socket to the cyclic collector, which pytest's unraisable hook turns into
+    # a failure under this suite's ``filterwarnings = ["error"]``.
+    caught.value.close()
 
 
 # --- the example client ------------------------------------------------------------
