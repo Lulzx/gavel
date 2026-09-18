@@ -47,7 +47,7 @@ def target_names(src: str) -> list[str]:
             if c.kind == "def" and not c.name.startswith("Policy.")]
 
 
-def publish_task(root: Path, version: str) -> dict:
+def publish_task(root: Path, version: str, repo: Path = REPO_ROOT) -> dict:
     meta_path = root / "meta.json"
     meta = json.loads(meta_path.read_text()) if meta_path.is_file() else {}
     laws_src = (root / LAWS_FILE).read_text()
@@ -77,7 +77,7 @@ def publish_task(root: Path, version: str) -> dict:
     return {
         "task_id": task_id,
         "tier": tier,
-        "path": root.relative_to(REPO_ROOT).as_posix(),
+        "path": root.relative_to(repo).as_posix(),
         "reference": f"references/{task_id}",
         "hash": hash_files({LAWS_FILE: laws_src, PRELUDE_FILE: prelude_src,
                             SOLUTION_FILE: stub_src}),

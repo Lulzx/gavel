@@ -309,8 +309,26 @@ and the resulting verdicts say `dev_only: true`.
 
 ### M2 — Bank v0.5
 
-1. Authoring pipeline as an agent loop over the env API (translate → laws → reference → mutants → calibrate → publish), with human review checkpoint for tier ≥ 3. **Partly done:** three agents author tiers 1–3 today by hand through the same tools; the loop that drives them is not automated.
-2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In progress** — 20 tasks.
+1. Authoring pipeline as an agent loop over the env API (translate → laws →
+   reference → mutants → calibrate → publish), with human review checkpoint for
+   tier ≥ 3. **Done, as a driver rather than as a generator.** `tools/author.py`
+   runs the stages in order and refuses to carry a task past one it has not
+   passed: files → derive → V1–V5 → episode → review → publish. Two of the six
+   are model work — nothing here translates a module or invents a law — so what
+   is automated is the part the plan can hold to a rule, and what is not is
+   named as not.
+   The episode stage is not a duplicate of V1. V1 asks whether the checker
+   accepts the reference; the episode asks whether the task *rewards* it — gate
+   open, tier 4, reward 1.0, done on the first turn — through the same
+   `GavelEnv` the training loop drives, so the pipeline cannot be satisfied by
+   a task the loop would not be.
+   The review binds to a revision, not to a task id: approval is recorded
+   against the hashes `tools/publish.py` derives from `LAWS.bend` and
+   `prelude.bend`, so editing either makes the approval stale and reopens the
+   checkpoint. A checkpoint that survives an edit to the thing it was reviewing
+   is a signature on an empty page.
+2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
+   progress** — 38 tasks.
 3. `tools/migrate.py` and a dry run against 2.0.4 to measure churn. **Done, and the answer is not the expected one** — see below.
 
 **M2.3 churn, measured.** The plan assumed syntax drift across releases ("three

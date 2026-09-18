@@ -53,6 +53,7 @@ either pin has drifted.
 
 ```
 uv run python -m tools.publish            # derive metadata, rebuild manifest.json
+uv run python -m tools.author tasks/2/t2-thing   # the authoring stages, in order
 uv run gavel list                         # tasks by tier
 uv run gavel info t1-add-succ             # prompt, laws, stub
 uv run gavel check t1-add-succ --reference
@@ -67,6 +68,16 @@ uv run python -m tools.soak -n 10000 -j 8 --out runs/soak   # unattended
 uv run gavel serve --socket /tmp/gavel.sock --http 127.0.0.1:8765
 bun run examples/client.ts                # a non-Python client
 ```
+
+## Authoring a task
+
+`tools/author.py` runs the stages in `PLAN.md` §M2 in order — files, derive,
+V1–V5, episode, review, publish — and refuses to carry a task past one it has
+not passed. Translating a module and inventing the laws stay human (or agent)
+work; everything after that is a measurement, so it is a gate rather than a
+maxim. A tier ≥ 3 task stops for a named reviewer, and the approval is recorded
+against the hashes of `LAWS.bend` and `prelude.bend`, so editing either reopens
+the checkpoint.
 
 ## Running episodes
 
