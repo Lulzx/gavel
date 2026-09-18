@@ -5,8 +5,8 @@ import Base
 # (`S.mul(1n+x, y)` is `y` against `y + S.mul(x, y)`). The checker reports both
 # as failed off the shared unfolding; the law the body contradicts is the
 # successor law.
-# Measured: `proof_tier=2 bare_tier=2`, nothing proven, first failure at
-# `LAWS.mul_zero`.
+# Measured: `proof_tier=3 bare_tier=2`, proven ['mul_zero_left'], first
+# failure at `LAWS.mul_zero`.
 def add(a: Nat, b: Nat) -> Nat:
   match a:
     case 0n:

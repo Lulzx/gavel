@@ -4,8 +4,8 @@ import Base
 # everywhere. The right-zero law holds by reduction at every `x`; the successor
 # law is `S.mul(1n+x, y) == y + S.mul(x, y)`, and this body answers `0n` where
 # the law wants `y + 0n`.
-# Measured: `proof_tier=2 bare_tier=2`, nothing proven, first failure at
-# `LAWS.mul_zero`.
+# Measured: `proof_tier=3 bare_tier=2`, proven ['mul_zero_left'], first
+# failure at `LAWS.mul_zero`.
 def add(a: Nat, b: Nat) -> Nat:
   match a:
     case 0n:
