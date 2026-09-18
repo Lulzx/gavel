@@ -851,8 +851,11 @@ and the resulting verdicts say `dev_only: true`.
    **The census is closed, measured 2026-09-19.** All 124 registered tasks carry
    at least one hand-authored mutant file, and **every one of them is at or
    above the four-file floor** — the first time both have been true. The
-   classifier reads 1,322 mutant files across the bank. The nine tier-2 tasks
-   that stood at zero (`t2-cube-all-laws`, `t2-dup-all-laws`,
+   classifier reads 1,324 mutant files across the bank, re-counted after the
+   two Fact 33 repairs added a strong mutant each (`4f07ac7` committed 98 files
+   the classifier was already counting; the count is now the same on disk and
+   in git, which it was not when the paragraph was first written). The nine
+   tier-2 tasks that stood at zero (`t2-cube-all-laws`, `t2-dup-all-laws`,
    `t2-has-mult3-laws`, `t2-has-odd-laws`, `t2-map-add-laws`,
    `t2-sq-inc-all-laws`, `t2-sum-half-laws`, `t2-sum-mod3-laws`,
    `t2-sum-nonzero-laws`) and the twelve thin tier-1 tasks (`t1-append-assoc`,
