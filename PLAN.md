@@ -817,14 +817,27 @@ and the resulting verdicts say `dev_only: true`.
    the per-task detail is in the commit messages and is not repeated here,
    because the counts below are the part that has to be right.
 
-   **The state of the census after that work, measured rather than tallied:**
-   of the 92 tasks that had no hand-authored file, **40 now have one and 52 do
-   not** — tier 1 is untouched at 8, tier 2 is 24 of 66 authored with 42 left,
-   and tier 3 is 29 of 31 authored with 2 left. Among the authored, three are
-   still under the rule's floor of four files: `t3-split-even-odd` and
-   `t3-sum-to-double` at three each, and `t3-zip-sum` at three. The two tier-3
-   tasks still at zero are `t3-rev-rev` and `t3-take-drop-split`, which is down
-   from eighteen at the census.
+   **The state of the census after that work, measured rather than tallied**
+   (classifier re-run at `93c214d`, 2026-09-18): of the 124 registered tasks,
+   **115 carry a hand-authored mutant file and 9 do not**. Tier 1 is 20 of 20
+   — finished, up from zero; tier 3 is 31 of 31 — finished; tiers 4 and 5 were
+   already complete and stay at 4 of 4 and 3 of 3. The whole of the remainder
+   is tier 2: **57 of 66**, with `t2-cube-all-laws`, `t2-dup-all-laws`,
+   `t2-has-mult3-laws`, `t2-has-odd-laws`, `t2-map-add-laws`,
+   `t2-sq-inc-all-laws`, `t2-sum-half-laws`, `t2-sum-mod3-laws` and
+   `t2-sum-nonzero-laws` still at zero. Across the bank the classifier reads
+   538 authored files out of 1,246. The floor of four authored files per task
+   is now met everywhere the census counts (the old exceptions,
+   `t3-split-even-odd`, `t3-sum-to-double` and `t3-zip-sum`, carry 4, 4 and 4
+   after the top-ups in `93c214d`). It is **not** met everywhere: twelve of the
+   twenty tier-1 tasks sit below it at two or three authored files each —
+   `t1-append-assoc` at two, and `t1-append-nil`, `t1-concat-append`,
+   `t1-count-zeros`, `t1-len-append`, `t1-len-cons`, `t1-len-map`,
+   `t1-len-snoc`, `t1-rev-append`, `t1-rev-snoc`, `t1-sum-append` and
+   `t1-take-drop` at three — so "tier 1 is finished" is a statement about the
+   *tasks* being authored at all, which is the thing the census counts, and not
+   about the floor, which they are under. Every one of the twelve type-checks
+   bare and none reaches tier 4, so they are thin rather than broken.
 
    **Two limits on that paragraph are worth stating, because both have already
    produced a wrong number here.** First, the classifier reads the working
