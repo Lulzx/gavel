@@ -570,6 +570,20 @@
       "path": "tasks/3/t3-zip-sum",
       "reference": "references/t3-zip-sum",
       "hash": "85384436474efa364ccc31872ecaa2d7e072d2b5e49a2b9a254b2c04dbeb6941"
+    },
+    {
+      "task_id": "t4-bst-insert",
+      "tier": 4,
+      "path": "tasks/4/t4-bst-insert",
+      "reference": "references/t4-bst-insert",
+      "hash": "85b946a5874e3b519a55997b7a60c6b5b7df55558c064c5c6b76ff88e3ccbe96"
+    },
+    {
+      "task_id": "t4-stack-wf",
+      "tier": 4,
+      "path": "tasks/4/t4-stack-wf",
+      "reference": "references/t4-stack-wf",
+      "hash": "3374547a5361cfeeaaec0497e49c7c2c14911ae12fcf45ea3d3700a997e35114"
     }
   ]
 }

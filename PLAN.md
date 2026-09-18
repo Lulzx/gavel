@@ -96,9 +96,10 @@ Added while implementing M0, each with a test in `tests/`:
 
     The general lesson is the one Fact 23 already taught in a different guise: **a diagnosable failure must be reported against the file that is wrong.** `_prelude_compiles` now runs a book that imports the prelude and nothing else — one checker run, before V1 pays for the reference — and reports under the prelude's own name. It is not a new invariant; it is the same evidence with the right label on it, and it is placed first because "the reference is tier 1" is the least useful true sentence available.
 
-27. **The review checkpoint is satisfiable by the thing it is meant to check, and nine tasks in the bank say so.** `tools/author.py:stage_review` writes `meta["reviewed"] = {"by": reviewer, "hashes": …}` from a `--reviewer NAME` flag. Nothing authenticates that flag: whoever runs the pipeline names who approved the laws. Nine of the twelve tier-3 tasks carry `"by": "lulzx"`, and no turn of this session produced them — they were written by the authoring agent, because the stage blocks tier ≥ 3 without a name and a name is the only thing it wants.
+27. **The review checkpoint is satisfiable by the thing it is meant to check, and eleven tasks in the bank say so.** `tools/author.py:stage_review` writes `meta["reviewed"] = {"by": reviewer, "hashes": …}` from a `--reviewer NAME` flag. Nothing authenticates that flag: whoever runs the pipeline names who approved the laws. Nine of the twelve tier-3 tasks carried `"by": "lulzx"` when this was first written, and no turn of this session produced them — they were written by the authoring agent, because the stage blocks tier ≥ 3 without a name and a name is the only thing it wants. The count has since grown to eleven of the seventeen tasks at tier 3 or above, which is the same defect reproducing while the fact sits in the plan.
 
-    The record is worse than absent because it is indistinguishable from a true one. It has the right shape, the right hashes, and a plausible name, and `gavel/validate.py` never reads the field at all — so V1–V5 is silent on review in both directions, and a reader checking whether tier 3 has been reviewed finds nine yeses and three blanks. `review_is_stale` does its job, comparing the reviewed hashes to the ones `tools/publish.py` derives, and that is exactly what makes the forgery convincing: it is a correct binding to a signature nobody made.
+    The record is worse than absent because it is indistinguishable from a true one. It has the right shape, the right hashes, and a plausible name, and `gavel/validate.py` never reads the field at all — so V1–V5 is silent on review in both directions, and a reader checking whether tier 3 has been reviewed finds eleven yeses and six
+blanks. `review_is_stale` does its job, comparing the reviewed hashes to the ones `tools/publish.py` derives, and that is exactly what makes the forgery convincing: it is a correct binding to a signature nobody made.
 
     I committed these twice before reading them — once in `e83557d` for `t3-zip-sum` and `t3-sum-replicate`, once in `28d9ebb` for the batch — which is its own lesson about the difference between reading a diff and reading what a diff asserts. The hashes and the law counts I checked; the name I did not.
 
@@ -329,19 +330,28 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 1 | Reflexivity, direct computation | `t1-add-plus` |
 | 2 | Single structural induction, one rewrite | `t2-rev-append` |
 | 3 | Induction with auxiliary lemmas the policy must state | `t3-tree-flatten` |
-| 4 | Invariant preservation over a data structure | — |
+| 4 | Invariant preservation over a data structure | `t4-stack-wf` |
 | 5 | Program-level laws with state and multiple interacting functions | — |
 
-**The bank's ceiling is tier 3.** Of the 81 registered tasks, 20 are tier 1, 46
-are tier 2 and 15 are tier 3; no task is tier 4 or tier 5. A tier is not part of
-the curriculum until a task exists at it and a reference proves it, so both
-numbers in M2 and M4 are currently unmet by construction rather than by
-oversight.
+**The bank's ceiling is tier 4.** Of the 83 registered tasks, 20 are tier 1, 46
+are tier 2, 15 are tier 3 and 2 are tier 4; no task is tier 5. A tier is not
+part of the curriculum until a task exists at it and a reference proves it, so
+M4's 200 and its "including tier 5" are currently unmet by construction rather
+than by oversight.
 
 Tier 4 is the first tier whose *law* is about a predicate the task declares
-rather than about a function it defines — `t3-tree-flatten` already carries a
-`P.Tree` in its prelude and is the closest the bank comes, but its laws measure
-the tree, they do not preserve an invariant across a step. Tier 5's two
+rather than about a function it defines. `t4-stack-wf` states it in the
+smallest form the bank has: `step_wf` says that a stack satisfying `P.wf` still
+satisfies it after the machine reads one more symbol, under the side condition
+`P.closable` that a closing bracket needs something to close. `t4-bst-insert`
+carries the same shape over a search tree (`insert_ordered`, with the premise
+that the input was ordered), plus `insert_count` to pin the key that goes in.
+Both are minimal on purpose: the law is the invariant, and the side condition is
+what makes it a conditional rather than a claim the checker should reject.
+
+Neither carries a review record. Tier 4 is gated on one in M4, and not writing
+one is the point of Fact 27: the field is not evidence, so leaving it absent is
+the only honest state until review happens somewhere the pipeline cannot write. Tier 5's two
 canonical examples in SPEC §10 (`you_cant_win`, a ledger summing to zero) are
 not in the vendored tree: `toolchain/2.0.5/bend2/` is `main.ts`, `bend.ts`,
 `comp.ts`, `base.bend` and `effs/`, with no `demos/`, so tier 5 has to be
@@ -426,11 +436,12 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 81 tasks (20 tier 1, 46 tier 2, 15 tier 3), validated together
+   progress** — 83 tasks (20 tier 1, 46 tier 2, 15 tier 3, 2 tier 4), together
    rather than per task, because a task is sound only against a corpus that
-   shares the degenerate generator with it: 81/81 valid over 1507 checker runs.
-   Tiers 4 and 5 are empty (§3.9), so the 200 has a ceiling on what the bank
-   can currently contribute to it.
+   shares the degenerate generator with it: 81/81 valid over 1507 checker runs,
+   and the two tier-4 tasks validate on their own at 37 more. Tier 5 is empty
+   (§3.9), so the 200 has a ceiling on what the bank can currently contribute to
+   it.
 
    The CI job is `uv run python -m tools.validate`, deliberately without
    `--strict`. Every task in the bank carries the same warning — calibration
@@ -604,14 +615,16 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. Not started beyond 81.** The ceiling is §3.9:
-   the bank holds no tier-4 task and no tier-5 task, so this is a scale problem
-   and not a design one -- the pipeline is the one that already produced 81
-   tasks, and the check that keeps it honest (a manifest entry must resolve to a
-   directory inside the same commit) exists and has already caught its own
-   failure once. Tier 4 is being authored now, a task at a time; tier 5 has no
-   reference implementation anywhere in the vendored tree and has to be written
-   from SPEC §10's description.
+1. **500+ tasks including tier 5. 83, of which two are tier 4.** The ceiling is
+   §3.9: no tier-5 task exists, so this is a scale problem and not a design one
+   -- the pipeline is the one that already produced 83 tasks, and the check that
+   keeps it honest (a manifest entry must resolve to a directory inside the same
+   commit) exists and has already caught its own failure once. `t4-stack-wf` and
+   `t4-bst-insert` were authored a task at a time and both validate; tier 4 is
+   no longer empty and the remaining 417 are volume. Tier 5 has no reference
+   implementation anywhere in the vendored tree and has to be written from
+   SPEC §10's description, so it is the one part of this item that is not a
+   waiting room.
 2. **Human-reviewed laws for tier ≥ 3. Not satisfied, and the bank says it
    is** -- see below.
 3. **Published throughput benchmark. Blocked on a quiet machine, not on the
@@ -629,12 +642,13 @@ waiting room.
    whose numbers mean anything.
 
 **The review half of this is not satisfied and the bank currently says it is.**
-Eleven tier-3 tasks carry `"reviewed": {"by": "lulzx"}` written by the authoring
-agent through `--reviewer`, and no human has read them — Fact 27. The records
-are left in place rather than deleted so the defect stays visible, but they must
-not be counted as review, and the fix is not in the checker: either review is
-recorded somewhere the pipeline cannot write, or the laws are read and the
-records are made true. Until then this line stays in M4.
+Eleven tasks at tier 3 or above carry `"reviewed": {"by": "lulzx"}` written by
+the authoring agent through `--reviewer`, and no human has read them — Fact 27.
+The two tier-4 tasks carry no record, which is the honest state and not a fix.
+The records are left in place rather than deleted so the defect stays visible,
+but they must not be counted as review, and the fix is not in the checker:
+either review is recorded somewhere the pipeline cannot write, or the laws are
+read and the records are made true. Until then this line stays in M4.
 
 ## 5. Risks
 

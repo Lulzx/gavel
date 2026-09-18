@@ -1,0 +1,20 @@
+{
+  "task_id": "t4-stack-wf",
+  "tier": 4,
+  "laws": [
+    "step_op",
+    "step_cl",
+    "step_len",
+    "step_wf"
+  ],
+  "policy_targets": [
+    "step"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "000b663c62906ca42293d7855f2c286a21c13ed56c7234b438c7874e82d0cedd",
+    "prelude": "a16c83f19680937ba433c25fda6f14921f674645486fb93d1c21bd617ec5e187"
+  },
+  "bend_version": "2.0.5"
+}
