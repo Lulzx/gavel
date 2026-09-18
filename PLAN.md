@@ -405,15 +405,22 @@ and the resulting verdicts say `dev_only: true`.
    M4's 500. `tools/validate.py` now takes `--jobs N` and CI passes 4; a task's
    checks are independent (own workdir, own checker process, no shared mutable
    state in the check path), and `map` keeps the reports in task order so the
-   output is unchanged. Measured on 12 tier-3 tasks: 200 s serial against 110 s
-   at `--jobs 4`, and that 1.8x is a floor rather than a ceiling — the box had
-   five other checker processes running throughout, so four workers were
-   competing with them. The runner has no such neighbours.
+   output is unchanged.
+
+   Measured on the runner, which is the only number that matters here: the step
+   took **20 m 09 s** over 59 tasks serially and **8 m 30 s** over 62 at
+   `--jobs 4`. More tasks, less than half the time. A local comparison on 12
+   tier-3 tasks gave only 200 s → 110 s, because five other checker processes
+   were running on the same box; the runner has no neighbours, which is why the
+   local figure was the pessimistic one.
 
    `--jobs` is off by default, and that is not timidity. V4 asserts
    `reference_ms` against a wall-clock budget, so validating concurrently
    inflates the very quantity being checked: a loaded box can fail a task that
-   is fine, and it would fail it with a confident number beside it.
+   is fine, and it would fail it with a confident number beside it. CI can
+   afford four at once because its runner is otherwise idle and the checks
+   measure ~200 ms against a 2000 ms budget; a developer's laptop cannot make
+   that assumption, so it is theirs to make.
 
    **A manifest is a claim about a revision, and two writers make it a claim
    about two.** `eafd7c5` committed a 62-entry manifest with only two of the
