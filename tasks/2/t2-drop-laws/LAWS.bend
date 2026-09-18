@@ -21,3 +21,13 @@ law drop_append_len:
   for xs: List<Nat>
   for ys: List<Nat>
   {S.drop(P.len(xs), P.append(xs, ys)) == ys : List<Nat>}
+
+# LAW: when the list runs out before the count, the answer is the empty list.
+# Neither law above reaches that case: `drop_succ`'s left-hand side pairs a
+# successor count with a cons cell, and `drop_append_len`'s `append(xs, ys)` is
+# never empty when `len(xs)` is a successor. So the inner `case Nil{}` is
+# orphaned without this one, and a body answering `k <> Nil{}` -- the rest of
+# the count, as a singleton -- proved every law at reward 1.000.
+law drop_nil:
+  for k: Nat
+  {S.drop(k, Nil{}) == Nil{} : List<Nat>}

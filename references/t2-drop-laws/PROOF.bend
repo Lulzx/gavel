@@ -20,3 +20,13 @@ def L.drop_append_len(xs, ys):
     case h <> t:
       %L.drop_append_len(t, ys) : {S.drop(P.len(t), P.append(t, ys)) == _ : List<Nat>}
       {==}
+
+# `drop_nil` is definitional in both cases of the count: at `0n` the body hands
+# back its list argument, and at `1n+k` the inner match on the empty list lands
+# on `Nil{}`.
+def L.drop_nil(k):
+  match k:
+    case 0n:
+      {==}
+    case 1n+kp:
+      {==}
