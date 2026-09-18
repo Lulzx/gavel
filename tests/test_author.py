@@ -166,13 +166,60 @@ def test_a_real_task_runs_the_whole_pipeline(scratch_repo, toolchain):
     run = author(root, repo=scratch_repo, manifest=manifest, backend="plain")
 
     assert [s.name for s in run.stages] == [
-        "files", "derive", "invariants", "episode", "review", "publish"]
+        "files", "derive", "mutants", "invariants", "episode", "review", "publish"]
     assert run.ok, [(s.name, s.detail) for s in run.stages]
+    mutants = next(s for s in run.stages if s.name == "mutants")
+    assert mutants.evidence["written"] == 0          # the fixture ships a corpus
+    assert any(m["strong"] for m in mutants.evidence["mutants"])
     episode = next(s for s in run.stages if s.name == "episode")
     assert episode.evidence["reward"] == 1.0
     assert episode.evidence["tier"] == 4
     bank = json.loads(manifest.read_text())
     assert [t["task_id"] for t in bank["tasks"]] == [SOURCE_TASK]
+
+
+@pytest.mark.checker
+def test_the_mutants_stage_generates_a_corpus_where_there_is_none(scratch_repo,
+                                                                  toolchain):
+    """The gap this stage was added to close.
+
+    Without it the pipeline went reference -> V1-V5, so every new task stopped
+    at ``invariants`` on "V2: no mutants authored -- laws unguarded" -- a
+    verdict that reads as being about the task when it is a step nobody ran.
+    """
+    reference = scratch_repo / "references" / SOURCE_TASK
+    shutil.rmtree(reference / "mutants")
+    root = scratch_repo / "tasks" / "1" / SOURCE_TASK
+    run = author(root, repo=scratch_repo,
+                 manifest=scratch_repo / "manifest.json", backend="plain")
+
+    mutants = next(s for s in run.stages if s.name == "mutants")
+    assert mutants.ok, mutants.detail
+    assert mutants.evidence["written"] > 0
+    assert (reference / "mutants").is_dir()
+    assert run.ok, [(s.name, s.detail) for s in run.stages]
+
+
+@pytest.mark.checker
+def test_the_mutants_stage_leaves_an_authored_corpus_alone(scratch_repo, toolchain):
+    """A corpus is the one part of a task that can be improved by hand.
+
+    Re-running the pipeline must not silently replace it: that would mean a
+    task's guards changed because someone ran the authoring loop again, which
+    is the same class of quiet substitution the stage exists to prevent.
+    """
+    reference = scratch_repo / "references" / SOURCE_TASK
+    mine = reference / "mutants" / "hand-written.bend"
+    mine.write_text("import Base\n\ndef add(a: Nat, b: Nat) -> Nat:\n  2n\n")
+
+    root = scratch_repo / "tasks" / "1" / SOURCE_TASK
+    run = author(root, repo=scratch_repo,
+                 manifest=scratch_repo / "manifest.json", backend="plain")
+
+    mutants = next(s for s in run.stages if s.name == "mutants")
+    assert mutants.evidence["written"] == 0
+    assert mine.is_file(), "the authored mutant was replaced"
+    assert any(m["name"] == "hand-written" for m in mutants.evidence["mutants"])
 
 
 @pytest.mark.checker
@@ -207,7 +254,8 @@ def test_a_reference_that_proves_nothing_is_refused_before_anything_is_written(
     run = author(task_root, repo=scratch_repo,
                  manifest=scratch_repo / "manifest.json", backend="plain")
     assert not run.ok
-    assert [s.name for s in run.stages] == ["files", "derive", "invariants"]
+    assert [s.name for s in run.stages] == ["files", "derive", "mutants",
+                                            "invariants"]
     assert "not 4" in run.stages[-1].detail
     assert not (scratch_repo / "manifest.json").exists()
     # And the episode stage never ran, so the task was never *rewarded*.

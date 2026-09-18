@@ -159,6 +159,73 @@ def stage_derive(root: Path, run: Run, repo: Path, version: str) -> None:
         {"laws": meta["laws"], "policy_targets": meta["policy_targets"]}))
 
 
+def stage_mutants(root: Path, run: Run, repo: Path, toolchain: Toolchain) -> None:
+    """The stage that was missing, and the reason a fresh task always stopped.
+
+    SPEC's pipeline is translate -> laws -> reference -> **mutants** -> calibrate
+    -> publish, and this driver went straight from the reference to V1-V5. So
+    every new task failed ``invariants`` on "V2: no mutants authored -- laws
+    unguarded", which reads like a verdict about the task when it is a step
+    nobody ran. The authoring loop then had to be driven by hand for the one
+    part that was already mechanised in ``tools/mutate.py``.
+
+    Generated only when the directory is empty. A mutant corpus is the one part
+    of a task that can be improved by hand, and quietly replacing one would mean
+    a task's guards changed because someone re-ran the pipeline -- the failure
+    this stage exists to prevent, one level up. ``mutants/`` deleted, the corpus
+    is regenerated on the next run.
+    """
+    from tools.mutate import (Mutant, check_mutants, dedupe, mutants_of,
+                              write_mutants)
+
+    entry = run.entry or {"task_id": root.name, "reference": f"references/{root.name}"}
+    try:
+        task = load_task(root, entry, repo)
+    except Exception as exc:                          # noqa: BLE001 - reported, not raised
+        run.stages.append(Stage("mutants", False, f"{type(exc).__name__}: {exc}"))
+        return
+
+    existing = sorted((task.references / "mutants").glob("*.bend"))
+    if existing:
+        # Labelled the same way a generated one is, so the tier table reads the
+        # same whichever produced it. Nothing here knows whether a mutant is
+        # hand-written, and ``check_mutants`` is what decides it anyway.
+        mutants = [Mutant(name=p.stem, rule="authored", source=p.read_text(),
+                          strong=True) for p in existing]
+        wrote = 0
+    else:
+        mutants = dedupe(mutants_of(task.reference_solution), task.reference_solution)
+        wrote = len(write_mutants(task, mutants))
+
+    reports = check_mutants(task, toolchain, mutants)
+    strong = [m for m in reports if m["strong"]]
+    escaped = [m for m in reports if not m["caught"]]
+    evidence = {
+        "written": wrote,
+        "mutants": [{"name": m["name"], "tier": m["tier"], "strong": m["strong"]}
+                    for m in reports],
+    }
+    source = f"generated {wrote}" if wrote else f"kept {len(existing)} authored"
+    if not reports:
+        run.stages.append(Stage("mutants", False,
+                                "no mutant could be derived from the reference",
+                                evidence))
+    elif escaped:
+        run.stages.append(Stage(
+            "mutants", False,
+            f"({source}) {len(escaped)} still prove every law: "
+            f"{', '.join(m['name'] for m in escaped)}", evidence))
+    elif not strong:
+        run.stages.append(Stage(
+            "mutants", False,
+            f"({source}) none of {len(reports)} type-checks, so no law was ever "
+            f"exercised", evidence))
+    else:
+        run.stages.append(Stage(
+            "mutants", True,
+            f"({source}) {len(strong)} of {len(reports)} strong", evidence))
+
+
 def stage_invariants(root: Path, run: Run, repo: Path, toolchain: Toolchain,
                      budget_ms: int, config: CheckConfig) -> None:
     entry = run.entry or {"task_id": root.name, "reference": f"references/{root.name}"}
@@ -260,6 +327,13 @@ def author(root: Path, *, repo: Path = REPO_ROOT,
     toolchain = Toolchain.load(version)
 
     stage_derive(root, run, repo, version)
+    if not run.ok:
+        return run
+
+    # Before the invariants, because V2 is one of them and it reads this
+    # directory. The order is the one SPEC gives, and it is also the only order
+    # in which V2 asks a question rather than reporting a missing file.
+    stage_mutants(root, run, repo, toolchain)
     if not run.ok:
         return run
 
