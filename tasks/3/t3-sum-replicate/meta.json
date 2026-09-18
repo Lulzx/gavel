@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-sum-replicate",
+  "tier": 3,
+  "laws": [
+    "sum_replicate_mul",
+    "sum_replicate_one",
+    "sum_cons"
+  ],
+  "policy_targets": [
+    "sum"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "98236783ceec9c02ee98c2cbf5d7dd1d35ff861f34bd1eab3884a310bd7aba84",
+    "prelude": "fbdcbc117e7661728886d85255abaa062d1a07e7acb4cf1641bf15772a663ca1"
+  },
+  "bend_version": "2.0.5"
+}

@@ -22,7 +22,9 @@ from typing import Any
 from .check import CheckConfig, check_submission
 from .degenerate import corpus, unmodelled
 from .laws import parse_imports, split_top_level
-from .tasks import LAWS_FILE, PRELUDE_FILE, PROOF_FILE, SOLUTION_FILE, Task
+from .runner import run_check, select_backend
+from .tasks import (LAWS_FILE, PRELUDE_FILE, PROOF_FILE, SOLUTION_FILE, Task,
+                    cleanup, prepare_workdir)
 from .toolchain import Toolchain
 from .verdict import TIER_COMPLETE, TIER_NO_CHECK
 
@@ -89,6 +91,7 @@ def validate_task(task: Task, toolchain: Toolchain, *,
 
     _posed(task, report)
     _law_references(task, report)
+    _prelude_compiles(task, toolchain, config, report)
     _v1_reference(task, toolchain, config, report, budget_ms)
     _v2_mutants(task, toolchain, config, report)
     _v3_degenerate(task, toolchain, config, report)
@@ -272,6 +275,58 @@ def _v4_latency(report: TaskReport, budget_ms: int) -> None:
         report.problems.append(
             f"V4: the reference's slowest run took {report.reference_ms}ms, "
             f"over the {budget_ms}ms budget")
+
+
+def _prelude_compiles(task: Task, toolchain: Toolchain, config: CheckConfig,
+                      report: TaskReport) -> None:
+    """The prelude is type-checked whether or not any law calls it.
+
+    A task's ``prelude.bend`` is imported by the task's own laws, so the checker
+    elaborates it as part of every book in the task -- including the reference.
+    A linearity error inside it therefore fails *every* submission, and the
+    diagnostic names a Location inside the prelude while the invariant that
+    reports it is V1 saying "reference is tier 1", which points at the
+    reference. Two shipped tasks were in exactly this state and cost an author
+    an afternoon each: a Lone binder used twice, in ``double_all`` and in
+    ``replicate``/``mul``.
+
+    Checked here, on a book that imports the prelude and nothing else, so the
+    message names the file that is actually wrong. Also the cheapest place to
+    find it: one run, before V1 pays for the reference.
+    """
+    if not task.prelude_src.strip():
+        return
+    book = f"import Base\nimport ./{PRELUDE_FILE} as P\n"
+    workdir = prepare_workdir(task, {PROOF_FILE: book},
+                              parent=config.workdir_parent)
+    try:
+        result = run_check(toolchain, workdir, PROOF_FILE, config.limits,
+                           select_backend(config.backend))
+    finally:
+        cleanup(workdir)
+    report.checked.append("prelude")
+    if result.ok:
+        return
+    report.problems.append(
+        f"prelude: {PRELUDE_FILE} does not type-check on its own "
+        f"({_first_diagnostic(result.stderr)}). The task's laws import it, so "
+        f"every book in this task fails with a Location inside this file -- "
+        f"which V1 reports as the reference being wrong.")
+
+
+def _first_diagnostic(stderr: str) -> str:
+    """The part of Bend's error block a person would read.
+
+    ``err_show`` prints ``Error:``, then one ``- name : value`` line per field,
+    then ``Location:``. Taking the first non-empty line gets the heading, which
+    says nothing; the fields and the location are the whole content.
+    """
+    lines = [line.strip() for line in stderr.splitlines() if line.strip()]
+    fields = [line for line in lines if line.startswith("-")]
+    location = next((line for line in lines if line.startswith("Location:")), "")
+    if not fields:
+        return " ".join(lines[:3]) or "no diagnostic"
+    return " ".join([*fields[:2], location]).strip()
 
 
 # --- V5: the immutable files carry no forbidden construct ----------------------

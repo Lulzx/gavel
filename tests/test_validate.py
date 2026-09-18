@@ -198,6 +198,48 @@ def test_the_self_referential_attempt_is_the_gates_problem_not_the_checkers(
     assert verdict.gate is not None and not verdict.gate.ok
 
 
+# --- the prelude is a file, and it has to compile ------------------------------
+
+def test_a_prelude_that_does_not_type_check_is_a_problem(make_task, toolchain, task):
+    """A Lone binder used twice, which is what actually shipped twice.
+
+    The prelude is imported by the task's own laws, so it is elaborated in every
+    book in the task. Without this check the first symptom is V1 reporting that
+    the *reference* is tier 1, and the Location that names the prelude is a few
+    lines into a diagnostic nobody reads that far down.
+    """
+    broken = ("import Base\n\n"
+              "def P.double_all(xs: List<Nat>) -> List<Nat>:\n"
+              "  match xs:\n"
+              "    case Nil{}:\n"
+              "      Nil{}\n"
+              "    case h <> t:\n"
+              "      (h + h) <> P.double_all(t)\n")
+    report = validate_task(make_task(prelude_src=broken, references=task.references),
+                           toolchain)
+    assert any(problem.startswith("prelude:") for problem in report.problems)
+    assert "consumed more than once" in " ".join(report.problems)
+    assert "prelude" in report.checked
+
+
+def test_a_task_whose_laws_never_call_the_prelude_still_pays_for_it(
+        make_task, toolchain, task):
+    """The reason the check exists rather than being folded into V1.
+
+    No law here mentions ``P.double_all``, so nothing in the task's text says
+    the prelude matters -- and every book in the task still fails, because the
+    checker elaborates what the law file imports.
+    """
+    broken = ("import Base\n\n"
+              "def P.unused(x: Nat) -> List<Nat>:\n"
+              "  match 1n:\n"
+              "    case 1n:\n"
+              "      x <> x <> Nil{}\n")
+    report = validate_task(make_task(prelude_src=broken, references=task.references),
+                           toolchain)
+    assert any(problem.startswith("prelude:") for problem in report.problems)
+
+
 # --- V5 -------------------------------------------------------------------------
 
 UNSAFE_PRELUDE = "import Base\n\n@unsafe\ndef P.loop(x: Nat) -> Nat:\n  P.loop(x)\n"

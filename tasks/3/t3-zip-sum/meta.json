@@ -1,0 +1,20 @@
+{
+  "task_id": "t3-zip-sum",
+  "tier": 3,
+  "laws": [
+    "zip_sum_nil_left",
+    "zip_sum_nil_right",
+    "zip_sum_len",
+    "zip_sum_self"
+  ],
+  "policy_targets": [
+    "zip_sum"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "9fc945fb3f2cda89afa361fc12cffda773d919dc127acd17ed08ed0966221303",
+    "prelude": "5a36dab02423eb29b2f94c9fe8d84b05c12c44f23742253a39a478002f044327"
+  },
+  "bend_version": "2.0.5"
+}
