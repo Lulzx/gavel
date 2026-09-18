@@ -1,5 +1,5 @@
 import Base
 import ./LAWS.bend as L
 
-def add_succ(x, y):
+def add_plus(x, y):
   {==}

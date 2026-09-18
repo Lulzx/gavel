@@ -17,7 +17,7 @@ Lifting one is a deliberate edit, not a side effect of editing the task.
 
 Usage:
     uv run python -m tools.publish            # every task under tasks/
-    uv run python -m tools.publish tasks/1/t1-add-succ
+    uv run python -m tools.publish tasks/1/t1-add-plus
 """
 
 from __future__ import annotations

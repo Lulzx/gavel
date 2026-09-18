@@ -69,7 +69,7 @@ def test_the_bool_zero_is_a_value_not_a_constructor_name():
 
 
 def test_law_binders_come_from_the_for_lines(task):
-    assert laws_of(task) == [("add_succ", [("x", "Nat"), ("y", "Nat")])]
+    assert laws_of(task) == [("add_plus", [("x", "Nat"), ("y", "Nat")])]
 
 
 def test_a_two_binder_law_keeps_both_binders(manifest):
@@ -85,7 +85,41 @@ def test_the_corpus_covers_the_ways_a_submission_can_be_empty(task):
                      "reference+reflexive-proof",
                      "reference+no-proof",
                      "reference+holed-proof",
-                     "self-referential-unsafe"}
+                     "self-referential-unsafe",
+                     "vary-add-to-double-a+reflexive-proof",
+                     "vary-add-to-project-a+reflexive-proof",
+                     "vary-add-to-double-b+reflexive-proof",
+                     "vary-add-to-project-b+reflexive-proof",
+                     "vary-add-to-zero+reflexive-proof"}
+
+
+def test_the_corpus_varies_one_function_at_a_time(task):
+    """Every argument-ignoring body, with the rest of the file at the reference.
+
+    This family is the one that caught ``t1-add-plus``'s predecessor. Its law
+    was ``add(x, 1n+y) == 1n + add(x, y)``, which the projection onto the
+    *second* argument satisfies -- ``add(a, b) = b`` makes the goal ``1n+y ==
+    1n+y`` -- while the whole-solution attempts above only ever projected onto
+    the first, so the task validated clean and paid reward 1.0 for a function
+    nobody had written.
+
+    The second projection is the point: a family that only tried ``project-a``
+    would have reported the same task pinned.
+    """
+    varied = {a.name for a in corpus(task) if a.name.startswith("vary-")}
+    assert varied == {"vary-add-to-double-a+reflexive-proof",
+                      "vary-add-to-project-a+reflexive-proof",
+                      "vary-add-to-double-b+reflexive-proof",
+                      "vary-add-to-project-b+reflexive-proof",
+                      "vary-add-to-zero+reflexive-proof"}
+    # A reusable binder is declared with `+` in the stub, and that `+` is not
+    # part of the name: a body rebuilt from it reads `+b + +b`, fails to
+    # type-check, and leaves the attempt proving nothing while looking like a
+    # check.
+    double_b = next(a for a in corpus(task)
+                    if a.name == "vary-add-to-double-b+reflexive-proof")
+    body = double_b.files[SOLUTION_FILE]
+    assert "def add(a: Nat, +b: Nat) -> Nat:\n  b + b" in body
 
 
 def test_every_degenerate_solution_is_crossed_with_a_real_proof(task):
@@ -153,7 +187,7 @@ def test_validating_in_parallel_gives_the_same_verdicts(capsys):
     V4 measures, which is exactly why ``--jobs`` is off by default.
     """
     from tools.validate import main
-    ids = ["t1-add-succ", "t1-len-append"]
+    ids = ["t1-add-plus", "t1-len-append"]
 
     def reports(jobs: int) -> dict:
         assert main([*ids, "--json", "--jobs", str(jobs)]) == 0
@@ -178,7 +212,7 @@ import ./prelude.bend as P
 import ./solution.bend as S
 
 # A law that holds by definition -- a task nobody should have published.
-law add_succ:
+law add_plus:
   for x: Nat
   for y: Nat
   {S.add(S.add(x, y), x) == S.add(S.add(x, y), x) : Nat}
@@ -190,7 +224,7 @@ import ./prelude.bend as P
 import ./solution.bend as S
 import ./LAWS.bend as L
 
-def L.add_succ(x, y):
+def L.add_plus(x, y):
   {==}
 """
 
@@ -315,7 +349,7 @@ import Base
 import ./prelude.bend as P
 import ./solution.bend as S
 
-law add_succ:
+law add_plus:
   for x: Nat
   for y: Nat
   {S.add(x, 1n+y) == 1n+S.add(x, y) : Nat}
@@ -418,7 +452,7 @@ def test_a_law_citing_something_the_stub_does_not_define(make_task, toolchain, t
     laws = ("import Base\n"
             "import ./prelude.bend as P\n"
             "import ./solution.bend as S\n\n"
-            "law add_succ:\n"
+            "law add_plus:\n"
             "  for x: Nat\n"
             "  for y: Nat\n"
             "  {S.len(S.add(x, 1n+y)) == 1n+S.add(x, y) : Nat}\n")

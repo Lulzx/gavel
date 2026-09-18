@@ -1,7 +1,7 @@
 """Break a reference solution in rule-shaped ways, and record what it costs.
 
-    uv run python -m tools.mutate t1-add-succ            # write the mutants
-    uv run python -m tools.mutate t1-add-succ --check    # and run them
+    uv run python -m tools.mutate t1-add-plus            # write the mutants
+    uv run python -m tools.mutate t1-add-plus --check    # and run them
     uv run python -m tools.mutate --check                # the whole bank
 
 A mutant is V2's evidence. The point of V2 is not that *something* about a

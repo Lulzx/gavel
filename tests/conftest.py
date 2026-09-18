@@ -16,25 +16,25 @@ from gavel.tasks import Task
 
 REPO = Path(__file__).resolve().parents[1]
 
-FIXTURE_TASK = "t1-add-succ"
+FIXTURE_TASK = "t1-add-plus"
 
 FIXTURE_LAWS = """\
 import Base
 import ./prelude.bend as P
 import ./solution.bend as S
 
-# LAW: adding a successor on the right is the successor of adding.
-law add_succ:
+# LAW: `S.add` is Base's `+`.
+law add_plus:
   for x: Nat
   for y: Nat
-  {S.add(x, 1n+y) == 1n+S.add(x, y) : Nat}
+  {S.add(x, y) == x + y : Nat}
 """
 
 FIXTURE_STUB = """\
 import Base
 
-# TODO(policy): implement. Recurse on `a`, so `add(x, 1n+y)` reduces to
-# `1n + add(x, y)` in the step.
+# TODO(policy): implement. Recurse on `a`, so `add(x, y)` reduces to
+# `x + y` in the step.
 def add(a: Nat, b: Nat) -> Nat:
   ?TODO
 """
@@ -77,7 +77,7 @@ def submission(task) -> dict[str, str]:
     """A submission that clears the gate. It need not type-check."""
     return {
         "solution.bend": FIXTURE_STUB,
-        "PROOF.bend": task.proof_header + "\ndef L.add_succ(x, y):\n  ?TODO\n",
+        "PROOF.bend": task.proof_header + "\ndef L.add_plus(x, y):\n  ?TODO\n",
     }
 
 
@@ -86,12 +86,12 @@ def make_task():
     """Build a Task without touching the filesystem."""
 
     def build(**over) -> Task:
-        meta = {"task_id": "t-fake", "tier": 1, "laws": ["add_succ"],
+        meta = {"task_id": "t-fake", "tier": 1, "laws": ["add_plus"],
                 "policy_targets": ["add"], "hashes": {}}
         meta.update(over.pop("meta", {}))
         fields = dict(
             task_id="t-fake", tier=1, root=REPO, references=REPO,
-            prompt="Prove that adding a successor is the successor of adding.\n",
+            prompt="Prove that `add` agrees with Base's `+`.\n",
             laws_src=FIXTURE_LAWS, prelude_src="import Base\n",
             stub_src=FIXTURE_STUB, meta=meta, hash="")
         fields.update(over)

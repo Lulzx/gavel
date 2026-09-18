@@ -32,3 +32,12 @@ def L.mul_two(x):
   %Policy.add_plus(x, x) : {S.add(x, S.add(x, 0n)) == _ : Nat}
   %Policy.add_zero(x) : {S.add(x, S.add(x, 0n)) == S.add(x, _) : Nat}
   {==}
+
+# `mul(0n, x)` matches the first argument of `mul`, so the goal is definitional
+# and the induction `Policy.add_plus` needed is not needed here.
+def L.mul_zero(x):
+  {==}
+
+# The goal is exactly what `Policy.add_zero` proves, so the lemma is the proof.
+def L.add_zero(x):
+  Policy.add_zero(x)

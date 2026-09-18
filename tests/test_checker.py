@@ -71,7 +71,7 @@ def test_a_self_referential_unsafe_proof_is_accepted_by_the_checker(
     """
     submission[SOLUTION_FILE] = task.reference_solution
     submission[PROOF_FILE] = (task.proof_header +
-                              "\n@unsafe\ndef L.add_succ(x, y):\n  L.add_succ(x, y)\n")
+                              "\n@unsafe\ndef L.add_plus(x, y):\n  L.add_plus(x, y)\n")
     workdir = run_dir(submission)
     result = run_check(toolchain, workdir, PROOF_FILE)
     assert result.exit_code == 0          # the exit code says fine
@@ -92,7 +92,7 @@ def test_a_submitted_main_replaces_the_success_line(toolchain, task, run_dir):
 def test_a_hole_prints_a_todo_count(toolchain, task, submission, run_dir):
     # The reference solution, so the only hole is the one in the proof.
     submission[SOLUTION_FILE] = task.reference_solution
-    submission[PROOF_FILE] = task.proof_header + "\ndef L.add_succ(x, y):\n  ?TODO\n"
+    submission[PROOF_FILE] = task.proof_header + "\ndef L.add_plus(x, y):\n  ?TODO\n"
     workdir = run_dir(submission)
     result = run_check(toolchain, workdir, PROOF_FILE)
     assert result.todo_count == 1
@@ -104,7 +104,7 @@ def test_only_the_first_type_error_is_reported(toolchain, task, submission, run_
     submission[SOLUTION_FILE] = (
         'import Base\n\ndef add(a: Nat, b: Nat) -> Nat:\n  "not a Nat"\n')
     submission[PROOF_FILE] = (
-        task.proof_header + '\ndef L.add_succ(x, y):\n  "also not a proof"\n')
+        task.proof_header + '\ndef L.add_plus(x, y):\n  "also not a proof"\n')
     workdir = run_dir(submission)
     result = run_check(toolchain, workdir, PROOF_FILE)
     assert not result.ok
@@ -284,7 +284,7 @@ def test_a_well_typed_but_wrong_solution_earns_tier_two(toolchain, task, submiss
 
 def test_the_gate_stops_the_checker_from_running_at_all(toolchain, task, submission):
     submission[PROOF_FILE] = (task.proof_header +
-                              "\n@unsafe\ndef L.add_succ(x, y):\n  {==}\n")
+                              "\n@unsafe\ndef L.add_plus(x, y):\n  {==}\n")
     verdict = check_submission(task, toolchain, submission)
     assert verdict.tier == TIER_REJECTED
     assert verdict.checks == ()            # no subprocess was started

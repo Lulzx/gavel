@@ -13,13 +13,13 @@ import pytest
 from tools.publish import main, publish_task
 
 REPO = Path(__file__).resolve().parents[1]
-SOURCE_TASK = REPO / "tasks" / "1" / "t1-add-succ"
+SOURCE_TASK = REPO / "tasks" / "1" / "t1-add-plus"
 
 
 @pytest.fixture
 def task_root(tmp_path):
     """A copy, because ``publish_task`` writes ``meta.json`` in place."""
-    root = tmp_path / "tasks" / "1" / "t1-add-succ"
+    root = tmp_path / "tasks" / "1" / "t1-add-plus"
     shutil.copytree(SOURCE_TASK, root)
     return root
 

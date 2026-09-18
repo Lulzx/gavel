@@ -55,9 +55,9 @@ either pin has drifted.
 uv run python -m tools.publish            # derive metadata, rebuild manifest.json
 uv run python -m tools.author tasks/2/t2-thing   # the authoring stages, in order
 uv run gavel list                         # tasks by tier
-uv run gavel info t1-add-succ             # prompt, laws, stub
-uv run gavel check t1-add-succ --reference
-uv run gavel check t1-add-succ --solution my.bend --proof my-proof.bend
+uv run gavel info t1-add-plus             # prompt, laws, stub
+uv run gavel check t1-add-plus --reference
+uv run gavel check t1-add-plus --solution my.bend --proof my-proof.bend
 uv run gavel validate                     # V1-V5 over the whole bank
 uv run gavel bench -n 10                  # check latency distribution
 uv run python -m tools.mutate --check     # author mutants and see which are strong
@@ -89,7 +89,7 @@ from gavel.trajectory import Trajectory
 env = GavelEnv.from_manifest("manifest.json", mode="dense", max_turns=4,
                              cache=VerdictCache("cache.sqlite"),
                              trajectory=Trajectory("runs/trajectory.jsonl"))
-obs = env.reset("t1-add-succ")
+obs = env.reset("t1-add-plus")
 obs, reward, done, info = env.step(Action(files={"solution.bend": ..., "PROOF.bend": ...}))
 env.close()          # ends any open episode, flushes the log
 env.metrics.write("runs/metrics.json")
@@ -167,14 +167,35 @@ The checker agrees: exit 0, `All terms check.` The same applies to a base-case l
 (`f(x, e) == x` is satisfied by `f(a, b) = a`). `t1-add-zero` was written that way
 and has been retired.
 
-Having both sides depend on the arguments is necessary but not sufficient. The
-inductive law for a `Nat`-valued function does pin it:
+Having both sides depend on the arguments is neither necessary nor sufficient, and the
+counterexample is the bank's own first task. This law was written for it:
 
 ```
 law add_succ: for x: Nat  for y: Nat  {S.add(x, 1n+y) == 1n+S.add(x, y) : Nat}
 ```
 
-but the same shape does not pin a container:
+Both sides depend on both arguments, and it pins nothing: `add(a, b) = b` satisfies it,
+because the goal becomes `1n+y == 1n+y`. That submission was measured at tier 4, reward
+1.000, for a function nobody had implemented.
+
+The reason generalizes, which is why the *shape* is worth recognising rather than the
+task. A single equation cannot pin a two-argument function whose arguments share a type.
+The law survives the projection `add(a, b) = b` whenever the substitution makes the two
+sides equal — and it does whenever both applications of `add` receive the same term in
+the position `b` occupies. `add(x, 1n+y)` and `add(x, y)` both take `x` first, so they
+collapse to `1n+y` and `y`, which the `1n +` on the right relates. The projection onto
+`a` satisfies it for the same reason. One law, two escaping projections.
+
+What does pin `add` in one law is putting a term that never mentions `add` on the right,
+which is what the task now carries and why it is now called `t1-add-plus`:
+
+```
+law add_plus: for x: Nat  for y: Nat  {S.add(x, y) == x + y : Nat}
+```
+
+Under `add(a, b) = b` the goal is `y == x + y`, which is false; under `add(a, b) = a` it
+is `x == x + y`, also false. That shape does not carry over to a container, though,
+because there the projection is a homomorphism:
 
 ```
 law append_cons: for x, xs, ys  {S.append(x <> xs, ys) == x <> S.append(xs, ys) : List<Nat>}
@@ -185,22 +206,28 @@ The projection `append(a, b) = a` satisfies that at tier 4 with `{==}`, because 
 **empty value on the left** — `append(Nil{}, ys) == ys` becomes `Nil{} == ys` under the
 projection, which is false — not the right-hand form `append(xs, Nil{}) == xs`.
 
-So the bank is built from pairs: **tier 1 = the inductive law alone where it pins, or a
-base law and a cons law together where neither does on its own; tier 2 = a weak base law
-plus the inductive law.**
+So the bank is built two ways: **tier 1 = one law whose right-hand side never mentions
+the function, or a base law and a cons law together where neither pins on its own; tier 2
+= a weak base law plus the inductive law.**
 
 The reliable test is mechanical, not a reading of the laws: **a law pins its function
 only if no argument-ignoring body satisfies it.** Checking a bad solution against the
 *reference* proof would not have caught it — that asks whether the reference proof is
 brittle, not whether the laws pin the function down.
 
-**A pair of laws can pin at most two functions.** V3 builds its identity solution from the
-*first* same-typed parameter, so a law set that an argument-ignoring body satisfies while
-the corpus is looking at a different argument is invisible to it, and V2 is
-proof-relative — it asks whether the reference proof happens to apply. Five shipped
-law-pairs were found to reach tier 4 for a function nobody implemented, and were
-rewritten. The decisive sweep is the cross product: every argument-ignoring body against
-a `{==}`-only proof. Prefer law sets small enough that this can be done by hand.
+**A pair of laws can pin at most two functions**, and a single law pins neither argument
+of a two-argument function unless one side avoids mentioning it. Three things make the
+sweep easy to get wrong, all of them measured here. It must be run against a `{==}`-only
+proof, or it is a question about the reference proof's reach rather than about the laws.
+It must try **every** same-typed parameter, not the first: `V3` originally built its
+identity solution from `_ignore_arguments`, which returns the first, so it projected
+`t1-add-succ` onto `a` and never tried `add(a, b) = b`. And it must include the body that
+uses a parameter twice — `mul(a, b) = b + b` satisfies `mul_two` and nothing in the other
+two families does.
+
+The corpus now covers all three: a `vary-*` family degenerates one function at a time
+with the rest of the file left at the reference, in the projecting, doubling and zero
+forms, beside the whole-solution cross product.
 
 ## Status
 

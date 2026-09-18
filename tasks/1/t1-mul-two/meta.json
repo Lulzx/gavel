@@ -13,7 +13,9 @@
     "helper-lemma"
   ],
   "laws": [
-    "mul_two"
+    "mul_zero",
+    "mul_two",
+    "add_zero"
   ],
   "policy_targets": [
     "add",
@@ -23,7 +25,7 @@
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "bend_version": "2.0.5",
   "hashes": {
-    "laws": "e87cff046cfc23844b515644a72a9cad53e16f67a98afaf91bea8d34e3d49f1a",
+    "laws": "a83d6d3d4e989c980ca9e5e4780da7c59babc8a0a2c40d2c6a1a8f26a6951167",
     "prelude": "90209e424d9384ffc550c1d54ba1b0f2f64c3a09ac89b56ffe60004b97c4afd0"
   }
 }

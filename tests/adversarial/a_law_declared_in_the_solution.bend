@@ -1,6 +1,6 @@
 import Base
 
-law add_succ:
+law add_plus:
   for x: Nat
   for y: Nat
   {add(x, 1n+y) == 1n+add(x, y) : Nat}

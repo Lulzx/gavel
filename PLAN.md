@@ -46,12 +46,12 @@ Added while implementing M0, each with a test in `tests/`:
 16. **The "`@unsafe` hangs the checker" observation from the probe session did not reproduce.** `@unsafe` with a self-call returns in ~200 ms (it is type-checked, not evaluated); forcing evaluation through a rewrite produces a type error, not a hang. The wall clock stays, but as defence against a checker bug we have not characterised rather than against a reproduced input — and it is tested against a stand-in that provably does not return, so the mechanism is covered regardless of what 2.0.5 does.
 17. **A law does not have to determine the function it is about, and the obvious laws do not.** `law add_zero: for x: Nat {S.add(x, 0n) == x : Nat}` is satisfied by the projection `def add(a, b) = a`, proved with `{==}` — verified at exit 0 against the pinned checker. The same holds for any right-identity law (`f(x, e) == x`), any base-case law (`f(0n) == 0n` is satisfied by `f = 0n`), and `bool_not_not` (`not(b) = b` is an involution). This invalidates the tier-1 examples in §4 M0 item 7 and, more importantly, any law authored by the obvious method.
 
-    The rule that replaces it: **a law pins its function only if both sides depend on the arguments.** The inductive equation does — `add_succ(x, 1n+y) == 1n+S.add(x, y)` rules out the projection, `len_cons(x <> xs) == 1n+len(xs)` rules out the constant. Hence the bank's shape is **tier 1 = the inductive law alone; tier 2 = a weak base law plus the inductive law**, where the second rules out what the first permits.
+    The rule that replaces it: **a law pins its function only if both sides depend on the arguments.** (Fact 28 retracts this rule outright: `add(x, 1n+y) == 1n+add(x, y)` has both sides depending on both arguments and pins nothing, so the condition is neither sufficient nor necessary. Read it as where the argument started, not as a criterion.) The inductive equation does — `add_succ(x, 1n+y) == 1n+S.add(x, y)` rules out the projection, `len_cons(x <> xs) == 1n+len(xs)` rules out the constant. Hence the bank's shape is **tier 1 = the inductive law alone; tier 2 = a weak base law plus the inductive law**, where the second rules out what the first permits.
 
-    This is only visible when a degenerate *solution* is crossed with a degenerate *proof*. V2 as originally specified holds the proof fixed and mutates the solution, which asks whether the reference proof is brittle and says nothing about whether the laws constrain anything. `gavel/degenerate.py` now emits the cross product, and V3 fails a task if any combination reaches tier 4. `t1-add-zero` was authored the obvious way, was caught by this, and has been retired in favour of `t1-add-succ`.
+    This is only visible when a degenerate *solution* is crossed with a degenerate *proof*. V2 as originally specified holds the proof fixed and mutates the solution, which asks whether the reference proof is brittle and says nothing about whether the laws constrain anything. `gavel/degenerate.py` now emits the cross product, and V3 fails a task if any combination reaches tier 4. `t1-add-zero` was authored the obvious way, was caught by this, and has been retired. What the cross product as it then stood still missed is Fact 28.
 18. **Bend's binders are affine: each may be consumed at most once**, and the match scrutinee counts as consumed. `match a:` then `add(p, a)` in a case body is rejected ("`p` consumed more than once") — so the common mutation "replace a recursive argument with an earlier parameter" usually fails *linearity* rather than type-checking. Similarly a self-call's decreasing argument must be leftmost: `add(b, p)` is refused by the descent checker ("expected a decreasing self-call"). Both make the mutant corpus thinner than the rule list suggests, and both are why V2 measures strength by type-checking the mutant on its own rather than by its tier against the reference proof.
 
-19. **Fact 17's rule is necessary but not sufficient.** "Both sides depend on the arguments" does not pin a function whose result is itself a parameter-shaped value. `law append_cons: for x, xs, ys {S.append(x <> xs, ys) == x <> S.append(xs, ys) : List<Nat>}` is satisfied at **tier 4** by the projection `append(a, b) = a` proved with `{==}` — verified against the pinned checker, because replacing `append` by its first argument maps `x <> xs` to itself on both sides. The projection is a monoid homomorphism, so every equation that only ever *prepends* is invisible to it.
+19. **Fact 17's rule is insufficient, and Fact 28 shows it is not necessary either.** "Both sides depend on the arguments" does not pin a function whose result is itself a parameter-shaped value. `law append_cons: for x, xs, ys {S.append(x <> xs, ys) == x <> S.append(xs, ys) : List<Nat>}` is satisfied at **tier 4** by the projection `append(a, b) = a` proved with `{==}` — verified against the pinned checker, because replacing `append` by its first argument maps `x <> xs` to itself on both sides. The projection is a monoid homomorphism, so every equation that only ever *prepends* is invisible to it.
 
     What actually pins a container-valued function is putting the **empty value on the left**: `append(Nil{}, ys) == ys` reduces, under the projection, to `Nil{} == ys`, which is false, and under the constant `Nil{}` to `Nil{} == ys`, which is also false. The right-hand form `append(xs, Nil{}) == xs` is the weak one from Fact 17 and pins nothing.
 
@@ -103,6 +103,23 @@ Added while implementing M0, each with a test in `tests/`:
     I committed these twice before reading them — once in `e83557d` for `t3-zip-sum` and `t3-sum-replicate`, once in `28d9ebb` for the batch — which is its own lesson about the difference between reading a diff and reading what a diff asserts. The hashes and the law counts I checked; the name I did not.
 
     This is the same defect as `"valid": true` in the manifest (`fb878db`), and the same rule applies: **a field that records a human judgement must not be writable by the machine that needs the judgement.** The fix is not in the checker — it is to stop treating the flag as evidence, and either to record review somewhere the pipeline cannot write, or to read the laws now and make the nine records true. Until one of those happens, M4's "human-reviewed laws for tier ≥ 3" is not satisfied, and the three tasks with no record are the only honest ones.
+
+28. **The sweep Fact 22 prescribes was never run over the bank, and two of 81 tasks were paying full reward for a function nobody implemented.** Fact 22 names the decisive test — every argument-ignoring body against a `{==}`-only proof — and records that both authors ran it by hand for their batches. That is true of the batches authored *after* the fact was written and of nothing else. `t1-add-succ` and `t1-mul-two` predate it, were never swept, and were both exploitable.
+
+    Swept mechanically over all 81 tasks — each function's body replaced in turn by each argument-ignoring body, every other function left at the reference — exactly two reach tier 4:
+
+    | task | hack | reward |
+    |---|---|---|
+    | `t1-add-succ` | `add(a, b) = b` | 1.000 |
+    | `t1-mul-two` | `add(a, b) = a + a` and `mul(a, b) = b + b` | 1.000 |
+
+    Both are one shape: a *single* law about a two-argument function whose arguments have the same type. That shape cannot be pinned by one equation, and the reason is worth stating because it makes the failure mode predictable rather than unlucky. A projection replaces every application of `f` by a parameter `p`, so a law survives it whenever the substitution makes the two sides equal — and in an equation where both applications of `f` receive the same term in the position `p` occupies, both sides collapse to `p == p`. `add(x, 1n+y) == 1n + add(x, y)` collapses under `add(a, b) = b`, and again under `add(a, b) = a`: *both* projections satisfy it. V3 built its identity solution from the first same-typed parameter only (`_ignore_arguments`), so the second one escaped, and the task validated clean.
+
+    This also settles Fact 17's rule, which is worse than Fact 19 says. "A law pins its function only if both sides depend on the arguments" is not merely insufficient — `add(x, 1n+y) == 1n + add(x, y)` has both sides depending on both arguments and pins nothing — it is **false**, and the counterexample is the bank's first task. The rule that holds is Fact 22's, and it is a claim about the whole law *set*, settled by running it rather than by reading it.
+
+    Both tasks are repaired. `t1-mul-two` gained `mul_zero` and `add_zero`, the weak base laws that rule out `b + b` and `a + a` (Fact 19's empty-value-on-the-left rule, applied at `0n`). `t1-add-succ` got the sharper repair: its single law became `add(x, y) == x + y`, which pins *because* one side does not mention `add` — the term it is compared against is Base's `+`, so no argument-ignoring body can match it. That is the one shape in which a single law does pin a two-argument function, and it is why the task is now `t1-add-plus`: the name should say what it proves. Its law file keeps the measured counterexample, because the reader's first instinct is that the old law pinned.
+
+    The repair is mechanical now. `gavel.degenerate.corpus` emits the family that catches this — one function degenerated with the rest left at the reference — beside the whole-solution cross product, one checker run per argument-ignoring body per function. The whole-solution family alone was blind to it by construction: it projected only onto the first same-typed parameter, so `add(a, b) = b` was never tried. `tests/test_validate.py::test_the_corpus_varies_one_function_at_a_time` pins the new family's shape, and the second projection is the assertion that matters.
 
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
@@ -309,7 +326,7 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 
 | Tier | Proof technique | The bank's example |
 |---|---|---|
-| 1 | Reflexivity, direct computation | `t1-add-succ` |
+| 1 | Reflexivity, direct computation | `t1-add-plus` |
 | 2 | Single structural induction, one rewrite | `t2-rev-append` |
 | 3 | Induction with auxiliary lemmas the policy must state | `t3-tree-flatten` |
 | 4 | Invariant preservation over a data structure | — |
@@ -411,15 +428,15 @@ and the resulting verdicts say `dev_only: true`.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
    progress** — 81 tasks (20 tier 1, 46 tier 2, 15 tier 3), validated together
    rather than per task, because a task is sound only against a corpus that
-   shares the degenerate generator with it: 81/81 valid over 1210 checker runs.
+   shares the degenerate generator with it: 81/81 valid over 1507 checker runs.
    Tiers 4 and 5 are empty (§3.9), so the 200 has a ceiling on what the bank
    can currently contribute to it.
 
    The CI job is `uv run python -m tools.validate`, deliberately without
    `--strict`. Every task in the bank carries the same warning — calibration
    has not run, so no `zero_shot_solve_rate` is recorded — and `--strict`
-   promotes warnings to failures, so switching it on now would fail all 59 for
-   a reason that is not about any of them. `--strict` is the right mode the
+   promotes warnings to failures, so switching it on now would fail every task
+   for a reason that is not about any of them. `--strict` is the right mode the
    moment calibration exists, and not before: a green build has to mean
    "checked and fine", not "not checked yet", which is exactly why the warning
    is reported at all rather than being silently absent.
@@ -452,6 +469,15 @@ and the resulting verdicts say `dev_only: true`.
    about 2.1 checks/s. That is the shape a per-check process should have --
    throughput set by the runner's cores rather than by the bank's size -- and
    it is also the reason a worker (M3.4) would buy a constant and not a curve.
+
+   The check count is not a property of the bank's size alone, and Fact 28 is
+   why: the `vary-*` family added one run per argument-ignoring body per
+   function, taking the same 81 tasks from 1210 checks to **1507**
+   (81/81 valid, measured serially on this machine). A task with more
+   same-typed parameters costs more to validate than one with fewer, so the
+   cost per task now varies with the signatures and not just with the tier.
+   CI's `--jobs 4` step should be re-timed rather than extrapolated from the
+   9 m 29 s above.
 
    `--jobs` is off by default, and that is not timidity. V4 asserts
    `reference_ms` against a wall-clock budget, so validating concurrently

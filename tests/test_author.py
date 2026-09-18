@@ -18,7 +18,7 @@ import pytest
 from tools.author import (REVIEWED_KEY, Run, author, required_files,
                           review_is_stale, stage_review)
 
-SOURCE_TASK = "t1-add-succ"
+SOURCE_TASK = "t1-add-plus"
 
 
 # --- files ------------------------------------------------------------------------

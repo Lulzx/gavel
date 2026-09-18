@@ -5,11 +5,11 @@
   "bun_version": "1.3.14",
   "tasks": [
     {
-      "task_id": "t1-add-succ",
+      "task_id": "t1-add-plus",
       "tier": 1,
-      "path": "tasks/1/t1-add-succ",
-      "reference": "references/t1-add-succ",
-      "hash": "7b8097c575b6760b76a28daf0df86bab04183d4aa9d8b40f8e49fb81e6ab0b34"
+      "path": "tasks/1/t1-add-plus",
+      "reference": "references/t1-add-plus",
+      "hash": "785d0e1b89ca7bf2ca2aa12c1dd0a20358d46d81821c4ce481ff576c7be44c70"
     },
     {
       "task_id": "t1-append-assoc",
@@ -93,7 +93,7 @@
       "tier": 1,
       "path": "tasks/1/t1-mul-two",
       "reference": "references/t1-mul-two",
-      "hash": "a1f3ffd99e59b77646087a33756e17bfd121f2d4b90d61d99fd94cddc489754e"
+      "hash": "afdf072b1427e90de960cc83a68258c310d36de4653b44a74e4fe012d8c92714"
     },
     {
       "task_id": "t1-mul-zero",

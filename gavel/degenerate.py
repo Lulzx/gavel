@@ -150,6 +150,72 @@ def _ignore_arguments(params: list[tuple[str, str]], ret: str) -> str | None:
     return _zero_of(ret)
 
 
+def _def_block(src: str, name: str) -> tuple[int, int] | None:
+    """The whole ``def name(...)`` block inside ``src``, signature to body.
+
+    Returns ``None`` rather than guessing when the def is not there: the caller
+    skips that function, and a skipped function is a hole in the corpus that
+    ``unmodelled`` is the other half of.
+    """
+    match = re.search(rf"^def\s+{re.escape(name)}\s*\(", src, re.M)
+    if not match:
+        return None
+    colon = src.find(":", match.end())
+    if colon < 0:
+        return None
+    tail = src[colon + 1:]
+    nxt = re.search(r"^(?:def|type)\s", tail, re.M)
+    return match.start(), colon + 1 + (nxt.start() if nxt else len(tail))
+
+
+def _ignoring_bodies(params: list[tuple[str, str]], ret: str
+                     ) -> list[tuple[str, str, list[str]]]:
+    """Every body that ignores at least one argument and still type-checks.
+
+    ``(label, body, binders-that-must-be-``+``)``. Three shapes, because each
+    catches something the others miss:
+
+    ``project-<p>``  the parameter handed back unchanged -- ``f(a, b) = a``
+    ``double-<p>``   the parameter used twice -- ``f(a, b) = b + b``
+    ``zero``         no parameter at all -- ``f(a, b) = 0n``
+
+    The middle one is the one the declared sweep in PLAN.md's Fact 22 leaves
+    out, and it is not optional: ``mul_two`` is satisfied by ``b + b`` and by
+    nothing in the other two families, so a corpus without it reports a task as
+    pinned when a policy can ignore its first argument and still be paid.
+
+    ``project`` and ``double`` need the parameter's type to *be* the return
+    type. For ``double`` the type also has to have an operator that joins two of
+    its values into one -- ``+`` on ``Nat``, ``<>`` on a list. A type with
+    neither is left alone rather than approximated, since a body that fails to
+    type-check is a run that proves nothing while looking like a check.
+    """
+    out: list[tuple[str, str, list[str]]] = []
+    for raw, typ in params:
+        # The stub spells a reusable binder `+b`. That `+` is a declaration and
+        # not part of the name: a body built from it reads `+b + +b`.
+        name = raw.lstrip("+-")
+        if typ != ret:
+            continue
+        if typ == "Nat":
+            out.append((f"double-{name}", f"{name} + {name}", [name]))
+        elif typ.startswith("List<"):
+            out.append((f"double-{name}", f"{name} <> {name}", [name]))
+        out.append((f"project-{name}", name, []))
+    zero = _zero_of(ret)
+    if zero is not None:
+        out.append(("zero", zero, []))
+    return out
+
+
+def _render_def(name: str, params: list[tuple[str, str]], ret: str,
+                body: str, reusable: list[str]) -> str:
+    declared = ", ".join(
+        f"{'+' if raw.lstrip('+-') in reusable else ''}{raw.lstrip('+-')}: {typ}"
+        for raw, typ in params)
+    return f"def {name}({declared}) -> {ret}:\n  {body}\n"
+
+
 def laws_of(task) -> list[tuple[str, list[tuple[str, str]]]]:
     """``(law_name, [(binder, type)])`` from the task's LAWS.bend."""
     out = []
@@ -192,6 +258,12 @@ def corpus(task) -> list[Degenerate]:
     ``f(x, e) == x`` is satisfied by the projection ``f(a, b) = a`` proved with
     ``{==}`` -- full reward for a function nobody implemented. Holding the
     proof fixed would never have shown that.
+
+    The cross product is taken two ways, because they answer different
+    questions: every function degenerate at once, and one function degenerate
+    with the rest left at the reference. The second is what turns "do these laws
+    pin the submission" into "do these laws pin *this function*", and it is the
+    one that catches a helper no law mentions.
     """
     targets = signatures(task.stub_src)
     laws = laws_of(task)
@@ -225,6 +297,39 @@ def corpus(task) -> list[Degenerate]:
         out.append(Degenerate(f"{solution_name}+reflexive-proof",
                               {SOLUTION_FILE: solution,
                                PROOF_FILE: _reflexive_proof(laws, header)}))
+
+    # One function at a time, with every other function left at the reference.
+    #
+    # The whole-solution attempts above cross one bad body with every function
+    # at once, which asks whether the *set* of laws rejects a uniformly
+    # argument-ignoring submission. That is a weaker question than the one that
+    # matters, and it is a different one: a task whose laws pin each function on
+    # its own can still be accepted here if the two bodies are wrong in a way
+    # that cancels, and a task whose laws pin none of them can pass because the
+    # corpus only ever tried the projection onto the *first* same-typed
+    # parameter. ``t1-add-plus`` shipped with a single law -- ``add(x, 1n+y) ==
+    # 1n + add(x, y)`` -- that the *second* projection satisfies, so ``add(a, b)
+    # = b`` earned reward 1.0 while the corpus looked at ``a`` and reported the
+    # task pinned.
+    #
+    # Holding the others at the reference is what makes this a question about
+    # one function. The price is that a hole needing two functions wrong at once
+    # is still invisible -- the full cross product would be quadratic in the
+    # functions and this is linear -- so it is a sharper corpus rather than a
+    # complete one.
+    reference = task.reference_solution
+    for name, params, ret in targets:
+        block = _def_block(reference, name)
+        if block is None:
+            continue
+        for label, body, reusable in _ignoring_bodies(params, ret):
+            varied = (reference[:block[0]]
+                      + _render_def(name, params, ret, body, reusable)
+                      + "\n" + reference[block[1]:])
+            out.append(Degenerate(
+                f"vary-{name}-to-{label}+reflexive-proof",
+                {SOLUTION_FILE: varied,
+                 PROOF_FILE: _reflexive_proof(laws, header)}))
 
     # The reference solution against a proof that proves nothing. This isolates
     # the proof, since the cross products above can fail for either reason, and

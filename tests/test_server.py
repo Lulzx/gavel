@@ -21,7 +21,7 @@ from gavel.tasks import PROOF_FILE, SOLUTION_FILE
 
 pytestmark = pytest.mark.checker
 
-TASK = "t1-add-succ"
+TASK = "t1-add-plus"
 
 # Enough threads that the counter is contended, few enough that the assertion
 # on it is readable.

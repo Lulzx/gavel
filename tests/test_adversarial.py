@@ -166,7 +166,7 @@ CASES: dict[str, Case] = {
         "L is not bound in this file, so the def proves no law of this task"),
     "a_proof_without_a_module_qualifier": Case(
         PROOF_FILE, REJECT,
-        "an unqualified add_succ is a new top-level name, not the law's proof"),
+        "an unqualified add_plus is a new top-level name, not the law's proof"),
     "a_proof_under_an_alias_the_submission_chose": Case(
         PROOF_FILE, ACCEPT,
         "the alias the submission writes is the one the name is resolved "

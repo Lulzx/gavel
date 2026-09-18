@@ -6,5 +6,5 @@ def Policy.note(x: Nat) -> String:
 import ./elsewhere.bend as E
 "
 
-def L.add_succ(x, y):
+def L.add_plus(x, y):
   {==}

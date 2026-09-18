@@ -187,7 +187,7 @@ def _verdict(tier: int = TIER_COMPLETE, task_id: str = "t-fake"):
 
     return Verdict(task_id=task_id, tier=tier,
                    reward=1.0 if tier == 4 else 0.0, n_laws=1,
-                   proven=("add_succ",) if tier == 4 else ())
+                   proven=("add_plus",) if tier == 4 else ())
 
 
 # --- against the real checker ----------------------------------------------------
@@ -219,7 +219,7 @@ def test_a_repeat_check_is_served_from_the_cache(tmp_path, task, toolchain):
 def test_the_cached_verdict_carries_the_checkers_own_words(tmp_path, task, toolchain):
     """A policy repairing from a cached result must see the same stderr."""
     files = {SOLUTION_FILE: task.reference_solution,
-             PROOF_FILE: task.proof_header + "\ndef L.add_succ(x, y):\n  ?TODO\n"}
+             PROOF_FILE: task.proof_header + "\ndef L.add_plus(x, y):\n  ?TODO\n"}
     cache = VerdictCache(tmp_path / "c.sqlite")
     config = CheckConfig(backend="plain")
 

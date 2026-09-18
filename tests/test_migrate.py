@@ -111,11 +111,11 @@ def test_a_candidate_that_breaks_the_success_line_quarantines_the_bank(
     """
     candidate = replace(toolchain, root=broken_checker(repo, tmp_path),
                         version="broken")
-    bank = write_bank(tmp_path, repo / "manifest.json", "t1-add-succ")
+    bank = write_bank(tmp_path, repo / "manifest.json", "t1-add-plus")
 
     rows = migrate_bank(bank, candidate, _config(), budget_ms=2000)
 
-    assert [row.task_id for row in rows] == ["t1-add-succ"]
+    assert [row.task_id for row in rows] == ["t1-add-plus"]
     assert rows[0].quarantined
     assert rows[0].reference_tier != 4
     assert BROKEN_LINE_TS.strip('"').removesuffix("\\n") in rows[0].evidence
@@ -130,7 +130,7 @@ def test_a_candidate_identical_to_the_pin_quarantines_nothing(repo, toolchain,
     everything unconditionally.
     """
     candidate = replace(toolchain, root=repo / "toolchain" / "2.0.5")
-    bank = write_bank(tmp_path, repo / "manifest.json", "t1-add-succ")
+    bank = write_bank(tmp_path, repo / "manifest.json", "t1-add-plus")
 
     rows = migrate_bank(bank, candidate, _config(), budget_ms=2000)
 
@@ -156,6 +156,6 @@ def _args(**over):
 
 def test_a_bank_that_loads_is_a_bank_that_can_be_migrated(repo, tmp_path):
     """The absolute-path trick the checker tests rely on, checked cheaply."""
-    bank = write_bank(tmp_path, repo / "manifest.json", "t1-add-succ")
+    bank = write_bank(tmp_path, repo / "manifest.json", "t1-add-plus")
     manifest = load_manifest(bank)
-    assert list(manifest) and manifest.get("t1-add-succ").laws_src
+    assert list(manifest) and manifest.get("t1-add-plus").laws_src

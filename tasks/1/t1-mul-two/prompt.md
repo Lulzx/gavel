@@ -1,4 +1,4 @@
-Implement `add` and `mul` on `Nat`, then prove the law about them.
+Implement `add` and `mul` on `Nat`, then prove the three laws about them.
 
 `add(a, b)` must return the sum of `a` and `b`, recursing on the first
 argument.
@@ -12,8 +12,20 @@ The law `mul_two` says that multiplying by two is adding a number to itself:
 
     S.mul(2n, x) == x + x
 
-The `+` there is Base's addition, not `S.add`, and it is what makes the law pin
-`mul`: a `mul` that ignores its argument makes the two sides differ.
+The `+` there is Base's addition, not `S.add`, which is what makes closing it a
+question about how `S.add` relates to Base's `+` rather than a computation.
+
+It does not, by itself, determine `mul` — and this is worth saying plainly,
+because the obvious reading is that it does. `mul(2n, x)` names its first
+argument as a literal, so `mul(a, b) = b + b` satisfies it. Two more laws close
+that off, and each is one line:
+
+    law mul_zero:  for x: Nat  {S.mul(0n, x) == 0n : Nat}
+    law add_zero:  for x: Nat  {S.add(x, 0n) == x : Nat}
+
+`mul_zero` is definitional: `mul` matches on its first argument and that
+argument is `0n`, so `{==}` is the whole proof. `add_zero` is the second lemma
+below — the goal is exactly what that lemma proves.
 
 `mul` recurses on its first argument, so `mul(2n, x)` reduces all the way to
 `add(x, add(x, 0n))` and the goal is a rewrite rather than an induction. Closing
@@ -31,4 +43,4 @@ being replaced sits. Note that `x` is named more than once in `L.mul_two`, and a
 binder is consumed on every use: re-bind it reusable first with `+x = x`.
 
 Write the implementations in `solution.bend` and the proof in `PROOF.bend`, as
-`def L.mul_two(x)`.
+`def L.mul_two(x)`, `def L.mul_zero(x)` and `def L.add_zero(x)`.
