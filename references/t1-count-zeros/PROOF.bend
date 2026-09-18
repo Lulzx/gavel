@@ -23,6 +23,11 @@ def Policy.add_assoc(a: Nat, -b: Nat, -c: Nat) -> {a + (b + c) == (a + b) + c : 
       %Policy.add_assoc(p, b, c) : {1n + (p + (b + c)) == 1n + _ : Nat}
       {==}
 
+# The first argument is the literal `Nil{}`, so `count_zeros` reduces to `0n`
+# and the goal is `0n == 0n`.
+def L.count_zeros_nil():
+  {==}
+
 def L.count_zeros_snoc(xs, x):
   match xs:
     case Nil{}:

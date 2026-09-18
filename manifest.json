@@ -37,7 +37,7 @@
       "tier": 1,
       "path": "tasks/1/t1-count-zeros",
       "reference": "references/t1-count-zeros",
-      "hash": "e163039328a479b8ed5d8b88c0158923e6bb5a0124d187d56e449e67e9333974"
+      "hash": "2364f70a18d751dec3761945f545519ba9a8bc8f1a5fe055d4234044e564053d"
     },
     {
       "task_id": "t1-double",

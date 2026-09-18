@@ -829,27 +829,25 @@ and the resulting verdicts say `dev_only: true`.
    the per-task detail is in the commit messages and is not repeated here,
    because the counts below are the part that has to be right.
 
-   **The state of the census after that work, measured rather than tallied**
-   (classifier re-run at `93c214d`, 2026-09-18): of the 124 registered tasks,
-   **115 carry a hand-authored mutant file and 9 do not**. Tier 1 is 20 of 20
-   — finished, up from zero; tier 3 is 31 of 31 — finished; tiers 4 and 5 were
-   already complete and stay at 4 of 4 and 3 of 3. The whole of the remainder
-   is tier 2: **57 of 66**, with `t2-cube-all-laws`, `t2-dup-all-laws`,
+   **The census is closed, measured 2026-09-19.** All 124 registered tasks carry
+   at least one hand-authored mutant file, and **every one of them is at or
+   above the four-file floor** — the first time both have been true. The
+   classifier reads 1,322 mutant files across the bank. The nine tier-2 tasks
+   that stood at zero (`t2-cube-all-laws`, `t2-dup-all-laws`,
    `t2-has-mult3-laws`, `t2-has-odd-laws`, `t2-map-add-laws`,
-   `t2-sq-inc-all-laws`, `t2-sum-half-laws`, `t2-sum-mod3-laws` and
-   `t2-sum-nonzero-laws` still at zero. Across the bank the classifier reads
-   538 authored files out of 1,246. The floor of four authored files per task
-   is now met everywhere the census counts (the old exceptions,
-   `t3-split-even-odd`, `t3-sum-to-double` and `t3-zip-sum`, carry 4, 4 and 4
-   after the top-ups in `93c214d`). It is **not** met everywhere: twelve of the
-   twenty tier-1 tasks sit below it at two or three authored files each —
-   `t1-append-assoc` at two, and `t1-append-nil`, `t1-concat-append`,
-   `t1-count-zeros`, `t1-len-append`, `t1-len-cons`, `t1-len-map`,
-   `t1-len-snoc`, `t1-rev-append`, `t1-rev-snoc`, `t1-sum-append` and
-   `t1-take-drop` at three — so "tier 1 is finished" is a statement about the
-   *tasks* being authored at all, which is the thing the census counts, and not
-   about the floor, which they are under. Every one of the twelve type-checks
-   bare and none reaches tier 4, so they are thin rather than broken.
+   `t2-sq-inc-all-laws`, `t2-sum-half-laws`, `t2-sum-mod3-laws`,
+   `t2-sum-nonzero-laws`) and the twelve thin tier-1 tasks (`t1-append-assoc`,
+   `t1-append-nil`, `t1-concat-append`, `t1-count-zeros`, `t1-len-append`,
+   `t1-len-cons`, `t1-len-map`, `t1-len-snoc`, `t1-rev-append`, `t1-rev-snoc`,
+   `t1-sum-append`, `t1-take-drop`) were all topped up rather than left as an
+   exception to the rule. **Thin was not the same as safe:** three of those
+   twelve top-ups found full-reward holes in the task they were topping up —
+   `t1-len-snoc` (`snoc` that prepends, since every law was about lengths),
+   `t1-len-append` (cons step recursing against `Nil{}`, since no law applied
+   `append` to a non-empty second argument) and `t1-count-zeros` (an offset that
+   cancels in a one-law recurrence set) — each proved at tier 4, reward 1.000
+   before the repair. A corpus floor is a statement about evidence, and these
+   three are the counter-example to reading it as a statement about soundness.
 
    **Two limits on that paragraph are worth stating, because both have already
    produced a wrong number here.** First, the classifier reads the working
