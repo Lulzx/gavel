@@ -771,11 +771,25 @@ and the resulting verdicts say `dev_only: true`.
    `all-*` tasks, `t2-at-laws`, `t2-count-prefix-laws`, `t2-elem-laws`,
    `t2-has-mult5-laws`, `t2-has-one-laws`, `t2-dec2-all-laws`, `t2-drop-laws`,
    `t2-init-laws` — all strong, 12/12 valid with no problems. Tier 3: the
-   background backlog starts at `26aca27`, five authored mutants each into
-   `t3-absdiff-comm`, `t3-merge-len` and `t3-rle-expand`, which brings the
-   tier-3 count from 8 of 18 to 11 of 18 and clears the floor `t3-absdiff-comm`
-   was one file short of. The ratios are what moved; the finding stands until
-   the counts reach zero.
+   background backlog starts at `26aca27` (five authored mutants each into
+   `t3-absdiff-comm`, `t3-merge-len` and `t3-rle-expand`) and continues at
+   `db3543b` (`t3-bin-inc`, `t3-concat-len`); `t3-count-append`'s five are
+   authored on disk and uncommitted. That is **six of the 18 repaired and
+   twelve still carrying no hand-authored file** — measured by re-running the
+   classifier over the manifest, which is also how the two numbers this
+   paragraph carried before were found to be wrong: it said the count moved
+   from 8 of 18 to 11 of 18, and the commit message on `db3543b` says nine of
+   the 18 now carry an authored corpus. Both were tallies carried forward from
+   previous tallies rather than re-measured, and both overstate the work by
+   three tasks. `db3543b` is on `origin/master`, so the correction is here
+   rather than in the commit, and the check that would have caught it is the
+   classifier run, not the running total. The twelve outstanding are
+   `t3-filter-bound`, `t3-interleave-nil`, `t3-isort-perm`, `t3-isort-sorted`,
+   `t3-mul-comm`, `t3-pad`, `t3-replicate-append`, `t3-rev-rev`,
+   `t3-sum-replicate`, `t3-take-drop-split`, `t3-zip-len` and `t3-zip-sum`,
+   with `t3-split-even-odd` and `t3-sum-to-double` one authored file each under
+   the floor of four. The ratios are what moved; the finding stands until the
+   counts reach zero.
 
    The related finding from `t3-zip-len` is worse and was caught before it
    shipped. A corpus is not the only thing that can be thin. Its original two
