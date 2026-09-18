@@ -63,6 +63,7 @@ uv run python -m tools.mutate --check     # author mutants and see which are str
 uv run python -m tools.calibrate --dry-run
 uv run python -m tools.sandbox_check      # prove the sandbox runs a real check
 uv run python -m tools.migrate --from ~/.bend/app/2.0.4/rRKuW7 --label 2.0.4
+uv run python -m tools.soak -n 10000 -j 8 --out runs/soak   # unattended
 uv run gavel serve --socket /tmp/gavel.sock --http 127.0.0.1:8765
 bun run examples/client.ts                # a non-Python client
 ```
@@ -82,6 +83,16 @@ obs, reward, done, info = env.step(Action(files={"solution.bend": ..., "PROOF.be
 env.close()          # ends any open episode, flushes the log
 env.metrics.write("runs/metrics.json")
 ```
+
+`tools/soak.py` drives that loop unattended, with a scripted policy standing in
+for a model so that what the run exercises is the harness. Each episode's task
+and script come from `Random(seed + index)`, so the same seed produces the same
+ten thousand episodes at any `--jobs` — a soak whose contents depend on how it
+was parallelised cannot be compared to a re-run of itself. `--policy noisy`
+(the default) marks each submission so no two are byte-identical and the
+latency percentiles are the checker's; `--policy scripted` re-sends identical
+bytes and measures the cache instead. At the end it reads its own log back and
+checks it against the report the run produced while it was happening.
 
 `info` is the full `Verdict`. The cache is keyed on everything a verdict is a
 function of — the task's bytes, the mutant corpus, the toolchain, the backend,

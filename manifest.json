@@ -293,6 +293,14 @@
       "valid": true
     },
     {
+      "task_id": "t3-isort-perm",
+      "tier": 3,
+      "path": "tasks/3/t3-isort-perm",
+      "reference": "references/t3-isort-perm",
+      "hash": "cb1745d92dcd8a79db9ba0865526f87b2b7646eb5581ade211afd534a296f638",
+      "valid": true
+    },
+    {
       "task_id": "t3-isort-sorted",
       "tier": 3,
       "path": "tasks/3/t3-isort-sorted",

@@ -23,8 +23,9 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -45,18 +46,43 @@ class CacheStats:
     hits: int = 0
     misses: int = 0
     stored: int = 0
+    _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
+
+    def hit(self) -> None:
+        with self._lock:
+            self.hits += 1
+
+    def miss(self) -> None:
+        with self._lock:
+            self.misses += 1
+
+    def store(self) -> None:
+        with self._lock:
+            self.stored += 1
+
+    def snapshot(self) -> tuple[int, int, int]:
+        """All three under one lock, so a report cannot show a hit counted
+        against a miss not yet counted -- the totals must add up."""
+        with self._lock:
+            return self.hits, self.misses, self.stored
 
     @property
     def total(self) -> int:
-        return self.hits + self.misses
+        hits, misses, _ = self.snapshot()
+        return hits + misses
 
     @property
     def hit_rate(self) -> float:
-        return self.hits / self.total if self.total else 0.0
+        hits, misses, _ = self.snapshot()
+        total = hits + misses
+        return hits / total if total else 0.0
 
     def to_json(self) -> dict[str, Any]:
-        return {"hits": self.hits, "misses": self.misses, "stored": self.stored,
-                "hit_rate": round(self.hit_rate, 4)}
+        hits, misses, stored = self.snapshot()
+        total = hits + misses
+        return {"hits": hits, "misses": misses, "stored": stored,
+                "lookups": total,
+                "hit_rate": round(hits / total, 4) if total else 0.0}
 
 
 def mutant_corpus(task: Task) -> str:
@@ -97,7 +123,15 @@ def verdict_key(task: Task, toolchain: Toolchain, files: dict[str, str],
 
 
 class VerdictCache:
-    """A file-backed memo. One process, one file; WAL so a reader can look."""
+    """A file-backed memo. One process, one file; WAL so a reader can look.
+
+    Thread-safe, and not only because sqlite is: one connection used from
+    several threads lets two transactions interleave on it, which sqlite
+    reports as a cursor error on one of them. The lock is per-process and the
+    connection is shared, which is the point -- a connection per worker would
+    make the cache a database per worker and the hit rate an artefact of how
+    the work was split.
+    """
 
     def __init__(self, path: Path | str = "gavel-cache.sqlite",
                  enabled: bool = True) -> None:
@@ -105,6 +139,7 @@ class VerdictCache:
         self.enabled = enabled
         self.stats = CacheStats()
         self._db: sqlite3.Connection | None = None
+        self._lock = threading.Lock()
         if enabled:
             self._open()
 
@@ -134,32 +169,37 @@ class VerdictCache:
     def get(self, key: str) -> Verdict | None:
         if not self.enabled or self._db is None:
             return None
-        row = self._db.execute("SELECT payload FROM verdicts WHERE key = ?",
-                               (key,)).fetchone()
+        with self._lock:
+            row = self._db.execute("SELECT payload FROM verdicts WHERE key = ?",
+                                   (key,)).fetchone()
         if row is None:
-            self.stats.misses += 1
+            self.stats.miss()
             return None
-        self.stats.hits += 1
+        self.stats.hit()
         return Verdict.from_json(json.loads(row[0]))
 
     def put(self, key: str, verdict: Verdict) -> None:
         if not self.enabled or self._db is None:
             return
-        self._db.execute(
-            "INSERT OR REPLACE INTO verdicts "
-            "(key, task_id, tier, reward, toolchain, payload, created) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (key, verdict.task_id, verdict.tier, verdict.reward,
-             verdict.toolchain_hash, json.dumps(verdict.to_json()), time.time()))
-        self._db.commit()
-        self.stats.stored += 1
+        with self._lock:
+            self._db.execute(
+                "INSERT OR REPLACE INTO verdicts "
+                "(key, task_id, tier, reward, toolchain, payload, created) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (key, verdict.task_id, verdict.tier, verdict.reward,
+                 verdict.toolchain_hash, json.dumps(verdict.to_json()),
+                 time.time()))
+            self._db.commit()
+        self.stats.store()
 
     # --- maintenance -----------------------------------------------------------
 
     def rows(self) -> int:
         if not self.enabled or self._db is None:
             return 0
-        return int(self._db.execute("SELECT COUNT(*) FROM verdicts").fetchone()[0])
+        with self._lock:
+            return int(self._db.execute(
+                "SELECT COUNT(*) FROM verdicts").fetchone()[0])
 
     def distribution(self) -> dict[str, int]:
         """How many cached verdicts there are per tier.
@@ -169,25 +209,28 @@ class VerdictCache:
         """
         if not self.enabled or self._db is None:
             return {}
-        rows = self._db.execute(
-            "SELECT tier, COUNT(*) FROM verdicts GROUP BY tier ORDER BY tier")
-        return {str(tier): count for tier, count in rows}
+        with self._lock:
+            rows = self._db.execute(
+                "SELECT tier, COUNT(*) FROM verdicts GROUP BY tier ORDER BY tier")
+            return {str(tier): count for tier, count in rows}
 
     def purge(self, task_id: str | None = None) -> int:
         if not self.enabled or self._db is None:
             return 0
-        if task_id is None:
-            cursor = self._db.execute("DELETE FROM verdicts")
-        else:
-            cursor = self._db.execute("DELETE FROM verdicts WHERE task_id = ?",
-                                      (task_id,))
-        self._db.commit()
-        return cursor.rowcount
+        with self._lock:
+            if task_id is None:
+                cursor = self._db.execute("DELETE FROM verdicts")
+            else:
+                cursor = self._db.execute(
+                    "DELETE FROM verdicts WHERE task_id = ?", (task_id,))
+            self._db.commit()
+            return cursor.rowcount
 
     def close(self) -> None:
-        if self._db is not None:
-            self._db.close()
-            self._db = None
+        with self._lock:
+            if self._db is not None:
+                self._db.close()
+                self._db = None
 
     def __enter__(self) -> "VerdictCache":
         return self

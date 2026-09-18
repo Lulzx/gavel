@@ -16,5 +16,13 @@ build/
 .gavel.stderr
 .gavel-work/
 
+# A soak writes tens of megabytes of episodes and a cache beside them. The
+# report is worth keeping and the trajectory is not: it is derived, and the
+# seeds that produce it are in the report.
+runs/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
 # OS
 .DS_Store
