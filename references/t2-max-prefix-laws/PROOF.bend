@@ -18,3 +18,13 @@ def L.max_prefix_len(xs):
     case h <> t:
       %L.max_prefix_len(t) : {P.max(h, S.max_prefix(P.len(t), t)) == P.max(h, _) : Nat}
       {==}
+
+# The list is a literal `Nil{}`, so the inner match is picked for every count,
+# but the outer match on `k` is stuck while `k` is a variable: the induction is
+# on `k`, and both cases reduce to `0n`.
+def L.max_prefix_nil(k):
+  match k:
+    case 0n:
+      {==}
+    case 1n+kp:
+      {==}

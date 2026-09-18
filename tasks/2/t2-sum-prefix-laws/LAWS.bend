@@ -18,3 +18,13 @@ law sum_prefix_zero:
 law sum_prefix_len:
   for xs: List<Nat>
   {S.sum_prefix(P.len(xs), xs) == P.sum(xs) : Nat}
+
+# LAW: once the list runs out the answer is zero. Neither law above reaches the
+# inner `Nil{}`: `sum_prefix_zero` fixes only the count `0n`, and
+# `sum_prefix_len` constrains only the diagonal, where the count and the list
+# length agree -- so the case where the list is shorter than the count is
+# unconstrained. Both `1n` and the remaining count proved the set at **tier 4,
+# reward 1.000**.
+law sum_prefix_nil:
+  for k: Nat
+  {S.sum_prefix(k, Nil{}) == 0n : Nat}

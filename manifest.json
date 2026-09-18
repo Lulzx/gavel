@@ -345,7 +345,7 @@
       "tier": 2,
       "path": "tasks/2/t2-max-prefix-laws",
       "reference": "references/t2-max-prefix-laws",
-      "hash": "5a4563bacf3e5ae5183ee89a5864d719c77f51be97a7d365a3d0a7b4fd6e28ec"
+      "hash": "b8929b416608ea91db067b306110055c12fd0aa0c7598035618bb4dc7baecbd4"
     },
     {
       "task_id": "t2-min-all-laws",
@@ -359,7 +359,7 @@
       "tier": 2,
       "path": "tasks/2/t2-min-laws",
       "reference": "references/t2-min-laws",
-      "hash": "7d64e00a0d944b4d06572c5df96cdf014ce831acc89dd53b175899f2d8b4dbe2"
+      "hash": "6c9812250456b4871928745f6ccc5f8954de8a9b5b83e073a6593e19fd760ebe"
     },
     {
       "task_id": "t2-mod3-all-laws",
@@ -415,7 +415,7 @@
       "tier": 2,
       "path": "tasks/2/t2-pred-laws",
       "reference": "references/t2-pred-laws",
-      "hash": "64da05526a9a51efdf78e07b67be395aeb16f0c148e2f467aac47ca8e9b0a113"
+      "hash": "1b63716f35ae3f03d45c532195c8132c4efab6414ec97e7715d4fd56fcc2f4d8"
     },
     {
       "task_id": "t2-replicate-len",
@@ -555,7 +555,7 @@
       "tier": 2,
       "path": "tasks/2/t2-sum-prefix-laws",
       "reference": "references/t2-sum-prefix-laws",
-      "hash": "82978d8d7cacc60da8d3644c4589e9e36c77fc9c874f168f2d0d4a4eb50fc751"
+      "hash": "a271187024f629bcca0cbe4120c564c408e7837d736f9ba12c46a3a49978f091"
     },
     {
       "task_id": "t2-sum-sq-inc-laws",

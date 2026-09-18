@@ -14,3 +14,11 @@ law pred_succ:
 law add_one:
   for x: Nat
   {S.add(x, 1n) == 1n+x : Nat}
+
+# LAW: the predecessor of zero is zero. `pred_succ` applies `pred` only to a
+# successor and `add_one` does not mention `pred` at all, so the `0n` case is
+# reached by no left-hand side. A `pred` answering `1n` there proves both laws
+# at **tier 4, reward 1.000** -- measured. This is the closed-value anchor.
+law pred_zero:
+  for x: Nat
+  {S.pred(0n) == 0n : Nat}

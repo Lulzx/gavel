@@ -18,3 +18,8 @@ def L.add_one(x):
     case 1n+p:
       %L.add_one(p) : {1n+S.add(p, 1n) == 1n+_ : Nat}
       {==}
+
+# `pred` matches on its argument, so `pred(0n)` is `0n` by unfolding. The binder
+# is unused on purpose: every law in this bank is instantiated through one.
+def L.pred_zero(x):
+  {==}

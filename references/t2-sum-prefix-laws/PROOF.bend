@@ -18,3 +18,13 @@ def L.sum_prefix_len(xs):
     case h <> t:
       %L.sum_prefix_len(t) : {h + S.sum_prefix(P.len(t), t) == h + _ : Nat}
       {==}
+
+# The list is a literal `Nil{}`, so the inner match is picked for every count,
+# but the outer match on `k` is stuck while `k` is a variable: the induction is
+# on `k`, and both cases reduce to `0n`.
+def L.sum_prefix_nil(k):
+  match k:
+    case 0n:
+      {==}
+    case 1n+kp:
+      {==}
