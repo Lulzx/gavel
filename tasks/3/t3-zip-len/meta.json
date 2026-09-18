@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-zip-len",
+  "tier": 3,
+  "laws": [
+    "zip_nil_l",
+    "zip_nil_r",
+    "zip_len"
+  ],
+  "policy_targets": [
+    "zip"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "45b165437a92ec0555566c2fef9d93f4d592a674d5f3adecbb0c7453807c8045",
+    "prelude": "f9cca7ff519cd5dd0344a60452efa5611789819c7854b3102a9d85a2f9c2380a"
+  },
+  "bend_version": "2.0.5"
+}

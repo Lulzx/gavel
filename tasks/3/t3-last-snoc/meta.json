@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-last-snoc",
+  "tier": 3,
+  "laws": [
+    "last_nil",
+    "last_cons",
+    "last_snoc"
+  ],
+  "policy_targets": [
+    "last"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "763033f3479a52deff54647f880e512983e0f9a59824231def908254bd091719",
+    "prelude": "4177e08ede819749a2133da423af6fed28a6cd198d4953495840fb5e56eb63c8"
+  },
+  "bend_version": "2.0.5"
+}

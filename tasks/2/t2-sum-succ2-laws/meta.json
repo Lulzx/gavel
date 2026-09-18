@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sum-succ2-laws",
+  "tier": 2,
+  "laws": [
+    "sum_succ2_nil",
+    "sum_succ2_snoc"
+  ],
+  "policy_targets": [
+    "sum_succ2"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "85e48a9425d12a921de4ba3dd8d59d17225c71c3d81950e297e6f7a246c0ae1d",
+    "prelude": "7fff742a6476a3772547a1f5d3c1d62bc2aae8a877224df90014d5dc96791c28"
+  },
+  "bend_version": "2.0.5"
+}

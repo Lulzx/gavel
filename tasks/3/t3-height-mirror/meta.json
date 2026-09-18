@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-height-mirror",
+  "tier": 3,
+  "laws": [
+    "height_leaf",
+    "height_node",
+    "height_mirror"
+  ],
+  "policy_targets": [
+    "height"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "6b1956a063c25884487de0536673dbdf3d2005ec949841bec99fb3055b992679",
+    "prelude": "5b657b8698414b7b3a774401fd300c990e2dba2ff6b10139ffa7b58c5a834d6b"
+  },
+  "bend_version": "2.0.5"
+}

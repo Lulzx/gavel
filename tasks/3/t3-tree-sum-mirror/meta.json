@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-tree-sum-mirror",
+  "tier": 3,
+  "laws": [
+    "tree_sum_leaf",
+    "tree_sum_node",
+    "tree_sum_mirror"
+  ],
+  "policy_targets": [
+    "tree_sum"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "def6d35b9512d4ec514d957e5c5af2c15ef84d0064306ad76681d1b1d07a73f3",
+    "prelude": "0519de4ba15363f28a39c8a21f156d0626fe842d6918fe9ccac54dd980949e89"
+  },
+  "bend_version": "2.0.5"
+}

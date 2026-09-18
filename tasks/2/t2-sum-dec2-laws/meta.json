@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sum-dec2-laws",
+  "tier": 2,
+  "laws": [
+    "sum_dec2_nil",
+    "sum_dec2_snoc"
+  ],
+  "policy_targets": [
+    "sum_dec2"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "0f64d5c1c38bc75d6ac8d8e623232aa6f2fdee237df23aece41831d8f9dab5ef",
+    "prelude": "73ce9577855d7e9b5a1cae7042aa583562fdb594a7fff3b8a7eb0b5f85107c54"
+  },
+  "bend_version": "2.0.5"
+}

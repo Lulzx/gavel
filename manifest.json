@@ -166,6 +166,20 @@
       "hash": "0dff60012f65bc551109489f86d04f0711469a4c3daee6563410f27a86550af7"
     },
     {
+      "task_id": "t2-all-mult3-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-all-mult3-laws",
+      "reference": "references/t2-all-mult3-laws",
+      "hash": "0c758dc956a9b71700a02692bb8b0e10ab999656d303b0e1fb7a154f8e9bcd4b"
+    },
+    {
+      "task_id": "t2-all-mult5-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-all-mult5-laws",
+      "reference": "references/t2-all-mult5-laws",
+      "hash": "31a476fbfffaca10973cda1f53f34d4fdbabdb0c0e40ff1ddefbe86b0cb986fe"
+    },
+    {
       "task_id": "t2-all-nonzero-laws",
       "tier": 2,
       "path": "tasks/2/t2-all-nonzero-laws",
@@ -215,6 +229,20 @@
       "hash": "76d20b309d828f07054b395ac453f437b9662ab96bb01a1624de0afde56cca86"
     },
     {
+      "task_id": "t2-cube-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-cube-all-laws",
+      "reference": "references/t2-cube-all-laws",
+      "hash": "153afe10f0e6c5caf015aece4501b12b43a41c0b15e36dfd91d116c607e76239"
+    },
+    {
+      "task_id": "t2-dec2-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-dec2-all-laws",
+      "reference": "references/t2-dec2-all-laws",
+      "hash": "63fb78deca1d899b45d385a5e3d22ff6f58451ca5a526a82c352080c12f88c6f"
+    },
+    {
       "task_id": "t2-double-all-laws",
       "tier": 2,
       "path": "tasks/2/t2-double-all-laws",
@@ -241,6 +269,20 @@
       "path": "tasks/2/t2-elem-laws",
       "reference": "references/t2-elem-laws",
       "hash": "9b5d0c25ca47f4ec1fd76d8b6f632876550d840a8fa11515155544f023f0123b"
+    },
+    {
+      "task_id": "t2-has-mult3-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-has-mult3-laws",
+      "reference": "references/t2-has-mult3-laws",
+      "hash": "d753a4079f29ba42185b1a8a554a75bf67c54629c9464402112c2c828164f7b5"
+    },
+    {
+      "task_id": "t2-has-mult5-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-has-mult5-laws",
+      "reference": "references/t2-has-mult5-laws",
+      "hash": "1744482bd2e7d7f5c83319336a13bdcadf11e51ff6959d3accd70d76c96cf413"
     },
     {
       "task_id": "t2-has-odd-laws",
@@ -320,6 +362,20 @@
       "hash": "7d64e00a0d944b4d06572c5df96cdf014ce831acc89dd53b175899f2d8b4dbe2"
     },
     {
+      "task_id": "t2-mod3-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-mod3-all-laws",
+      "reference": "references/t2-mod3-all-laws",
+      "hash": "830b0a10265f0d607d2676f75aa1ab75ca5d5f9b0715eff9e660c78ed2d888d9"
+    },
+    {
+      "task_id": "t2-mod5-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-mod5-all-laws",
+      "reference": "references/t2-mod5-all-laws",
+      "hash": "24b1f0ea1372846ab69349e23f02bf0606622d46cd64c18bd70b864fcec6c7c8"
+    },
+    {
       "task_id": "t2-mul-distrib",
       "tier": 2,
       "path": "tasks/2/t2-mul-distrib",
@@ -339,6 +395,13 @@
       "path": "tasks/2/t2-pow-laws",
       "reference": "references/t2-pow-laws",
       "hash": "9a20fd168c28fd7bf3b8c73f42e80cd132fb5751c9c336ce17aabb46c85d9afc"
+    },
+    {
+      "task_id": "t2-pow2-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-pow2-all-laws",
+      "reference": "references/t2-pow2-all-laws",
+      "hash": "bd7e4f58ab8213821a4659b0fcd2bd0d21342bfa581b8af5e653d6d0504813ae"
     },
     {
       "task_id": "t2-pred-all-laws",
@@ -390,6 +453,13 @@
       "hash": "196b8237c89d058d4f0b3a1b2e4940ebfbc225e6b09602b15fe238d95709f34a"
     },
     {
+      "task_id": "t2-sq-inc-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sq-inc-all-laws",
+      "reference": "references/t2-sq-inc-all-laws",
+      "hash": "0ab5d29e983e87105d4e61856d418927bbd70f2ed5646d70414e1dab4f56b331"
+    },
+    {
       "task_id": "t2-sq-prefix-laws",
       "tier": 2,
       "path": "tasks/2/t2-sq-prefix-laws",
@@ -411,11 +481,32 @@
       "hash": "99ed5ed7e0cd0c19c40aa64eff8b51bb4a6eb3be61f1bf1051d42b4223eb281b"
     },
     {
+      "task_id": "t2-succ2-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-succ2-all-laws",
+      "reference": "references/t2-succ2-all-laws",
+      "hash": "8f3976aa0cfb95ee4c8cdce93efe7e3fea3c1a2b9fc163bba9d38fb857783a0d"
+    },
+    {
       "task_id": "t2-sum-acc",
       "tier": 2,
       "path": "tasks/2/t2-sum-acc",
       "reference": "references/t2-sum-acc",
       "hash": "9d71c22206fc7476dabea8fe84c348fb766d6c99ba8f8dfd826050408e2dca8c"
+    },
+    {
+      "task_id": "t2-sum-cube-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-cube-laws",
+      "reference": "references/t2-sum-cube-laws",
+      "hash": "653598a7d1b43f92bcc83228bf33c3bbaccffc0dbcbf7398a520df203153e748"
+    },
+    {
+      "task_id": "t2-sum-dec2-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-dec2-laws",
+      "reference": "references/t2-sum-dec2-laws",
+      "hash": "68512f8803ab9270a1b61d7322a950a60a769536295bc19e0c6826b1f8ff5b04"
     },
     {
       "task_id": "t2-sum-half-laws",
@@ -432,11 +523,32 @@
       "hash": "5a1c31140343bbe45dd143870aa32025f4aa1be31a6b96cad905392a28a425d2"
     },
     {
+      "task_id": "t2-sum-mod3-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-mod3-laws",
+      "reference": "references/t2-sum-mod3-laws",
+      "hash": "15e749c481480089c849cbc4d627d25c5e382fb11f3192956def448280bb9bcd"
+    },
+    {
+      "task_id": "t2-sum-mod5-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-mod5-laws",
+      "reference": "references/t2-sum-mod5-laws",
+      "hash": "50a39f8f15bd630471ed2b4f9a33a39718e79a21c56f676f5e268f1cfc691863"
+    },
+    {
       "task_id": "t2-sum-nonzero-laws",
       "tier": 2,
       "path": "tasks/2/t2-sum-nonzero-laws",
       "reference": "references/t2-sum-nonzero-laws",
       "hash": "19e75d76b4056b704546b0aaf3662f55af7db0b80ae900b7bd42b90a87e53e59"
+    },
+    {
+      "task_id": "t2-sum-pow2-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-pow2-laws",
+      "reference": "references/t2-sum-pow2-laws",
+      "hash": "c080075ee82dc82fde91c91f6d8b01acf84d59067bf615dfd0a06cd1387afaf0"
     },
     {
       "task_id": "t2-sum-prefix-laws",
@@ -446,11 +558,32 @@
       "hash": "82978d8d7cacc60da8d3644c4589e9e36c77fc9c874f168f2d0d4a4eb50fc751"
     },
     {
+      "task_id": "t2-sum-sq-inc-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-sq-inc-laws",
+      "reference": "references/t2-sum-sq-inc-laws",
+      "hash": "9e2a3476e379fbc1132927e3b7dcc3011473c003ad5d9f50c8f12df83600a2b6"
+    },
+    {
       "task_id": "t2-sum-sq-laws",
       "tier": 2,
       "path": "tasks/2/t2-sum-sq-laws",
       "reference": "references/t2-sum-sq-laws",
       "hash": "338dcfab7edf1353c02a75de3e7a26b43290073e6338bf0e57a41d628d605a80"
+    },
+    {
+      "task_id": "t2-sum-succ2-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-succ2-laws",
+      "reference": "references/t2-sum-succ2-laws",
+      "hash": "83cdccd791bac458dcd54e25f7753f1bf7d573fbadd9d1055974dd4464c40e12"
+    },
+    {
+      "task_id": "t2-sum-triple-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-triple-laws",
+      "reference": "references/t2-sum-triple-laws",
+      "hash": "c7b1be17ba1007735f25363a93712c4573c0f26a4905feb1065eaf62ee7dbd5d"
     },
     {
       "task_id": "t2-take-laws",
@@ -460,11 +593,39 @@
       "hash": "fca11cd2488841098c5d60be26812862d42d8a33ff7eb27e12b5401a57ef7756"
     },
     {
+      "task_id": "t2-triple-all-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-triple-all-laws",
+      "reference": "references/t2-triple-all-laws",
+      "hash": "7f2029a6b143b051cf4b0517fd39ac80f2a1bed6e091c483dff415bc23c0971c"
+    },
+    {
       "task_id": "t2-zeros-prefix-laws",
       "tier": 2,
       "path": "tasks/2/t2-zeros-prefix-laws",
       "reference": "references/t2-zeros-prefix-laws",
       "hash": "bf43c8e9f79f0114c35889b2751dd563bafbcfa15203201a6406edc01eba83c7"
+    },
+    {
+      "task_id": "t3-absdiff-comm",
+      "tier": 3,
+      "path": "tasks/3/t3-absdiff-comm",
+      "reference": "references/t3-absdiff-comm",
+      "hash": "24d8b7e93048ccf02f89bcfb48f6fd82144d27b5a0bebd1c0955bd5e12caac2d"
+    },
+    {
+      "task_id": "t3-any-append",
+      "tier": 3,
+      "path": "tasks/3/t3-any-append",
+      "reference": "references/t3-any-append",
+      "hash": "b956ecc59f2b83a908ca6b3e47e5f819b319027fc9a34ce6e38e54ce3881cc9b"
+    },
+    {
+      "task_id": "t3-bin-inc",
+      "tier": 3,
+      "path": "tasks/3/t3-bin-inc",
+      "reference": "references/t3-bin-inc",
+      "hash": "23306f33c4d214303703083a93a25eebe7dda5abc0b389b1d1de13f6e7d20069"
     },
     {
       "task_id": "t3-concat-len",
@@ -488,6 +649,20 @@
       "hash": "f2ec160701a6a2406f5e78fc94a3e10b27647bbd46b522224a284b0bf9c1209c"
     },
     {
+      "task_id": "t3-height-mirror",
+      "tier": 3,
+      "path": "tasks/3/t3-height-mirror",
+      "reference": "references/t3-height-mirror",
+      "hash": "556437d219a9fadc4b5a9f61557c9b7cc2a54f785abe62432222e95e49a66b8c"
+    },
+    {
+      "task_id": "t3-interleave-nil",
+      "tier": 3,
+      "path": "tasks/3/t3-interleave-nil",
+      "reference": "references/t3-interleave-nil",
+      "hash": "a1a6215f24e369bae2f08b8bcf5785c15e0a06e853d4429ce82ca2abe9c96306"
+    },
+    {
       "task_id": "t3-isort-perm",
       "tier": 3,
       "path": "tasks/3/t3-isort-perm",
@@ -502,6 +677,13 @@
       "hash": "de643030ffa0bdaf9bbcc0d668a13e1f98655fd216bdede9e53f35695979240a"
     },
     {
+      "task_id": "t3-last-snoc",
+      "tier": 3,
+      "path": "tasks/3/t3-last-snoc",
+      "reference": "references/t3-last-snoc",
+      "hash": "60e59f48c9f0ab428bc25cee4ec5b7386a7e449a2ca3a19fd62769bda7b6f676"
+    },
+    {
       "task_id": "t3-mul-comm",
       "tier": 3,
       "path": "tasks/3/t3-mul-comm",
@@ -509,11 +691,25 @@
       "hash": "337504eafd9bbe143faf631fdf22d3a0d563480a084c7b0da8859f9530f61d55"
     },
     {
+      "task_id": "t3-nappend-len",
+      "tier": 3,
+      "path": "tasks/3/t3-nappend-len",
+      "reference": "references/t3-nappend-len",
+      "hash": "a2e7946d7a227307e6c3dc137b91c0a115543e712d75508b7c305ecacb94faa1"
+    },
+    {
       "task_id": "t3-pad",
       "tier": 3,
       "path": "tasks/3/t3-pad",
       "reference": "references/t3-pad",
       "hash": "447d292c35eb593d3d880cb3f072d4a4fa6e53daf35ea916b9872e1b2d7cb9a6"
+    },
+    {
+      "task_id": "t3-prefixes-len",
+      "tier": 3,
+      "path": "tasks/3/t3-prefixes-len",
+      "reference": "references/t3-prefixes-len",
+      "hash": "90c60abbd1e3b05e10301bce790614e0c1703fc1abb52220fb9d3a6bc876abd4"
     },
     {
       "task_id": "t3-replicate-append",
@@ -528,6 +724,13 @@
       "path": "tasks/3/t3-rev-rev",
       "reference": "references/t3-rev-rev",
       "hash": "22704f38da3e2b6b8f6351f8536927afa465b1b9389cecfdb751aebe53cb6d59"
+    },
+    {
+      "task_id": "t3-split-even-odd",
+      "tier": 3,
+      "path": "tasks/3/t3-split-even-odd",
+      "reference": "references/t3-split-even-odd",
+      "hash": "20e2a056e87ab38157334b4cdaeddf5b812c1d01330e47dd27577855e3078ae0"
     },
     {
       "task_id": "t3-sum-acc",
@@ -565,6 +768,20 @@
       "hash": "06b8a832dd22eae164843d87c9028b72388a4edc5e9c5baec136b16dce7284a1"
     },
     {
+      "task_id": "t3-tree-sum-mirror",
+      "tier": 3,
+      "path": "tasks/3/t3-tree-sum-mirror",
+      "reference": "references/t3-tree-sum-mirror",
+      "hash": "e8c10c8f3a10360745e86f2131f3f0654ac228f5c1b791cca2e1d96688e81236"
+    },
+    {
+      "task_id": "t3-zip-len",
+      "tier": 3,
+      "path": "tasks/3/t3-zip-len",
+      "reference": "references/t3-zip-len",
+      "hash": "82df9c434af20287500b855492d552a94818a770ca68099405fce7c60df16e20"
+    },
+    {
       "task_id": "t3-zip-sum",
       "tier": 3,
       "path": "tasks/3/t3-zip-sum",
@@ -591,6 +808,13 @@
       "path": "tasks/5/t5-compile-word",
       "reference": "references/t5-compile-word",
       "hash": "9d7859e7a4c9983837de72ff09976987844c9f2e6fc017d90ae50c2a00dc43f0"
+    },
+    {
+      "task_id": "t5-opt-drop",
+      "tier": 5,
+      "path": "tasks/5/t5-opt-drop",
+      "reference": "references/t5-opt-drop",
+      "hash": "652d5f8393da88a0a056e36980e348009cc1faa35620497c4c7c9c5f094c0e71"
     },
     {
       "task_id": "t5-run-effect",

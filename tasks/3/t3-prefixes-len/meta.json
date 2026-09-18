@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-prefixes-len",
+  "tier": 3,
+  "laws": [
+    "prefixes_nil",
+    "prefixes_cons",
+    "prefixes_len"
+  ],
+  "policy_targets": [
+    "prefixes"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "67a9868b620a3bb44c77a93c4e579d2ff7f8b753847871b1eea04a896fd2ae94",
+    "prelude": "3730476347c2a781181affd6a6c315cc0d32d301bdd51ad7a26648d60290f7a9"
+  },
+  "bend_version": "2.0.5"
+}

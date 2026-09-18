@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-split-even-odd",
+  "tier": 3,
+  "laws": [
+    "split_nil",
+    "split_cons",
+    "split_len"
+  ],
+  "policy_targets": [
+    "split"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "adc525c6a667c9211642c76e675a719437e9984955fb4e5e3930fda1b5fd733d",
+    "prelude": "f0e14c0d1c7ca92d47d504f9527697b339b8dd18a473d75d042063e16a8cd162"
+  },
+  "bend_version": "2.0.5"
+}

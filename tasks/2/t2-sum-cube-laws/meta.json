@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sum-cube-laws",
+  "tier": 2,
+  "laws": [
+    "sum_cube_nil",
+    "sum_cube_snoc"
+  ],
+  "policy_targets": [
+    "sum_cube"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "55355ad0839744f423164debf4c2496082d34a5e86a41954afba1a121284b611",
+    "prelude": "01146176d024cc6af4d33813d944a8e6ec2dcaa90ee632d2be5d3be19a2eb63e"
+  },
+  "bend_version": "2.0.5"
+}

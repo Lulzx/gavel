@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sum-triple-laws",
+  "tier": 2,
+  "laws": [
+    "sum_triple_nil",
+    "sum_triple_snoc"
+  ],
+  "policy_targets": [
+    "sum_triple"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "51628e9380bcd1da77d61e1ec9c53424a50d06eec98b3a317b02696e9440b5ee",
+    "prelude": "e2e4e29bacbc15d9a3575499eca4f0185c0be104e8fd6969a0b8b772baff6732"
+  },
+  "bend_version": "2.0.5"
+}

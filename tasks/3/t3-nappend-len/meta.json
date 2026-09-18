@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-nappend-len",
+  "tier": 3,
+  "laws": [
+    "nappend_zero",
+    "nappend_succ",
+    "nappend_len"
+  ],
+  "policy_targets": [
+    "nappend"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "0bf1eb29b682c2083d8843b6390c09f903367d23d3e8946bb84d705dee229f0b",
+    "prelude": "2f3866483944c161b1bb3bc1d8186ab8e51be046c95e978aae1206e1c63aab90"
+  },
+  "bend_version": "2.0.5"
+}

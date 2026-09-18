@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-triple-all-laws",
+  "tier": 2,
+  "laws": [
+    "triple_all_single",
+    "triple_all_append"
+  ],
+  "policy_targets": [
+    "triple_all"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3892f0559ae7bc5b42ba76baf210ba4df7bed76ef485e8abc6ca83554b45de4c",
+    "prelude": "e2e4e29bacbc15d9a3575499eca4f0185c0be104e8fd6969a0b8b772baff6732"
+  },
+  "bend_version": "2.0.5"
+}

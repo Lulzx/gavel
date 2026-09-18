@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sum-mod3-laws",
+  "tier": 2,
+  "laws": [
+    "sum_mod3_nil",
+    "sum_mod3_snoc"
+  ],
+  "policy_targets": [
+    "sum_mod3"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "f81cd0e86fd52b7dcf82364f2e2f0c8d7707006e88a2bd04162de9c26afe8ad5",
+    "prelude": "b16cd1bfbe4dc6ced35f7cf2413c3a6b721ba73a1628277d4ac2ef440710d981"
+  },
+  "bend_version": "2.0.5"
+}

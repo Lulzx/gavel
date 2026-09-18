@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-interleave-nil",
+  "tier": 3,
+  "laws": [
+    "interleave_nil_l",
+    "interleave_nil_r",
+    "interleave_len"
+  ],
+  "policy_targets": [
+    "interleave"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "a0631ee5b954ea6b0fa42d7ac9c1ecb33a66d36ae6c0c637a941c11fb7bf790c",
+    "prelude": "1fb5e074538fd6aeedd9c34a4572362d28d1c3091a67c2451b092e4ee96cc29d"
+  },
+  "bend_version": "2.0.5"
+}

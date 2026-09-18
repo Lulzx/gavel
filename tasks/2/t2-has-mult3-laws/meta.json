@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-has-mult3-laws",
+  "tier": 2,
+  "laws": [
+    "has_mult3_nil",
+    "has_mult3_snoc"
+  ],
+  "policy_targets": [
+    "has_mult3"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "65a294a60e03cab0aff500730cfcce0b54b41fb39984af6d56d2e6fff49f375c",
+    "prelude": "4cf4ec27c0fd3fb258de6ebabd4d93f9ce4f767884594517f5dc2fd963d79527"
+  },
+  "bend_version": "2.0.5"
+}

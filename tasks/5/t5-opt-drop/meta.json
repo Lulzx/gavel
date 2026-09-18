@@ -1,0 +1,24 @@
+{
+  "task_id": "t5-opt-drop",
+  "tier": 5,
+  "laws": [
+    "exec_nil",
+    "exec_zero",
+    "exec_inc",
+    "exec_twice",
+    "clean_opt",
+    "opt_sound",
+    "opt_sound_zero"
+  ],
+  "policy_targets": [
+    "exec",
+    "opt"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "37ee6c79ca053044515cf436db79467d4fe2ed10713fa49a17b61e333c933099",
+    "prelude": "58e0aada8849b24f24b8cfb49f1c16842639c18db78afdb12bf0c0c8877acb6e"
+  },
+  "bend_version": "2.0.5"
+}

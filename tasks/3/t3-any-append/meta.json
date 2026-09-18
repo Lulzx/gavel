@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-any-append",
+  "tier": 3,
+  "laws": [
+    "any_nil",
+    "any_cons",
+    "any_append"
+  ],
+  "policy_targets": [
+    "any"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "bdb470f506e10f8b65dd2ab2739cdf2a3ad71689eae8c46fd474bce48761a9a5",
+    "prelude": "f9bfbbe3a2320a88e475e19dab459bf55f6e7aea82ad56ab80e8cfebfa528990"
+  },
+  "bend_version": "2.0.5"
+}

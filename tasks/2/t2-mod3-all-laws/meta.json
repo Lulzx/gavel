@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-mod3-all-laws",
+  "tier": 2,
+  "laws": [
+    "mod3_all_single",
+    "mod3_all_append"
+  ],
+  "policy_targets": [
+    "mod3_all"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "0e712498a483b900537043cf4aba23d3445d05005ec6192464119d654d1cf7e7",
+    "prelude": "b16cd1bfbe4dc6ced35f7cf2413c3a6b721ba73a1628277d4ac2ef440710d981"
+  },
+  "bend_version": "2.0.5"
+}

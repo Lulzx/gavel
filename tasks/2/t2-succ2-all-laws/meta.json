@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-succ2-all-laws",
+  "tier": 2,
+  "laws": [
+    "succ2_all_single",
+    "succ2_all_append"
+  ],
+  "policy_targets": [
+    "succ2_all"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "a9f9dbd2679531e9fdf8ec381e8d7b9b32554391502c1b44eb950caaac62892e",
+    "prelude": "7fff742a6476a3772547a1f5d3c1d62bc2aae8a877224df90014d5dc96791c28"
+  },
+  "bend_version": "2.0.5"
+}

@@ -333,10 +333,25 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf` |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 85 registered tasks, 20 are tier 1, 46
-are tier 2, 15 are tier 3, 2 are tier 4 and 2 are tier 5. No tier is empty, so
+**The bank's ceiling is tier 5.** Of the 117 registered tasks, 20 are tier 1, 66
+are tier 2, 26 are tier 3, 2 are tier 4 and 3 are tier 5. No tier is empty, so
 what M2's 200 and M4's 500 are short of is volume rather than a design nobody
 has done yet.
+
+The last 32 of those are a 31-task batch from the two authoring agents plus
+`t5-opt-drop`, and the tier-2 half of the batch is a *family*.
+Its twenty tasks are four list functions — `all_<f>`, `sum_<f>`, `has_<f>` and
+`<f>_all` — instantiated at ten arithmetic predicates (`mult3`, `mult5`, `cube`,
+`dec2`, `mod3`, `mod5`, `pow2`, `sq-inc`, `succ2`, `triple`), each carrying the
+same two laws with its own predicate substituted. They are distinct tasks:
+distinct targets, distinct law names, no collision with anything already in the
+bank, and each one validated on its own. But a policy that solves one of them
+has learnt nearly all of the others, so they are closer to twenty lessons on one
+template than to twenty lessons, and that is a fact about the bank's *effective*
+size. It is recorded here rather than left inside the count, because the count
+is what M2 is measured by and the difference between 117 tasks and 97 distinct
+problems is exactly the kind of gap that reads as progress in a total and
+disappears in a curriculum.
 
 Tier 4 is the first tier whose *law* is about a predicate the task declares
 rather than about a function it defines. `t4-stack-wf` states it in the
@@ -389,6 +404,43 @@ The pair of tasks is the point — the first earns its laws by pinning what the
 policy writes, the second by anchoring it to something the policy cannot
 write — and a third should be built by asking which of the two a new
 program-level law is.
+
+`t5-opt-drop` is the third, and it is the first whose law is about a
+*transformation* rather than a second reading of a program. The machine is three
+instructions and the task is the `Twice` that follows a `Zero`: doubling zero is
+zero, so that instruction can be removed — but only where the accumulator is
+known to be zero, and that knowledge is a parameter of the optimiser rather than
+a fact about the program. `P.clean` is in the prelude, so `clean_opt` judges the
+policy's output against a meaning the policy did not write, and the three laws
+about the optimiser are deliberately not three restatements of one claim:
+`clean_opt` is the specification and rejects an optimiser that kept a redundant
+instruction, `opt_sound` rejects one that removed on its own initiative under a
+caller who claimed nothing, and `opt_sound_zero` cashes the claim by running
+both programs *at* zero instead of believing it. The `exec` laws are stated over
+an arbitrary tail rather than over a one-instruction program, which is what
+stops the body that applies the first instruction and stops: the
+one-instruction version of all four is satisfied by it, and the optimiser's laws
+would not notice either, because a truncating `exec` reads the two programs they
+compare the same way.
+
+Three things came out of writing it. First, the mutants are the evidence that
+the three optimiser laws are three obligations: one body satisfies both
+correctness laws and fails `clean_opt`, one satisfies `clean_opt` and fails
+`opt_sound`, and one — the optimiser that reads a flag but not its caller's —
+satisfies `opt_sound_zero` and fails `opt_sound`, which is exactly the pair of
+blind spots that a single soundness law would have had to choose between.
+Second, the mutants measure tier 2 rather than the tier 3 that
+`t5-compile-word`'s corpus measures, and the reason is structural rather than a
+defect in the corpus: Bend defs cannot be mutually recursive, so the reference
+proof carrying the two soundness laws is one induction over the flag, and the
+helper that induction lives in is a statement about `exec` and `opt` — the
+isolation run carries it into every law, so the first mutant stops all of them.
+The corpus is still strong in V2's sense, which is the sense that matters: every
+mutant type-checks and none reaches tier 4. Third, the gate allows a submission
+to declare only the policy's own names plus `Policy.*`, so a mutant that wants a
+second recursion has to put its helper there — a top-level `go` is rejected at
+tier 0, before any law is consulted, which is a rejection that says nothing
+about the law the mutant was written to probe.
 
 ## 4. Milestones and work packages
 
@@ -469,13 +521,16 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 85 tasks (20 tier 1, 46 tier 2, 15 tier 3, 2 tier 4, 2 tier 5),
+   progress** — 117 tasks (20 tier 1, 66 tier 2, 26 tier 3, 2 tier 4, 3 tier 5),
    validated together rather than per task, because a task is sound only against
    a corpus that shares the degenerate generator with it. The whole bank was
-   measured locally at 84 tasks: **84/84 valid over 1564 checker runs** (the
-   last CI run over a whole bank was at 83, `83/83` over 1544, run
-   `35350369509`). `t5-compile-word` is the 85th. The 200 is short by 115 and
-   every one of them is a scale problem rather than a design one.
+   measured locally as **117/117 valid over 2057 checker runs**, with no
+   problems and one warning per task — the missing calibration measurement, which
+   is the warning `--strict` would promote (the last CI run over a whole bank was
+   at 83, `83/83` over 1544, run `35350369509`). The 114 tasks at tiers 1–4 are
+   short of the 200 by 86, and 20 of the 117 are the tier-2 family §3.9 records:
+   the count and the number of distinct problems are not the same number, and
+   only one of the two is what a curriculum buys.
 
    The CI job is `uv run python -m tools.validate`, deliberately without
    `--strict`. Every task in the bank carries the same warning — calibration
@@ -673,18 +728,21 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 85, of which two are tier 4 and two are tier
-   5.** None of the five tiers is empty, so what is left here is volume: the
+1. **500+ tasks including tier 5. 117, of which two are tier 4 and three are
+   tier 5.** None of the five tiers is empty, so what is left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
-   the check that keeps it honest (a manifest entry must resolve to a directory
-   inside the same commit) exists and has already caught its own failure once.
-   Tier 5 was the one part of this item that was not a waiting room, and it is
-   now written twice over — `t5-run-effect` and `t5-compile-word`, both authored
-   from SPEC §10's description because the vendored tree has no tier-5 reference
-   to port. The remaining 415 are volume, and the interesting question the first
-   two between them answered — what makes a program-level law sound when the
-   functions in it are the policy's own — is the one §3.9 now records, in the
-   two opposite answers it took.
+   the same shape of work has since produced 32 more (a 31-task batch from two
+   authoring agents and the third tier-5 task), so the remaining 383 are volume
+   and nothing else. The check that keeps it honest (a manifest entry must
+   resolve to a directory inside the same commit) exists and has already caught
+   its own failure once. Tier 5 was the one part of this item that was not a
+   waiting room, and it is now written three times over — `t5-run-effect`,
+   `t5-compile-word` and `t5-opt-drop`, all authored from SPEC §10's description
+   because the vendored tree has no tier-5 reference to port. The question the
+   first two between them answered — what makes a program-level law sound when
+   the functions in it are the policy's own — is the one §3.9 now records, in
+   the two opposite answers it took, and the third was written by asking which
+   of the two a law about a *transformation* is.
 2. **Human-reviewed laws for tier ≥ 3. Not satisfied, and the bank says it
    is** -- see below.
 3. **Published throughput benchmark. Blocked on a quiet machine, not on the

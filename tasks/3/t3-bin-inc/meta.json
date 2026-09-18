@@ -1,0 +1,19 @@
+{
+  "task_id": "t3-bin-inc",
+  "tier": 3,
+  "laws": [
+    "inc_bin_nil",
+    "inc_bin_zero",
+    "to_nat_inc"
+  ],
+  "policy_targets": [
+    "inc_bin"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ff411128bae52194e48d63bc8a11ba1efdb2ae4df7bb98a0aada133197ce76fa",
+    "prelude": "b3cceb8815f69eb8580f5ae76aa5a8627e1e91c7826268093233619f4e5b96ef"
+  },
+  "bend_version": "2.0.5"
+}

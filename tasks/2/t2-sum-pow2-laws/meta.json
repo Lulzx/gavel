@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-sum-pow2-laws",
+  "tier": 2,
+  "laws": [
+    "sum_pow2_nil",
+    "sum_pow2_snoc"
+  ],
+  "policy_targets": [
+    "sum_pow2"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "4224d8ebfc45f9fd29f738549ce26f6a136e98cd1bc3453f515c3860afcb6dc8",
+    "prelude": "e973783ebaff5c81c46da9187ef11c01e35f4a2057f905fa979cbff12424f1e1"
+  },
+  "bend_version": "2.0.5"
+}

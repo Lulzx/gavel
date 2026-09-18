@@ -1,0 +1,18 @@
+{
+  "task_id": "t2-cube-all-laws",
+  "tier": 2,
+  "laws": [
+    "cube_all_single",
+    "cube_all_append"
+  ],
+  "policy_targets": [
+    "cube_all"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "25ac855e7fadad9ec853c81e3e0b39f7a374e331e2846b445a64346e73e42a53",
+    "prelude": "01146176d024cc6af4d33813d944a8e6ec2dcaa90ee632d2be5d3be19a2eb63e"
+  },
+  "bend_version": "2.0.5"
+}
