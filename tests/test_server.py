@@ -23,6 +23,10 @@ pytestmark = pytest.mark.checker
 
 TASK = "t1-add-succ"
 
+# Enough threads that the counter is contended, few enough that the assertion
+# on it is readable.
+WORKERS = 8
+
 
 @pytest.fixture
 def server(manifest, toolchain):
@@ -146,6 +150,85 @@ def test_closing_a_session_twice_is_not_an_error(server):
     assert ask(server, op="close", session=session)["ok"]
     assert ask(server, op="close", session=session)["ok"]
     assert session not in server.sessions
+
+
+def test_a_session_is_stepped_by_one_thread_at_a_time(server, task):
+    """The transport is threaded and a client may open two connections on one
+    session id, so a step has to be atomic.
+
+    Testing this by its *symptom* does not work, which is worth recording.
+    ``turn += 1`` is four bytecodes and CPython does not switch between them,
+    so the obvious assertion -- eight threads step, the counter reads eight --
+    holds whether or not the lock is there. What the lock actually buys is
+    that two steps are never inside the env at once, so that is what is
+    measured: a step takes a checker subprocess, and two threads released
+    from a barrier are inside that window together unless something stops
+    them.
+    """
+    session_id = ask(server, op="reset", task_id=TASK)["session"]
+    session = server.sessions[session_id]
+    # Not solved, so the episode runs its turns out rather than ending on the
+    # first one -- every thread has to reach the env to be counted.
+    submission = {SOLUTION_FILE: task.reference_solution,
+                  PROOF_FILE: task.proof_header}
+    session.env.max_turns = WORKERS
+    watched = _Watched(session.env)
+    session.env = watched
+    watchers = threading.Barrier(WORKERS)
+
+    def step() -> None:
+        watchers.wait()
+        ask(server, op="step", session=session_id, files=submission)
+
+    threads = [threading.Thread(target=step) for _ in range(WORKERS)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    assert not watched.overlapped
+    assert watched.entered == WORKERS
+    assert server.metrics.turns == WORKERS
+
+
+class _Watched:
+    """An env that notices if two threads are ever inside :meth:`step`."""
+
+    def __init__(self, env) -> None:
+        self._env = env
+        self._count = threading.Lock()
+        self.inside = 0
+        self.entered = 0
+        self.overlapped = False
+
+    def __getattr__(self, name):
+        return getattr(self._env, name)
+
+    def step(self, action):
+        with self._count:
+            self.inside += 1
+            self.entered += 1
+            self.overlapped |= self.inside > 1
+        try:
+            return self._env.step(action)
+        finally:
+            with self._count:
+                self.inside -= 1
+
+
+def test_resetting_an_id_the_client_already_holds_keeps_the_old_episode(server,
+                                                                        task):
+    """A second reset on the same id starts a new episode, and the turns the
+    first one spent are data -- so the old env is closed, which logs an open
+    episode, rather than dropped."""
+    submission = {SOLUTION_FILE: task.reference_solution,
+                  PROOF_FILE: task.proof_header}
+    ask(server, op="reset", task_id=TASK, session="mine")
+    ask(server, op="step", session="mine", files=submission)
+    assert server.metrics.episodes == 0            # still open: one turn left
+    ask(server, op="reset", task_id=TASK, session="mine")
+    assert server.metrics.episodes == 1            # the abandoned one was logged
+    assert ask(server, op="step", session="mine", files=submission)["ok"]
 
 
 def test_a_solved_episode_lands_in_the_servers_one_report(server, task):

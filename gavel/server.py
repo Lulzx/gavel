@@ -54,10 +54,19 @@ class ServerError(RuntimeError):
 
 @dataclass
 class Session:
-    """One policy's episode. Holds the env, and the id it answers to."""
+    """One policy's episode. Holds the env, and the id it answers to.
+
+    The lock is per session, not per server, because the shared things --
+    the cache, the log, the report -- already guard themselves, and what is
+    not shared is the env. A step mutates the turn counter, the turn list, and
+    the running best, so two connections carrying the same session id would
+    race on all three; the transport is threaded and nothing stops a client
+    from opening two.
+    """
 
     session_id: str
     env: GavelEnv
+    lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
 
 @dataclass
@@ -132,7 +141,8 @@ class GavelServer:
         if task_id is not None and not isinstance(task_id, str):
             return _error("invalid", "task_id must be a string or null")
         session = self.new_session(request.get("session"))
-        observation = session.env.reset(task_id)
+        with session.lock:
+            observation = session.env.reset(task_id)
         return {"ok": True, "op": "reset", "session": session.session_id,
                 "observation": observation}
 
@@ -144,7 +154,9 @@ class GavelServer:
                 for k, v in files.items()):
             return _error("invalid",
                           "files must be an object of string -> string")
-        observation, reward, done, verdict = session.env.step(Action(files=files))
+        with session.lock:
+            observation, reward, done, verdict = session.env.step(
+                Action(files=files))
         return {"ok": True, "op": "step", "session": session.session_id,
                 "observation": observation, "reward": reward, "done": done,
                 "info": verdict.to_json()}
@@ -156,7 +168,10 @@ class GavelServer:
         with self._lock:
             session = self.sessions.pop(session_id, None)
         if session is not None:
-            session.env.close()
+            # Under the session's own lock, so a close cannot land in the
+            # middle of the step it is closing on top of.
+            with session.lock:
+                session.env.close()
         return {"ok": True, "op": "close", "session": session_id}
 
     # --- sessions --------------------------------------------------------------
@@ -173,7 +188,15 @@ class GavelServer:
         env.metrics = self.metrics
         session = Session(session_id=identifier, env=env)
         with self._lock:
+            previous = self.sessions.get(identifier)
             self.sessions[identifier] = session
+        if previous is not None:
+            # A client that resets an id it already holds is starting a new
+            # episode. The turns it already spent are still data, so the old
+            # env is closed -- which logs an open episode -- rather than
+            # dropped on the floor.
+            with previous.lock:
+                previous.env.close()
         return session
 
     def session(self, session_id: Any) -> Session:
@@ -195,7 +218,8 @@ class GavelServer:
             sessions, self.sessions = list(self.sessions.values()), {}
             self._closed = True
         for session in sessions:
-            session.env.close()
+            with session.lock:
+                session.env.close()
         if self.trajectory is not None:
             self.trajectory.close()
         if self.cache is not None:
