@@ -16,14 +16,18 @@ them -- Bend's terse errors are the signal a policy learns to repair from.
 from __future__ import annotations
 
 import random
+import time
 from dataclasses import InitVar, dataclass, field, replace
 from pathlib import Path
 from typing import Any, Callable, Iterator
 
+from .cache import VerdictCache
 from .check import CheckConfig, check_submission
+from .metrics import Metrics
 from .reward import dense_delta
 from .tasks import (SUBMITTED_FILES, Manifest, Task, TaskError, load_manifest)
 from .toolchain import DEFAULT_VERSION, Toolchain
+from .trajectory import EpisodeRecord, Trajectory, TurnRecord
 from .verdict import TIER_COMPLETE, Verdict
 
 DEFAULT_MAX_TURNS = 4
@@ -65,6 +69,17 @@ class GavelEnv:
     config: CheckConfig = field(default_factory=CheckConfig)
     seed: int | None = None
 
+    cache: VerdictCache | None = None
+    """A memo shared across envs and episodes. Not owned: :meth:`close` leaves it
+    open, because its whole point is to outlive one episode."""
+
+    trajectory: Trajectory | None = None
+    """Where episodes are logged. Owned: :meth:`close` closes it."""
+
+    store_actions: bool = False
+    """Write the submitted source into the log as well as its hash. Off by
+    default; see ``gavel.trajectory`` for why."""
+
     backend: InitVar[str | None] = None
     """PLAN §3.7 spells the constructor with this. It is written into ``config``
     rather than stored beside it, so the isolation in force has one home."""
@@ -73,7 +88,13 @@ class GavelEnv:
     turn: int = field(default=0, init=False)
     best: float = field(default=0.0, init=False)
     history: list[Verdict] = field(default_factory=list, init=False)
+    metrics: Metrics = field(default_factory=Metrics, init=False)
+    episodes: int = field(default=0, init=False)
     _rng: random.Random = field(default=None, init=False, repr=False)
+    _turns: list[TurnRecord] = field(default_factory=list, init=False, repr=False)
+    _open: bool = field(default=False, init=False, repr=False)
+    _began: float = field(default=0.0, init=False, repr=False)
+    _earned: float = field(default=0.0, init=False, repr=False)
 
     def __post_init__(self, backend: str | None) -> None:
         if self.mode not in ("dense", "sparse"):
@@ -94,10 +115,19 @@ class GavelEnv:
 
     def reset(self, task_id: str | None = None) -> dict[str, Any]:
         """Begin an episode. ``task_id`` of None samples."""
+        if self._open:
+            # A policy that resets mid-episode is not an error, and the turns it
+            # did spend are still data: log them as an episode that ended
+            # unsolved rather than dropping them on the floor.
+            self._end_episode()
         self.task = self._pick(task_id)
         self.turn = 0
         self.best = 0.0
         self.history = []
+        self._earned = 0.0
+        self._turns = []
+        self._began = time.monotonic()
+        self._open = True
         return self._observation(feedback=None)
 
     def step(self, action: Action) -> tuple[dict[str, Any], float, bool, Verdict]:
@@ -109,24 +139,55 @@ class GavelEnv:
 
         self.turn += 1
         verdict = check_submission(self.task, self.toolchain, action.files,
-                                   self.config)
+                                   self.config, cache=self.cache)
         self.history.append(verdict)
 
         reward = self._reward(verdict)
         done = verdict.solved or self.turn >= self.max_turns
         self.best = max(self.best, verdict.reward)
+        self._earned += reward
+        self._turns.append(TurnRecord(turn=self.turn, reward=reward, done=done,
+                                      verdict=verdict,
+                                      files=dict(action.files)
+                                      if self.store_actions else None))
+        if done:
+            self._end_episode()
 
         observation = self._observation(
             feedback=None if done else self._feedback(verdict))
         return observation, reward, done, verdict
 
     def close(self) -> None:
-        """No persistent resources yet: every check cleans up its own workdir.
+        """End any open episode, then release what this env owns.
 
-        Kept because the API is Gym-shaped and the M3 worker pool will need it.
+        The cache is deliberately left open -- it is shared, and closing it here
+        would break a caller running several envs against one memo. The
+        trajectory is this env's log, so it is closed.
         """
+        if self._open:
+            self._end_episode()
+        if self.trajectory is not None:
+            self.trajectory.close()
         self.task = None
         self.history = []
+
+    def _end_episode(self) -> None:
+        assert self.task is not None
+        record = EpisodeRecord(
+            episode=self.episodes, task_id=self.task.task_id,
+            tier=self.task.tier, mode=self.mode, seed=self.seed,
+            turns=self._turns,
+            ms=int((time.monotonic() - self._began) * 1000),
+            # A reward means nothing without the bank and the checker that
+            # produced it, and neither is recoverable from the log later.
+            bank_hash=self.manifest.hash,
+            bend_version=self.toolchain.version)
+        self.episodes += 1
+        self.metrics.add(record)
+        if self.trajectory is not None:
+            self.trajectory.write(record)
+        self._open = False
+        self._turns = []
 
     # --- reward ---------------------------------------------------------------
 

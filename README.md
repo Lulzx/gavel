@@ -29,7 +29,8 @@ Two consequences of how the checker is built shape everything else:
 ## Layout
 
 ```
-gavel/          the harness — gate, runner, check protocol, reward, environment
+gavel/          the harness — gate, runner, check protocol, reward, environment,
+                verdict cache, episode log, metrics
 toolchain/      the vendored, pinned Bend checker (see toolchain/fetch.py)
 tasks/<tier>/   task definitions: prompt, LAWS.bend, prelude.bend, stub
 references/     hidden reference solutions, proofs, and mutants
@@ -62,6 +63,30 @@ uv run python -m tools.calibrate --dry-run
 uv run python -m tools.sandbox_check      # prove the sandbox runs a real check
 uv run python -m tools.migrate --from ~/.bend/app/2.0.4/rRKuW7 --label 2.0.4
 ```
+
+## Running episodes
+
+```python
+from gavel.cache import VerdictCache
+from gavel.env import Action, GavelEnv
+from gavel.trajectory import Trajectory
+
+env = GavelEnv.from_manifest("manifest.json", mode="dense", max_turns=4,
+                             cache=VerdictCache("cache.sqlite"),
+                             trajectory=Trajectory("runs/trajectory.jsonl"))
+obs = env.reset("t1-add-succ")
+obs, reward, done, info = env.step(Action(files={"solution.bend": ..., "PROOF.bend": ...}))
+env.close()          # ends any open episode, flushes the log
+env.metrics.write("runs/metrics.json")
+```
+
+`info` is the full `Verdict`. The cache is keyed on everything a verdict is a
+function of — the task's bytes, the mutant corpus, the toolchain, the backend,
+the limits, and the submission — so a hit is the verdict a fresh run would have
+produced, and `verdict.cached` says it was reused. The log is one JSON object
+per episode; a half-written final line is skipped rather than fatal. Metrics
+are derived from the same records the log holds, so a run watched live and the
+same run read back afterwards cannot disagree.
 
 ## Isolation
 

@@ -157,6 +157,21 @@ class Manifest:
     def toolchain_hash(self) -> str:
         return self.bank.get("toolchain_hash", "")
 
+    @property
+    def hash(self) -> str:
+        """The bank's identity: its version, and every task's hash by id.
+
+        Not a hash of ``manifest.json``, which carries fields -- timestamps,
+        calibration numbers -- that change without changing what a task *is*.
+        This is the pair a trajectory has to record for its rewards to mean
+        anything later: which tasks, and which checker.
+        """
+        return sha256_text(json.dumps(
+            [self.bank.get("version"), self.bend_version, self.toolchain_hash]
+            + [[task.task_id, task.hash] for task in sorted(
+                self.tasks.values(), key=lambda t: t.task_id)],
+            sort_keys=True))
+
     def __iter__(self) -> Iterator[Task]:
         return iter(self.tasks.values())
 

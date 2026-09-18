@@ -22,7 +22,7 @@ from gavel.runner import (PLAIN, SUCCESS_LINE, UNSAFE_MARK, BackendError,
 from gavel.tasks import (PROOF_FILE, SOLUTION_FILE, cleanup, prepare_workdir)
 from gavel.toolchain import TOOLCHAIN_DIR, Toolchain, ToolchainError
 from gavel.verdict import (TIER_CHECKS, TIER_COMPLETE, TIER_NO_CHECK,
-                           TIER_PARTIAL, TIER_REJECTED)
+                           TIER_PARTIAL, TIER_REJECTED, Verdict)
 
 pytestmark = pytest.mark.checker
 
@@ -285,6 +285,30 @@ def test_a_verdict_round_trips_through_json(toolchain, task, submission):
     assert blob["task_id"] == task.task_id
     assert blob["tier"] == TIER_COMPLETE
     assert blob["laws_proven"] == list(task.laws)
+
+
+def test_a_verdict_survives_json_and_back_unchanged(toolchain, task, submission):
+    """Not just the shape: the same object, field for field.
+
+    The cache stores verdicts as JSON and hands them back in place of a run, so
+    a field that ``to_json`` forgets is a field the cached verdict quietly
+    loses -- and the reward is computed from what comes back, not from what
+    went in.
+    """
+    verdict = check_submission(task, toolchain, reference_files(task, submission))
+    restored = Verdict.from_json(json.loads(json.dumps(verdict.to_json())))
+    assert restored == verdict
+
+
+def test_a_rejected_submission_round_trips_too(toolchain, task):
+    """The gate path, where there are no checks to carry the reward."""
+    verdict = check_submission(task, toolchain, {
+        SOLUTION_FILE: "import Base\n@unsafe\ndef add(a: Nat, b: Nat) -> Nat:\n  add(a, b)\n",
+        PROOF_FILE: task.proof_header})
+    assert verdict.gate is not None and not verdict.gate.ok
+    restored = Verdict.from_json(json.loads(json.dumps(verdict.to_json())))
+    assert restored == verdict
+    assert restored.gate.findings
 
 
 # --- partial credit ------------------------------------------------------------

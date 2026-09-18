@@ -73,6 +73,8 @@ Added while implementing M0, each with a test in `tests/`:
 | `bend PROOF.bend` once per turn (§7.3) | Full run first; on failure, a solution-only run and then per-law isolation runs to a fixed point | Fact 8 |
 | Pin by "version and installer commit" (§14) | Pin by sha256 of the vendored `bend2/` tree + bun version; recorded in `manifest.json` and every verdict | Fact 10 |
 | Container per version (§9) | Linux: bubblewrap/nsjail profile around `bun`; macOS dev: subprocess with scrubbed env, `BEND_HUB=http://127.0.0.1:9`, rlimits, timeout | Bend is a bun script, not a binary; a full image is M1, not M0 |
+| Trajectory is one line **per turn** (§13.1) | One line **per episode**, with the turns nested | M3.2. The per-turn fields that do not vary within a run — `run_id`, `bank_hash`, `bend_version` — move to the episode level instead of being repeated; every per-turn field of §13.1 is still present, nested under `turns`. A line per turn also means concurrent envs interleave turns from different episodes in one file, and the reader has to regroup them to compute anything. |
+| Cache key is `(toolchain_hash, task_hash, submission_hash)` (§2) | Also `bend_version`, `bun_version`, `backend`, `limits`, the **mutant corpus**, and a schema version | M3.2. Each of those moves the verdict. The two easy ones: a verdict produced under the plain backend cannot be served as a sandboxed one, and a task's mutants live in `references/` rather than in the task's own files, so regenerating the corpus changes the answer (SPEC §7.4.2) without changing any hash the task carries. |
 
 ## 2. Repository layout
 
@@ -333,8 +335,20 @@ looks.
 
 ### M3 — API
 
-1. Multi-turn env with dense/sparse modes; feedback truncation.
-2. `cache.py` (sqlite), `trajectory.py` JSONL, `metrics.py` export.
+1. Multi-turn env with dense/sparse modes; feedback truncation. **Done** — M0
+   item 8 built it; `tests/test_env.py` covers the dense/sparse distinction,
+   the improvement-only payment, the feedback path, and the episode bounds.
+2. `cache.py` (sqlite), `trajectory.py` JSONL, `metrics.py` export. **Done.**
+   The cache is a memo over everything a verdict is a function of (see the
+   deviation above); a hit is marked `cached: true` and keeps the original
+   `ms`, so nothing downstream mistakes a lookup for a check. The trajectory is
+   append-only JSONL, flushed per line, and a reader skips a half-written final
+   line rather than failing — the reason for the format is that a killed soak
+   should still be worth reading. Metrics are derived from the same records the
+   log holds, asserted equal by test, so a finished run and a watched run
+   cannot disagree. `GavelEnv.close()` ends any open episode (an abandoned
+   episode is data) and closes the trajectory; it deliberately leaves the cache
+   open, because a memo shared across envs must outlive any one of them.
 3. `server.py` JSON-lines over Unix socket + HTTP; client example in a non-Python stack.
 4. Persistent bun worker backend; publish p50/p95/p99 and verdicts/min/core.
 5. 10k-episode unattended soak with a scripted policy.

@@ -43,6 +43,11 @@ class GateFinding:
         return {"code": self.code, "message": self.message,
                 "file": self.file, "line": self.line}
 
+    @classmethod
+    def from_json(cls, blob: dict[str, Any]) -> "GateFinding":
+        return cls(code=blob["code"], message=blob["message"],
+                   file=blob.get("file", ""), line=blob.get("line", 0))
+
 
 @dataclass(frozen=True)
 class GateResult:
@@ -55,7 +60,15 @@ class GateResult:
         return tuple(f.code for f in self.findings)
 
     def to_json(self) -> dict[str, Any]:
-        return {"passed": self.ok, "findings": [f.to_json() for f in self.findings]}
+        return {"passed": self.ok, "findings": [f.to_json() for f in self.findings],
+                "hashes": [list(h) for h in self.hashes]}
+
+    @classmethod
+    def from_json(cls, blob: dict[str, Any]) -> "GateResult":
+        return cls(ok=blob["passed"],
+                   findings=tuple(GateFinding.from_json(f)
+                                  for f in blob.get("findings", [])),
+                   hashes=tuple(tuple(h) for h in blob.get("hashes", [])))
 
 
 @dataclass(frozen=True)
@@ -122,11 +135,33 @@ class CheckResult:
             "kind": self.failure_kind,
             "ms": self.ms,
             "backend": self.backend,
+            "success_line": self.success_line,
+            "unsafe_warning": self.unsafe_warning,
+            "timed_out": self.timed_out,
             "todo_count": self.todo_count,
             "location": self.error_location,
+            "error_block": self.error_block,
             "stderr": self.stderr[:4096],
             "stdout": self.stdout[:4096],
         }
+
+    @classmethod
+    def from_json(cls, blob: dict[str, Any]) -> "CheckResult":
+        """The inverse of :meth:`to_json`, for the verdict cache.
+
+        Every field the reward and the feedback depend on is in the JSON, so a
+        cached result is the same object a fresh run would have produced --
+        including the checker's own words, which are what the policy is shown
+        on the next turn.
+        """
+        return cls(
+            ok=blob["ok"], exit_code=blob.get("exit"), ms=blob.get("ms", 0),
+            success_line=blob.get("success_line", False),
+            unsafe_warning=blob.get("unsafe_warning", False),
+            todo_count=blob.get("todo_count"), timed_out=blob.get("timed_out", False),
+            error_block=blob.get("error_block"), error_location=blob.get("location"),
+            stdout=blob.get("stdout", ""), stderr=blob.get("stderr", ""),
+            backend=blob.get("backend", "plain"))
 
 
 @dataclass(frozen=True)
@@ -147,6 +182,14 @@ class Verdict:
     difficulty_weight: float = 1.0
     ms: int = 0
     incident: str | None = None
+    cached: bool = False
+    """True when this verdict was served from the cache rather than recomputed.
+
+    Kept because a cache hit is still the *right* verdict but is not evidence
+    about this machine: ``ms`` is the original run's, and the process that
+    produced it may not exist any more. Anything measuring latency or claiming
+    a fresh proof must filter on this.
+    """
 
     @property
     def solved(self) -> bool:
@@ -179,4 +222,21 @@ class Verdict:
             "submission_hash": self.submission_hash,
             "ms": self.ms,
             "incident": self.incident,
+            "cached": self.cached,
         }
+
+    @classmethod
+    def from_json(cls, blob: dict[str, Any]) -> "Verdict":
+        return cls(
+            task_id=blob["task_id"], tier=blob["tier"], reward=blob["reward"],
+            n_laws=blob["n_laws"], proven=tuple(blob.get("laws_proven", ())),
+            failed=tuple(blob.get("laws_failed", ())),
+            gate=(GateResult.from_json(blob["gate"])
+                  if blob.get("gate") is not None else None),
+            checks=tuple(CheckResult.from_json(c) for c in blob.get("checks", ())),
+            toolchain_hash=blob.get("toolchain_hash", ""),
+            task_hash=blob.get("task_hash", ""),
+            submission_hash=blob.get("submission_hash", ""),
+            difficulty_weight=blob.get("difficulty_weight", 1.0),
+            ms=blob.get("ms", 0), incident=blob.get("incident"),
+            cached=blob.get("cached", False))

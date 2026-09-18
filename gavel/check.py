@@ -20,6 +20,7 @@ from pathlib import Path
 
 from . import reward as reward_mod
 from . import runner
+from .cache import VerdictCache, verdict_key
 from .gate import check as gate_check
 from .gate import law_definitions
 from .laws import alias_map, parse_imports, split_top_level
@@ -66,13 +67,33 @@ class _Runs:
 
 
 def check_submission(task: Task, toolchain: Toolchain, files: dict[str, str],
-                     config: CheckConfig = CheckConfig()) -> Verdict:
-    """Check one submission against one task and return the reward."""
+                     config: CheckConfig = CheckConfig(),
+                     cache: VerdictCache | None = None) -> Verdict:
+    """Check one submission against one task and return the reward.
+
+    ``cache`` is opt-in and passed here rather than configured on
+    ``CheckConfig``: a config is a frozen value that callers compare and
+    serialise, and a live database handle is neither. A miss stores the verdict
+    it just computed, so the cache fills from ordinary use.
+    """
     began = time.monotonic()
+    key = None
+    if cache is not None:
+        key = verdict_key(task, toolchain, files,
+                          select_backend(config.backend), config.limits)
+        hit = cache.get(key)
+        if hit is not None:
+            return replace(hit, cached=True)
+
+    def keep(verdict: Verdict) -> Verdict:
+        if cache is not None and key is not None:
+            cache.put(key, verdict)
+        return verdict
+
     gate = gate_check(task, files)
     if not gate.ok:
-        return _finish(task, toolchain, files, gate, (),
-                       solution_checks=False, proven=(), began=began)
+        return keep(_finish(task, toolchain, files, gate, (),
+                            solution_checks=False, proven=(), began=began))
 
     workdir = prepare_workdir(task, files, parent=config.workdir_parent)
     backend = select_backend(config.backend)
@@ -87,8 +108,8 @@ def check_submission(task: Task, toolchain: Toolchain, files: dict[str, str],
                       solution_checks=solution_checks, proven=proven, began=began)
     incident = _mutant_incident(task, files, verdict.tier)
     if incident is not None:
-        return replace(verdict, reward=0.0, incident=incident)
-    return verdict
+        verdict = replace(verdict, reward=0.0, incident=incident)
+    return keep(verdict)
 
 
 def _mutant_incident(task: Task, files: dict[str, str], tier: int) -> str | None:
