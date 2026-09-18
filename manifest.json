@@ -712,6 +712,13 @@
       "hash": "a2e7946d7a227307e6c3dc137b91c0a115543e712d75508b7c305ecacb94faa1"
     },
     {
+      "task_id": "t3-neg-all-dual",
+      "tier": 3,
+      "path": "tasks/3/t3-neg-all-dual",
+      "reference": "references/t3-neg-all-dual",
+      "hash": "c4eddb0e862406d414cd234cfee4619a975e282682e0a5666d8969cc9684ff8d"
+    },
+    {
       "task_id": "t3-pad",
       "tier": 3,
       "path": "tasks/3/t3-pad",

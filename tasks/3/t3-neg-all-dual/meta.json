@@ -1,0 +1,21 @@
+{
+  "task_id": "t3-neg-all-dual",
+  "tier": 3,
+  "laws": [
+    "neg_all_nil",
+    "neg_all_cons",
+    "neg_all_involutive",
+    "neg_all_all",
+    "neg_all_any"
+  ],
+  "policy_targets": [
+    "neg_all"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3e7ddac67513835cfed0d12c9a952d83955b749bf9b9682f03cf2fe4f76218eb",
+    "prelude": "05e46adb53339547a99209973536e5a970f60ff20c895b3e9e8a5e19468a886f"
+  },
+  "bend_version": "2.0.5"
+}
