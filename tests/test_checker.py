@@ -112,7 +112,7 @@ def test_only_the_first_type_error_is_reported(toolchain, task, submission, run_
     assert result.stderr.count("Error:") == 1
 
 
-def test_the_wall_clock_kills_a_checker_that_never_returns(toolchain, task, tmp_path):
+def test_the_wall_clock_kills_a_checker_that_never_returns(toolchain, task):
     """The timeout, tested against a checker that provably does not return.
 
     Driving this with a real Bend file would mean depending on whichever input
@@ -120,14 +120,20 @@ def test_the_wall_clock_kills_a_checker_that_never_returns(toolchain, task, tmp_
     moment that input stopped hanging. A stand-in that sleeps tests the
     mechanism itself: the wait, the kill, and the group signal.
     """
-    slow = tmp_path / "bun"
-    # An absolute path: the runner scrubs PATH down to the bun directory, so a
-    # bare `sleep` really does not resolve. (It failed that way first.)
-    slow.write_text("#!/bin/sh\nexec /bin/sleep 60\n")
-    slow.chmod(0o755)
     workdir = prepare_workdir(task, {
         SOLUTION_FILE: "import Base\n", PROOF_FILE: task.proof_header})
     try:
+        # Inside the workdir rather than in ``tmp_path``. The sandbox binds the
+        # workdir back over a read-only root and mounts a fresh tmpfs on /tmp,
+        # so a stand-in that lives anywhere else is simply not there -- and the
+        # failure is "No such file or directory", which looks like a broken
+        # fixture rather than an untested timeout. Found on the Linux runner,
+        # where this was the only one of 78 checker tests to fail.
+        slow = workdir / "bun"
+        # An absolute path: the runner scrubs PATH down to the bun directory, so
+        # a bare `sleep` really does not resolve. (It failed that way first.)
+        slow.write_text("#!/bin/sh\nexec /bin/sleep 60\n")
+        slow.chmod(0o755)
         result = run_check(replace(toolchain, bun=slow), workdir, PROOF_FILE,
                            Limits(wall_ms=800))
     finally:
