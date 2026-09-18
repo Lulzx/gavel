@@ -333,9 +333,10 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf` |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 84 registered tasks, 20 are tier 1, 46
-are tier 2, 15 are tier 3, 2 are tier 4 and 1 is tier 5. The 200 of M4 is still
-short by construction; tier 5 is no longer missing for that reason.
+**The bank's ceiling is tier 5.** Of the 85 registered tasks, 20 are tier 1, 46
+are tier 2, 15 are tier 3, 2 are tier 4 and 2 are tier 5. No tier is empty, so
+what M2's 200 and M4's 500 are short of is volume rather than a design nobody
+has done yet.
 
 Tier 4 is the first tier whose *law* is about a predicate the task declares
 rather than about a function it defines. `t4-stack-wf` states it in the
@@ -347,7 +348,7 @@ that the input was ordered), plus `insert_count` to pin the key that goes in.
 Both are minimal on purpose: the law is the invariant, and the side condition is
 what makes it a conditional rather than a claim the checker should reject.
 
-None of the three carries a review record. Tier 4 is gated on one in M4, and
+None of the four carries a review record. Tier 4 is gated on one in M4, and
 not writing one is the point of Fact 27: the field is not evidence, so leaving
 it absent is the only honest state until review happens somewhere the pipeline
 cannot write.
@@ -370,6 +371,24 @@ answer is written down rather than related to the other function. The lesson is
 general and is why the tier table now has a second row worth reading: a
 program-level law between two functions the policy writes is vacuous unless
 something else in the file pins each function alone.
+
+`t5-compile-word` is the second tier-5 task, and it is the other half of that
+lesson. A source language of words (`P.Empty{}`, `P.Sym{n}`, `P.Cat{a, b}`) is
+compiled to a one-instruction machine, and the law is
+`exec(compile(e), w) == glue(w, eval(e))`. What makes it different from
+`t5-run-effect` is that `eval` — the specification — is in the *prelude*, so it
+is a definition the policy cannot edit and does not write. The compiler is then
+judged against a fixed meaning rather than against a second function the policy
+also wrote, which is why this task needs no definitional pin for `compile` at
+all: a compiler that emitted a stray instruction for the empty expression, or
+that emitted a concatenation's two halves in the wrong order, is caught by the
+theorem, because `eval` reads them in order. The pins are on `exec` instead
+(`exec_nil`, `exec_emit`, `exec_splice`), and they are complete for the same
+reason the machine is: every program is a splice of one-instruction programs.
+The pair of tasks is the point — the first earns its laws by pinning what the
+policy writes, the second by anchoring it to something the policy cannot
+write — and a third should be built by asking which of the two a new
+program-level law is.
 
 ## 4. Milestones and work packages
 
@@ -450,13 +469,13 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 84 tasks (20 tier 1, 46 tier 2, 15 tier 3, 2 tier 4, 1 tier 5),
+   progress** — 85 tasks (20 tier 1, 46 tier 2, 15 tier 3, 2 tier 4, 2 tier 5),
    validated together rather than per task, because a task is sound only against
-   a corpus that shares the degenerate generator with it. The last CI run over a
-   whole bank was at 83 tasks: **83/83 valid over 1544 checker runs** (run
-   `35350369509`). `t5-run-effect` is the 84th and was validated locally
-   (`1/1 valid ... 20 checker runs`); CI re-measures on push. The 200 is short by
-   116 and every one of them is a scale problem rather than a design one.
+   a corpus that shares the degenerate generator with it. The whole bank was
+   measured locally at 84 tasks: **84/84 valid over 1564 checker runs** (the
+   last CI run over a whole bank was at 83, `83/83` over 1544, run
+   `35350369509`). `t5-compile-word` is the 85th. The 200 is short by 115 and
+   every one of them is a scale problem rather than a design one.
 
    The CI job is `uv run python -m tools.validate`, deliberately without
    `--strict`. Every task in the bank carries the same warning — calibration
@@ -654,17 +673,18 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 84, of which two are tier 4 and one is tier
+1. **500+ tasks including tier 5. 85, of which two are tier 4 and two are tier
    5.** None of the five tiers is empty, so what is left here is volume: the
-   pipeline that produced 83 tasks produced the 84th as well, and the check that
-   keeps it honest (a manifest entry must resolve to a directory inside the same
-   commit) exists and has already caught its own failure once. The tier-5 task
-   was the one part of this item that was not a waiting room, and it is now
-   written: `t5-run-effect`, authored from SPEC §10's description because the
-   vendored tree has no tier-5 reference to port. The remaining 416 are volume,
-   and the interesting question the first one answered — whether a program-level
-   law between two policy-written functions can be sound at all — is the one
-   §3.9 now records.
+   pipeline that produced 83 tasks produced the 84th and the 85th as well, and
+   the check that keeps it honest (a manifest entry must resolve to a directory
+   inside the same commit) exists and has already caught its own failure once.
+   Tier 5 was the one part of this item that was not a waiting room, and it is
+   now written twice over — `t5-run-effect` and `t5-compile-word`, both authored
+   from SPEC §10's description because the vendored tree has no tier-5 reference
+   to port. The remaining 415 are volume, and the interesting question the first
+   two between them answered — what makes a program-level law sound when the
+   functions in it are the policy's own — is the one §3.9 now records, in the
+   two opposite answers it took.
 2. **Human-reviewed laws for tier ≥ 3. Not satisfied, and the bank says it
    is** -- see below.
 3. **Published throughput benchmark. Blocked on a quiet machine, not on the

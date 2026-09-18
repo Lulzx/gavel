@@ -1,0 +1,21 @@
+{
+  "task_id": "t5-compile-word",
+  "tier": 5,
+  "laws": [
+    "exec_nil",
+    "exec_emit",
+    "exec_splice",
+    "exec_compile"
+  ],
+  "policy_targets": [
+    "compile",
+    "exec"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3ecf0b19809cc0e936b12e23c32fa05399d837a072990ca014436d6c1754811e",
+    "prelude": "e2762938b5003dbe60b5eb9d2cfec0f8ffc8edbbd92fcfeb256bdb65bbb8096c"
+  },
+  "bend_version": "2.0.5"
+}

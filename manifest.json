@@ -586,6 +586,13 @@
       "hash": "3374547a5361cfeeaaec0497e49c7c2c14911ae12fcf45ea3d3700a997e35114"
     },
     {
+      "task_id": "t5-compile-word",
+      "tier": 5,
+      "path": "tasks/5/t5-compile-word",
+      "reference": "references/t5-compile-word",
+      "hash": "9d7859e7a4c9983837de72ff09976987844c9f2e6fc017d90ae50c2a00dc43f0"
+    },
+    {
       "task_id": "t5-run-effect",
       "tier": 5,
       "path": "tasks/5/t5-run-effect",
