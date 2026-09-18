@@ -441,6 +441,24 @@ three tier-4 tasks before it each gave up something to get — the queue by
 consuming its premise in the proof, this one by declining to state the case the
 law already covers.
 
+A fifth tier-4 task is in flight and it is worth recording how it was almost two.
+The shape is a predicate transport between structures: a `Tree` fold and a list
+fold over the same traversal, with the tree's bound predicate moved onto the list
+the traversal produces, and the accumulator threaded identically on both sides so
+the step is convertible without Boolean algebra. Both authoring agents proposed
+it the same day, independently, each having checked that `inorder` was free at
+HEAD and each having found it free — because neither had registered it, and the
+prototypes lived in `/tmp`, which the other cannot see. tier3-author's scratch
+version even reused `t4-bst-insert`'s own `ordered`, `all_le` and `all_ge`
+verbatim, so the two were the same task twice rather than two tasks. Ruled one:
+tier2-author owns it, because their version carries an order-sensitive law that
+is not a definitional unfolding (`inorder_head`, measured with a negative
+control) whereas the other version's only order sensitivity was its shape pins,
+which its own author predicted would be the eleventh instance of the finding
+above. The lesson is not about this task — it is that the distinctness check has
+to run against *unregistered* work too, and a scratch prototype is invisible to
+a grep of the manifest, so two agents can pass the same check and still collide.
+
 None of the four tier-4 tasks carries a review record. Tier 4 is gated on one in M4, and
 not writing one is the point of Fact 27: the field is not evidence, so leaving
 it absent is the only honest state until review happens somewhere the pipeline
