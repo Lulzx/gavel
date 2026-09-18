@@ -13,6 +13,14 @@
       "valid": true
     },
     {
+      "task_id": "t1-append-nil",
+      "tier": 1,
+      "path": "tasks/1/t1-append-nil",
+      "reference": "references/t1-append-nil",
+      "hash": "538e975f1a080a8b36e2ef226cd2c7f054fa480365fc9000be6fe862a706c1b3",
+      "valid": true
+    },
+    {
       "task_id": "t2-add-laws",
       "tier": 2,
       "path": "tasks/2/t2-add-laws",

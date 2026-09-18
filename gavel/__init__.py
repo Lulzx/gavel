@@ -6,6 +6,7 @@ machinery behind those two.
 """
 
 from .check import CheckConfig, check_submission
+from .env import Action, EnvError, GavelEnv, tier_sampler, uniform_sampler
 from .tasks import Manifest, Task, load_manifest
 from .toolchain import Toolchain, ToolchainError
 from .verdict import (TIER_CHECKS, TIER_COMPLETE, TIER_NO_CHECK, TIER_PARTIAL,
@@ -15,8 +16,9 @@ from .verdict import (TIER_CHECKS, TIER_COMPLETE, TIER_NO_CHECK, TIER_PARTIAL,
 __version__ = "0.1.0"
 
 __all__ = [
-    "CheckConfig", "CheckResult", "GateFinding", "GateResult", "Manifest",
-    "TIER_CHECKS", "TIER_COMPLETE", "TIER_NO_CHECK", "TIER_PARTIAL",
-    "TIER_REJECTED", "Task", "Toolchain", "ToolchainError", "Verdict",
-    "check_submission", "load_manifest",
+    "Action", "CheckConfig", "CheckResult", "EnvError", "GateFinding",
+    "GateResult", "GavelEnv", "Manifest", "TIER_CHECKS", "TIER_COMPLETE",
+    "TIER_NO_CHECK", "TIER_PARTIAL", "TIER_REJECTED", "Task", "Toolchain",
+    "ToolchainError", "Verdict", "check_submission", "load_manifest",
+    "tier_sampler", "uniform_sampler",
 ]

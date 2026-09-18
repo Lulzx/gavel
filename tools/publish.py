@@ -89,11 +89,15 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("paths", nargs="*", help="task directories")
     parser.add_argument("--version", default=DEFAULT_VERSION)
+    parser.add_argument("--manifest", default=str(MANIFEST),
+                        help="where to write the bank; task paths are stored "
+                             "relative to this file, so keep it in the repo root")
     args = parser.parse_args(argv)
+    manifest = Path(args.manifest).resolve()
 
     if args.paths:
         roots = [Path(p).resolve() for p in args.paths]
-        existing = json.loads(MANIFEST.read_text()) if MANIFEST.is_file() else {"tasks": []}
+        existing = json.loads(manifest.read_text()) if manifest.is_file() else {"tasks": []}
     else:
         roots = sorted(p.parent for p in (REPO_ROOT / "tasks").glob("*/*/LAWS.bend"))
         existing = {"tasks": []}
@@ -113,8 +117,8 @@ def main(argv: list[str] | None = None) -> int:
         "bun_version": toolchain.bun_version,
         "tasks": sorted(entries.values(), key=lambda e: (e["tier"], e["task_id"])),
     }
-    MANIFEST.write_text(json.dumps(bank, indent=2) + "\n")
-    print(f"manifest: {len(bank['tasks'])} tasks -> {MANIFEST}")
+    manifest.write_text(json.dumps(bank, indent=2) + "\n")
+    print(f"manifest: {len(bank['tasks'])} tasks -> {manifest}")
     return 0
 
 
