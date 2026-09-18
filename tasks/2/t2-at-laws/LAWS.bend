@@ -20,3 +20,13 @@ law at_len_append:
   for xs: List<Nat>
   for y: Nat
   {S.at(P.append(xs, y <> Nil{}), P.len(xs)) == y : Nat}
+
+# LAW: nothing is at any position of the empty list. Neither law above lands on
+# that case -- `at_succ`'s left side is a cons cell, and `at_len_append`'s is
+# `append(xs, ·)`, which is never `Nil{}` -- so without this one the empty case
+# is unconstrained and a body answering `1n` there proves every law in the set.
+# The law is definitional and is here for coverage, not for arithmetic: it is
+# the case the induction at `xs` in `at_len_append` starts from.
+law at_nil:
+  for n: Nat
+  {S.at(Nil{}, n) == 0n : Nat}

@@ -18,3 +18,12 @@ def L.count_odd_prefix_len(xs):
     case h <> t:
       %L.count_odd_prefix_len(t) : {P.is_odd(h) + S.count_odd_prefix(P.len(t), t) == P.is_odd(h) + _ : Nat}
       {==}
+
+# Definitional in both cases of the count: at zero the count case answers `0n`,
+# and at a successor the inner match on the empty list answers `0n` too.
+def L.count_odd_prefix_nil(k):
+  match k:
+    case 0n:
+      {==}
+    case 1n+kp:
+      {==}

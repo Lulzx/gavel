@@ -19,3 +19,13 @@ law count_odd_prefix_zero:
 law count_odd_prefix_len:
   for xs: List<Nat>
   {S.count_odd_prefix(P.len(xs), xs) == P.count_odd(xs) : Nat}
+
+# LAW: an exhausted count holds no odd numbers, whatever the count. The two laws
+# above reach the inner `Nil{}` case only through `count_odd_prefix(len(xs), xs)`
+# and `len(xs) >= 1` forces the list non-empty there, so without this one the
+# inner empty case is unconstrained and a body answering `1n` in it proves every
+# law in the set. Like the base law this one is definitional in both cases of the
+# count; it is here for coverage of the case no other law reaches.
+law count_odd_prefix_nil:
+  for k: Nat
+  {S.count_odd_prefix(k, Nil{}) == 0n : Nat}

@@ -17,3 +17,8 @@ def L.at_len_append(xs, y):
     case h <> t:
       %L.at_len_append(t, y) : {S.at(P.append(t, y <> Nil{}), P.len(t)) == _ : Nat}
       {==}
+
+# Definitional: the match on the empty list answers `0n` without looking at the
+# count, so both sides are `0n` for every `n`.
+def L.at_nil(n):
+  {==}
