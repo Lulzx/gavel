@@ -1,0 +1,19 @@
+{
+  "task_id": "t4-inorder-transport",
+  "tier": 4,
+  "laws": [
+    "inorder_node",
+    "inorder_transport",
+    "inorder_size"
+  ],
+  "policy_targets": [
+    "inorder"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "1ffd019802ac62cf845e23a9871450fc68910742342c2e36d02ed892ada431f2",
+    "prelude": "fafa2756ebb7c1b2df625becfce4ea5e8db9fe406bebbbdb65fe180b88f1ccf8"
+  },
+  "bend_version": "2.0.5"
+}

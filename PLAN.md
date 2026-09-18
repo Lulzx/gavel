@@ -496,7 +496,14 @@ the competing version was worth rejecting: Option A (`inorder` alone, either
 law set) can only ever put the weight on an unfolding. tier3-author authors the
 task, not because of the ruling but because they hold the green six-law proof and
 the proof is the expensive artifact; tier2-author's staged version is parked under
-`_abandoned/`, and their finding is what forced the better design.
+`_abandoned/t4-inorder-transport-tier2/`, and their finding is what forced the
+better design. The park happened on 2026-09-18 rather than at staging time, and
+the delay was a live hazard worth naming: `tools.publish` walks `tasks/` and
+describes whatever it finds, so with the staged dir sitting at `tasks/4/` a
+publish by anyone would have registered a third tier-4 `inorder` task into a
+124-task manifest — and re-publishing was exactly what the soundness repair below
+required. The parked copy keeps both the task dir and the reference dir, so the
+prototype is intact and re-derivable; nothing is deleted.
 
 None of the four tier-4 tasks carries a review record. Tier 4 is gated on one in M4, and
 not writing one is the point of Fact 27: the field is not evidence, so leaving
