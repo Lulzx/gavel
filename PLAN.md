@@ -765,12 +765,17 @@ and the resulting verdicts say `dev_only: true`.
    have been defensible; doing both is the choice because neither the evidence
    nor the count is worth having alone.
 
-   The 92 is the census as measured, not a running total, and the first batch
-   against it landed the same day (`5187735`): six of the 66 tier-2 tasks —
-   `t2-add-laws`, the three `all-*` tasks, `t2-at-laws` and
-   `t2-count-prefix-laws` — now carry four authored mutants each, all strong
-   (6/6 valid, problems empty). The ratio is what moved; the finding stands
-   until the count reaches zero.
+   The 92 is the census as measured, not a running total, and the work against
+   it landed the same day. Tier 2: batches one and two (`5187735`, `060ad97`)
+   author four mutants each into twelve of the 66 — `t2-add-laws`, the three
+   `all-*` tasks, `t2-at-laws`, `t2-count-prefix-laws`, `t2-elem-laws`,
+   `t2-has-mult5-laws`, `t2-has-one-laws`, `t2-dec2-all-laws`, `t2-drop-laws`,
+   `t2-init-laws` — all strong, 12/12 valid with no problems. Tier 3: the
+   background backlog starts at `26aca27`, five authored mutants each into
+   `t3-absdiff-comm`, `t3-merge-len` and `t3-rle-expand`, which brings the
+   tier-3 count from 8 of 18 to 11 of 18 and clears the floor `t3-absdiff-comm`
+   was one file short of. The ratios are what moved; the finding stands until
+   the counts reach zero.
 
    The related finding from `t3-zip-len` is worse and was caught before it
    shipped. A corpus is not the only thing that can be thin. Its original two
