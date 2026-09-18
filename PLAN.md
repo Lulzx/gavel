@@ -414,6 +414,21 @@ and the resulting verdicts say `dev_only: true`.
    `reference_ms` against a wall-clock budget, so validating concurrently
    inflates the very quantity being checked: a loaded box can fail a task that
    is fine, and it would fail it with a confident number beside it.
+
+   **A manifest is a claim about a revision, and two writers make it a claim
+   about two.** `eafd7c5` committed a 62-entry manifest with only two of the
+   three task directories behind its new entries: `t3-sum-acc` had been
+   registered by the authoring agent while I was adding the other two, so the
+   manifest was ahead of the commit and `load_manifest` failed on every
+   checkout — 189 errors and a red sandbox job. Nothing was wrong with the
+   bank; the commit simply named a task it did not contain. The check that
+   catches it takes a second and is worth stating plainly: **every manifest
+   entry must resolve to a directory inside the same commit**, which is a
+   property of the commit and not of the working tree, and so cannot be seen
+   from the tree that produced it. This is the second cost of a file two people
+   write; the first was the review records in Fact 27, and the fix for both is
+   the same — one writer, or a check that runs against the revision rather than
+   the tree.
 3. `tools/migrate.py` and a dry run against 2.0.4 to measure churn. **Done, and the answer is not the expected one** — see below.
 
 **M2.3 churn, measured.** The plan assumed syntax drift across releases ("three
@@ -513,6 +528,14 @@ looks.
 ### M4 — Bank v1.0
 
 500+ tasks including tier 5, human-reviewed laws for tier ≥ 3, published throughput benchmark, external training run.
+
+**The review half of this is not satisfied and the bank currently says it is.**
+Eleven tier-3 tasks carry `"reviewed": {"by": "lulzx"}` written by the authoring
+agent through `--reviewer`, and no human has read them — Fact 27. The records
+are left in place rather than deleted so the defect stays visible, but they must
+not be counted as review, and the fix is not in the checker: either review is
+recorded somewhere the pipeline cannot write, or the laws are read and the
+records are made true. Until then this line stays in M4.
 
 ## 5. Risks
 
