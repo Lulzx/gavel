@@ -1,0 +1,20 @@
+{
+  "task_id": "t3-sum-acc",
+  "tier": 3,
+  "laws": [
+    "sum_acc_nil",
+    "sum_acc_cons",
+    "sum_acc_add",
+    "sum_acc_zero"
+  ],
+  "policy_targets": [
+    "sum_acc"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "9da61aa5377a04f38b16e034e6bcdb762ae364af58b4fc43fdbec1c34f1ad7a2",
+    "prelude": "f2e2336d85d1ba76de31546f5181727ab649f4a78ec29c11db5b1b9fb98746b1"
+  },
+  "bend_version": "2.0.5"
+}
