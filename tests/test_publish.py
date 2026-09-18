@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from tools.publish import publish_task
+from tools.publish import main, publish_task
 
 REPO = Path(__file__).resolve().parents[1]
 SOURCE_TASK = REPO / "tasks" / "1" / "t1-add-succ"
@@ -56,3 +56,32 @@ def test_a_quarantine_does_not_expire_when_the_task_is_edited(task_root):
                           previous={"hash": "a hash from before the edit",
                                     "quarantined": True})
     assert edited["quarantined"] is True
+
+
+def test_an_incomplete_task_stops_the_whole_run_before_it_writes(task_root,
+                                                                 tmp_path, capsys):
+    """Two agents share this tree, so a task caught mid-write is normal.
+
+    Publishing is read-then-write per task, so this used to rewrite the metadata
+    of every task before the incomplete one and then die on a raw
+    FileNotFoundError -- leaving a run that half happened, which is not a state
+    anyone can reason about afterwards. The cost of surviving that is one
+    existence check up front.
+    """
+    good = task_root
+    before = (good / "meta.json").stat().st_mtime_ns
+    broken = tmp_path / "tasks" / "2" / "t2-mid-write"
+    broken.mkdir(parents=True)
+    (broken / "prelude.bend").write_text("import Base\n")
+
+    manifest = tmp_path / "manifest.json"
+    assert main([str(good), str(broken), "--manifest", str(manifest)]) == 1
+
+    assert "t2-mid-write" in capsys.readouterr().err
+    assert not manifest.is_file()
+    # The good task was not touched either. It is listed first, so a per-task
+    # check would have rewritten its metadata before reaching the broken one.
+    # Compared by mtime rather than by content: ``publish_task`` writes the same
+    # keys in the same order, so a rewrite can be byte-identical and a content
+    # check would pass whether or not the guard exists.
+    assert (good / "meta.json").stat().st_mtime_ns == before

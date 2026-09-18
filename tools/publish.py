@@ -116,6 +116,24 @@ def main(argv: list[str] | None = None) -> int:
     roots = ([Path(p).resolve() for p in args.paths] if args.paths else
              sorted(p.parent for p in (REPO_ROOT / "tasks").glob("*/*/LAWS.bend")))
 
+    # Everything is checked before anything is written. Publishing is a
+    # read-then-write per task, so a task that is mid-write used to fail on the
+    # eighth of twenty with a FileNotFoundError, having already rewritten the
+    # metadata of the first seven. Two agents share this tree; the whole point
+    # of failing here is that "half of it happened" is not a state anyone can
+    # reason about afterwards.
+    unusable = [(root, [n for n in (LAWS_FILE, PRELUDE_FILE, SOLUTION_FILE)
+                        if not (root / n).is_file()]) for root in roots]
+    unusable = [(root, missing) for root, missing in unusable if missing]
+    if unusable:
+        for root, missing in unusable:
+            print(f"publish: {root} is missing {', '.join(missing)}",
+                  file=sys.stderr)
+        print(f"publish: nothing written -- {len(unusable)} of {len(roots)} "
+              f"task(s) are incomplete, and a task caught mid-write would be "
+              f"registered exactly as it stands", file=sys.stderr)
+        return 1
+
     entries = {e["task_id"]: e for e in existing.get("tasks", [])}
     if not args.paths:
         entries = {name: e for name, e in entries.items()
