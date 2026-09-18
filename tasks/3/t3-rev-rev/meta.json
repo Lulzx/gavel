@@ -1,0 +1,26 @@
+{
+  "task_id": "t3-rev-rev",
+  "tier": 3,
+  "laws": [
+    "rev_len",
+    "rev_append",
+    "rev_rev"
+  ],
+  "policy_targets": [
+    "rev"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "863b9f706e4275fdf0f3af9fa5ab3d25b0e4c78403b2da4d06c271f37ef9123f",
+    "prelude": "7bc1534c0ba975f51b09771036aeaf9b28f1a317493fd5f5243a6337a5292c80"
+  },
+  "bend_version": "2.0.5",
+  "reviewed": {
+    "by": "lulzx",
+    "hashes": {
+      "laws": "863b9f706e4275fdf0f3af9fa5ab3d25b0e4c78403b2da4d06c271f37ef9123f",
+      "prelude": "7bc1534c0ba975f51b09771036aeaf9b28f1a317493fd5f5243a6337a5292c80"
+    }
+  }
+}

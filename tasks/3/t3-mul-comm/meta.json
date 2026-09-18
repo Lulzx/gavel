@@ -1,0 +1,27 @@
+{
+  "task_id": "t3-mul-comm",
+  "tier": 3,
+  "laws": [
+    "mul_one_right",
+    "mul_zero_right",
+    "mul_succ_right",
+    "mul_comm"
+  ],
+  "policy_targets": [
+    "mul"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "831f45098a8526a8659efc0f12b743e269d268597694fe5a97ada063ae3663eb",
+    "prelude": "faf5ca7ec2050186cac59f9895a6186e5a49e05bbaa9b77132588dcf92d3246a"
+  },
+  "bend_version": "2.0.5",
+  "reviewed": {
+    "by": "lulzx",
+    "hashes": {
+      "laws": "831f45098a8526a8659efc0f12b743e269d268597694fe5a97ada063ae3663eb",
+      "prelude": "faf5ca7ec2050186cac59f9895a6186e5a49e05bbaa9b77132588dcf92d3246a"
+    }
+  }
+}

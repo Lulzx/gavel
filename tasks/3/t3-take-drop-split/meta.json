@@ -1,0 +1,27 @@
+{
+  "task_id": "t3-take-drop-split",
+  "tier": 3,
+  "laws": [
+    "take_drop",
+    "drop_drop",
+    "take_len"
+  ],
+  "policy_targets": [
+    "take",
+    "drop"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7e41f3647915bf5d3a5636d56b0c205e951eef8935e54e774a24a4dc6906ddf2",
+    "prelude": "9a3764b79faecb2b819fa7366ce301617796639aee82d381a3b5d131fd806b2b"
+  },
+  "bend_version": "2.0.5",
+  "reviewed": {
+    "by": "lulzx",
+    "hashes": {
+      "laws": "7e41f3647915bf5d3a5636d56b0c205e951eef8935e54e774a24a4dc6906ddf2",
+      "prelude": "9a3764b79faecb2b819fa7366ce301617796639aee82d381a3b5d131fd806b2b"
+    }
+  }
+}

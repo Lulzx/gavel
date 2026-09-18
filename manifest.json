@@ -334,6 +334,20 @@
       "hash": "bf43c8e9f79f0114c35889b2751dd563bafbcfa15203201a6406edc01eba83c7"
     },
     {
+      "task_id": "t3-concat-len",
+      "tier": 3,
+      "path": "tasks/3/t3-concat-len",
+      "reference": "references/t3-concat-len",
+      "hash": "78d39ba15fae80b373d45862179a324f61e280f1b42f3c95216e042fb6426b2d"
+    },
+    {
+      "task_id": "t3-count-append",
+      "tier": 3,
+      "path": "tasks/3/t3-count-append",
+      "reference": "references/t3-count-append",
+      "hash": "41479646a6135dee7171f6ef7142eed5aad4fb21f175b4f21383f8a18d7810fe"
+    },
+    {
       "task_id": "t3-filter-bound",
       "tier": 3,
       "path": "tasks/3/t3-filter-bound",
@@ -353,6 +367,55 @@
       "path": "tasks/3/t3-isort-sorted",
       "reference": "references/t3-isort-sorted",
       "hash": "de643030ffa0bdaf9bbcc0d668a13e1f98655fd216bdede9e53f35695979240a"
+    },
+    {
+      "task_id": "t3-mul-comm",
+      "tier": 3,
+      "path": "tasks/3/t3-mul-comm",
+      "reference": "references/t3-mul-comm",
+      "hash": "337504eafd9bbe143faf631fdf22d3a0d563480a084c7b0da8859f9530f61d55"
+    },
+    {
+      "task_id": "t3-pad",
+      "tier": 3,
+      "path": "tasks/3/t3-pad",
+      "reference": "references/t3-pad",
+      "hash": "447d292c35eb593d3d880cb3f072d4a4fa6e53daf35ea916b9872e1b2d7cb9a6"
+    },
+    {
+      "task_id": "t3-replicate-append",
+      "tier": 3,
+      "path": "tasks/3/t3-replicate-append",
+      "reference": "references/t3-replicate-append",
+      "hash": "0cf8525474516b1859640f648f47439b31cb34e4ab43109e8b866ce57b4a032f"
+    },
+    {
+      "task_id": "t3-rev-rev",
+      "tier": 3,
+      "path": "tasks/3/t3-rev-rev",
+      "reference": "references/t3-rev-rev",
+      "hash": "22704f38da3e2b6b8f6351f8536927afa465b1b9389cecfdb751aebe53cb6d59"
+    },
+    {
+      "task_id": "t3-sum-replicate",
+      "tier": 3,
+      "path": "tasks/3/t3-sum-replicate",
+      "reference": "references/t3-sum-replicate",
+      "hash": "07c57fd4b51d3e1daf06df7c7650c43a85627f5ec01700936d99d1d8dbd159fb"
+    },
+    {
+      "task_id": "t3-take-drop-split",
+      "tier": 3,
+      "path": "tasks/3/t3-take-drop-split",
+      "reference": "references/t3-take-drop-split",
+      "hash": "1ef82607ab37753fa65b3d8229d1e6cec673ff05aac1683129a28cc44b8fa4dc"
+    },
+    {
+      "task_id": "t3-zip-sum",
+      "tier": 3,
+      "path": "tasks/3/t3-zip-sum",
+      "reference": "references/t3-zip-sum",
+      "hash": "85384436474efa364ccc31872ecaa2d7e072d2b5e49a2b9a254b2c04dbeb6941"
     }
   ]
 }
