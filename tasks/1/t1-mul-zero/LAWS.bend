@@ -2,6 +2,18 @@ import Base
 import ./prelude.bend as P
 import ./solution.bend as S
 
+# LAW: `add` is Base's addition. The stub declares `add` and `mul` and the
+# prompt asks for both, but the three laws above are written against Base's `+`,
+# so they constrain `add` only where `mul` happens to call it -- and a `mul`
+# that writes its own step as `b + mul(p, b)` never calls it. Measured at tier
+# 4, reward 1.000, with `add(a, b) = 0n` and the rest of the reference `mul`.
+# Written the other way round, `x + y` is Base's addition and `S.add` is the
+# policy's, so this law is what makes the stub's first obligation an obligation.
+law add_plus:
+  for x: Nat
+  for y: Nat
+  {S.add(x, y) == x + y : Nat}
+
 # LAW: multiplying by zero on the right gives zero.
 law mul_zero:
   for x: Nat

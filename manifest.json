@@ -100,7 +100,7 @@
       "tier": 1,
       "path": "tasks/1/t1-mul-zero",
       "reference": "references/t1-mul-zero",
-      "hash": "866265776429c0460df6d1bea28a8c4c11a15a7a7aee6336eacc23702e2fedb5"
+      "hash": "dc85a4805f1046599d67d84d780bab0a799f9f774c544e3e4127d2fb92ff31d7"
     },
     {
       "task_id": "t1-pred-succ",

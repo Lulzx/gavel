@@ -13,6 +13,12 @@ def Policy.add_plus(x: Nat, y: Nat) -> {S.add(x, y) == x + y : Nat}:
       %Policy.add_plus(p, y) : {1n + S.add(p, y) == 1n + _ : Nat}
       {==}
 
+# The law is `Policy.add_plus`'s statement, so the proof is the lemma itself:
+# after citing it the goal is `x + y == x + y`.
+def L.add_plus(x, y):
+  %Policy.add_plus(x, y) : {S.add(x, y) == _ : Nat}
+  {==}
+
 # The induction is in `x`. The step reduces `mul(1n+p, 0n)` to `mul(p, 0n)`
 # because `add(0n, _)` is the identity, and the hypothesis then closes it.
 def L.mul_zero(x):
