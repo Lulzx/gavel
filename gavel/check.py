@@ -19,11 +19,12 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from . import reward as reward_mod
+from . import runner
 from .gate import check as gate_check
 from .gate import law_definitions
 from .laws import alias_map, parse_imports, split_top_level
 from .lexer import KIND_NAME, tokenize
-from .runner import DEFAULT_LIMITS, Limits, run_check
+from .runner import DEFAULT_LIMITS, Backend, Limits, run_check, select_backend
 from .tasks import (LAWS_FILE, PROOF_FILE, SOLUTION_FILE, Task, cleanup,
                     prepare_workdir, submission_hash)
 from .toolchain import Toolchain
@@ -43,6 +44,16 @@ class CheckConfig:
     """A runaway guard: a check that needs more runs than this is a bug."""
 
     workdir_parent: Path | None = None
+
+    backend: str = field(default_factory=runner.default_backend)
+    """``auto`` -- bubblewrap on Linux, a plain subprocess elsewhere.
+
+    A config carries the *name* rather than a resolved backend so that a task
+    that is never checked never pays for the lookup, and so that a config is
+    still a plain value that can be compared and serialised. The default comes
+    from ``GAVEL_BACKEND``, which is how a job that is not about isolation
+    opts out of it.
+    """
 
 
 @dataclass
@@ -64,10 +75,11 @@ def check_submission(task: Task, toolchain: Toolchain, files: dict[str, str],
                        solution_checks=False, proven=(), began=began)
 
     workdir = prepare_workdir(task, files, parent=config.workdir_parent)
+    backend = select_backend(config.backend)
     runs = _Runs()
     try:
         solution_checks, proven = _run_protocol(task, toolchain, files, workdir,
-                                                runs, config)
+                                                runs, config, backend)
     finally:
         if not config.keep_workdir:
             cleanup(workdir)
@@ -109,8 +121,8 @@ def _mutant_incident(task: Task, files: dict[str, str], tier: int) -> str | None
 
 
 def _run_protocol(task: Task, toolchain: Toolchain, files: dict[str, str],
-                  workdir: Path, runs: _Runs,
-                  config: CheckConfig) -> tuple[bool, tuple[str, ...]]:
+                  workdir: Path, runs: _Runs, config: CheckConfig,
+                  backend: Backend) -> tuple[bool, tuple[str, ...]]:
     """Returns ``(solution_checks, proven)``; the tier follows from those."""
     laws = list(task.laws)
     n_laws = len(laws)
@@ -118,7 +130,8 @@ def _run_protocol(task: Task, toolchain: Toolchain, files: dict[str, str],
     filled = law_definitions(proof_src, laws)
     filled_in_order = tuple(law for law in laws if law in filled)
 
-    full = runs.add(run_check(toolchain, workdir, PROOF_FILE, config.limits))
+    full = runs.add(run_check(toolchain, workdir, PROOF_FILE, config.limits,
+                              backend))
     if full.ok:
         return (True, tuple(laws))
 
@@ -129,28 +142,31 @@ def _run_protocol(task: Task, toolchain: Toolchain, files: dict[str, str],
     if full.todo_count is not None and full.todo_count == n_laws - len(filled_in_order):
         return (True, filled_in_order)
 
-    solution_checks = _solution_checks(task, toolchain, workdir, runs, config)
+    solution_checks = _solution_checks(task, toolchain, workdir, runs, config,
+                                       backend)
     if not solution_checks:
         return (False, ())
     if not config.attribute_partial or not filled_in_order:
         return (True, ())
 
     proven = _fixed_point(task, toolchain, workdir, proof_src, laws, filled,
-                          runs, config)
+                          runs, config, backend)
     return (True, proven)
 
 
 def _solution_checks(task: Task, toolchain: Toolchain, workdir: Path,
-                     runs: _Runs, config: CheckConfig) -> bool:
+                     runs: _Runs, config: CheckConfig, backend: Backend) -> bool:
     """Whether ``solution.bend`` is a well-typed program on its own."""
     if len(runs.results) >= config.max_runs:
         return False
-    return runs.add(run_check(toolchain, workdir, SOLUTION_FILE, config.limits)).ok
+    return runs.add(run_check(toolchain, workdir, SOLUTION_FILE, config.limits,
+                              backend)).ok
 
 
 def _fixed_point(task: Task, toolchain: Toolchain, workdir: Path,
                  proof_src: str, laws: list[str], filled: dict[str, object],
-                 runs: _Runs, config: CheckConfig) -> tuple[str, ...]:
+                 runs: _Runs, config: CheckConfig,
+                 backend: Backend) -> tuple[str, ...]:
     """Credit each law whose proof stands on its own, to a fixed point.
 
     A law is credited when an isolation run -- the header, the helpers it can
@@ -180,7 +196,7 @@ def _fixed_point(task: Task, toolchain: Toolchain, workdir: Path,
             body = _isolation_source(header, helpers, filled, selected, index)
             (workdir / ISOLATION_FILE).write_text(body)
             result = runs.add(run_check(toolchain, workdir, ISOLATION_FILE,
-                                        config.limits))
+                                        config.limits, backend))
             remaining = len(laws) - len(selected)
             if result.ok or (result.todo_count is not None
                              and result.todo_count == remaining):

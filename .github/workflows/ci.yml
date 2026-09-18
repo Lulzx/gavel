@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    name: harness (dev backend)
+    runs-on: ubuntu-latest
+    env:
+      # The runner image has no bubblewrap and this job is about the harness
+      # rather than the boundary, so isolation is opted out of once, here. The
+      # opt-out is not invisible: every verdict computed in this job carries
+      # `backend: plain` and `dev_only: true`.
+      GAVEL_BACKEND: plain
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Tests
+        run: uv run pytest -q
+
+      - name: The bank validates
+        run: uv run python -m tools.validate
+
+      - name: The bank is in sync with its tasks
+        run: |
+          uv run python -m tools.publish
+          git diff --exit-code -- manifest.json
+
+  sandbox:
+    name: adversarial corpus under bubblewrap
+    runs-on: ubuntu-latest
+    # Not yet verified on a Linux host: bubblewrap inside Docker needs a user
+    # namespace that the default seccomp profile does not grant, and whether
+    # the flags below are enough depends on the host kernel. Left non-blocking
+    # until a green run exists, then flip this to false -- a job that is
+    # allowed to fail is a job nobody reads.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: docker build -t gavel:ci .
+
+      - name: The sandbox runs a real check
+        run: |
+          docker run --rm \
+            --security-opt seccomp=unconfined \
+            gavel:ci uv run python -m tools.sandbox_check --backend bwrap
+
+      - name: The adversarial corpus under the sandbox
+        run: |
+          docker run --rm \
+            --security-opt seccomp=unconfined \
+            gavel:ci uv run pytest -q tests/test_adversarial.py tests/test_checker.py

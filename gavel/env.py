@@ -16,7 +16,7 @@ them -- Bend's terse errors are the signal a policy learns to repair from.
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass, field
+from dataclasses import InitVar, dataclass, field, replace
 from pathlib import Path
 from typing import Any, Callable, Iterator
 
@@ -65,17 +65,23 @@ class GavelEnv:
     config: CheckConfig = field(default_factory=CheckConfig)
     seed: int | None = None
 
+    backend: InitVar[str | None] = None
+    """PLAN §3.7 spells the constructor with this. It is written into ``config``
+    rather than stored beside it, so the isolation in force has one home."""
+
     task: Task | None = field(default=None, init=False)
     turn: int = field(default=0, init=False)
     best: float = field(default=0.0, init=False)
     history: list[Verdict] = field(default_factory=list, init=False)
     _rng: random.Random = field(default=None, init=False, repr=False)
 
-    def __post_init__(self) -> None:
+    def __post_init__(self, backend: str | None) -> None:
         if self.mode not in ("dense", "sparse"):
             raise EnvError(f"mode must be 'dense' or 'sparse', not {self.mode!r}")
         if self.max_turns < 1:
             raise EnvError("max_turns must be at least 1")
+        if backend is not None:
+            self.config = replace(self.config, backend=backend)
         self._rng = random.Random(self.seed)
 
     @classmethod

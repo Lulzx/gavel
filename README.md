@@ -35,6 +35,7 @@ tasks/<tier>/   task definitions: prompt, LAWS.bend, prelude.bend, stub
 references/     hidden reference solutions, proofs, and mutants
 tools/          offline authoring tools; none of these run in the reward path
 tests/          test suite, including the adversarial corpus
+Dockerfile      the Linux environment, with bubblewrap, for the sandboxed run
 ```
 
 ## Pinning
@@ -58,7 +59,24 @@ uv run gavel validate                     # V1-V5 over the whole bank
 uv run gavel bench -n 10                  # check latency distribution
 uv run python -m tools.mutate --check     # author mutants and see which are strong
 uv run python -m tools.calibrate --dry-run
+uv run python -m tools.sandbox_check      # prove the sandbox runs a real check
 ```
+
+## Isolation
+
+Every check is a subprocess with a scrubbed environment, rlimits and a wall
+clock. On Linux it is wrapped in bubblewrap: `--unshare-all`, the whole root
+bound read-only with the check's own directory bound back over it, no network.
+Every verdict names the backend it ran under and whether that backend is a
+security boundary, because a reward is only as trustworthy as the process that
+produced it.
+
+`auto` picks the strongest backend the machine can run, and **fails rather than
+downgrades** — a silent fallback would produce a verdict that looks sandboxed in
+every field except the one nobody reads. A job that is not about isolation
+(macOS development, a lint job) opts out once with `GAVEL_BACKEND=plain`, and
+the verdicts it produces carry `dev_only: true`. `Dockerfile` and the CI
+`sandbox` job run the adversarial corpus under the real thing.
 
 `tools/validate.py` and `tools/mutate.py` exit non-zero on failure, so they can gate a
 merge. `tools/calibrate.py --dry-run` prints a prompt without spending anything;

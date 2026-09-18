@@ -11,11 +11,14 @@ from __future__ import annotations
 import json
 import shutil
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
-from gavel.check import check_submission
-from gavel.runner import SUCCESS_LINE, UNSAFE_MARK, Limits, run_check, scrub_env
+from gavel.check import CheckConfig, check_submission
+from gavel.runner import (PLAIN, SUCCESS_LINE, UNSAFE_MARK, BackendError,
+                          BwrapBackend, Limits, run_check, scrub_env,
+                          select_backend)
 from gavel.tasks import (PROOF_FILE, SOLUTION_FILE, cleanup, prepare_workdir)
 from gavel.toolchain import TOOLCHAIN_DIR, Toolchain, ToolchainError
 from gavel.verdict import (TIER_CHECKS, TIER_COMPLETE, TIER_NO_CHECK,
@@ -143,6 +146,80 @@ def test_the_environment_is_scrubbed(toolchain, tmp_path):
     assert env["LC_ALL"] == "C"
     assert env["PATH"] == str(toolchain.bun.parent)
     assert env["BEND_HUB"] == "http://127.0.0.1:9"
+
+
+# --- the backend ---------------------------------------------------------------
+
+def test_every_verdict_names_the_isolation_it_ran_under(toolchain, task,
+                                                        submission):
+    """A reward is only as trustworthy as the process that produced it.
+
+    With the sandbox only in the caller's configuration, a verdict computed
+    unsandboxed is indistinguishable from one that was not -- and that is the
+    distinction a training run needs in its log. The backend is named
+    explicitly here so the assertion is about the plumbing rather than about
+    which platform the suite happens to be running on.
+    """
+    config = CheckConfig(backend="plain")
+    verdict = check_submission(task, toolchain, reference_files(task, submission),
+                               config)
+    assert verdict.checks
+    assert {check.backend for check in verdict.checks} == {"plain"}
+    assert verdict.checks[0].to_json()["backend"] == "plain"
+
+
+def test_the_plain_backend_is_marked_dev_only():
+    assert PLAIN.dev_only and PLAIN.name == "plain"
+    assert not BwrapBackend(bwrap=Path("/usr/bin/bwrap")).dev_only
+
+
+def test_the_sandbox_argv_binds_the_root_read_only_and_the_workdir_writable(
+        toolchain, tmp_path):
+    """The two binds are the whole boundary, and their order is the boundary.
+
+    Everything outside the check is read-only and the check's own directory is
+    bound back over it; several of these flags are load-bearing -- without
+    ``--unshare-all`` there is no network namespace, and the gate's hub-import
+    rule would be the only thing standing between a policy and the internet.
+    """
+    argv = BwrapBackend(bwrap=Path("/usr/bin/bwrap")).argv(
+        toolchain, tmp_path, "PROOF.bend")
+    assert argv[0] == "/usr/bin/bwrap"
+    assert "--unshare-all" in argv and "--die-with-parent" in argv
+    root = argv.index("--ro-bind")
+    assert argv[root + 1:root + 3] == ["/", "/"]
+    work = argv.index("--bind")
+    assert argv[work + 1:work + 3] == [str(tmp_path), str(tmp_path)]
+    assert work > root                      # the writable bind must win
+    assert argv[-3:] == [str(toolchain.bun), str(toolchain.main_ts), "PROOF.bend"]
+
+
+def test_asking_for_the_sandbox_without_it_is_an_error_not_a_downgrade(
+        monkeypatch):
+    """Silently falling back would be the worst outcome: the run would look
+    sandboxed in every field except the one nobody reads."""
+    monkeypatch.setattr("shutil.which", lambda _: None)
+    with pytest.raises(BackendError, match="bubblewrap"):
+        select_backend("bwrap")
+
+
+def test_an_unknown_backend_is_refused():
+    with pytest.raises(BackendError, match="unknown backend"):
+        select_backend("chroot")
+
+
+def test_a_job_can_opt_out_of_isolation_once(monkeypatch):
+    """``GAVEL_BACKEND`` is read when a config is built, not when a check runs.
+
+    So ``auto`` keeps its single meaning -- the strongest backend the machine
+    has -- and the opt-out is a decision made where it can be seen, rather than
+    a third branch hidden inside the resolver.
+    """
+    monkeypatch.delenv("GAVEL_BACKEND", raising=False)
+    assert CheckConfig().backend == "auto"
+    monkeypatch.setenv("GAVEL_BACKEND", "plain")
+    assert CheckConfig().backend == "plain"
+    assert CheckConfig(backend="auto").backend == "auto"
 
 
 # --- the protocol -------------------------------------------------------------

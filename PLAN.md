@@ -272,11 +272,30 @@ Exit: 20 tasks tiers 1–3, `gavel check` CLI, p50 < 1 s, zero-shot solve rate 1
 
 ### M1 — Gate
 
-1. Full tokenizer port with `base.bend` round-trip test.
-2. `gate.py` all rules; `tests/adversarial/` corpus (≥ 30 files).
-3. `tools/mutate.py`, `tools/degenerate.py`; V2/V3 wired into `validate.py`; all 20 tasks pass.
-4. Linux bubblewrap backend + Dockerfile that installs pinned bun and copies `toolchain/`; CI runs the adversarial corpus inside it.
-5. Mutant-consistency tripwire (§7.4.2) in `check.py`: compare submitted `solution.bend` hash against the task's mutant hashes; on match plus success, withhold reward and write an incident record.
+1. Full tokenizer port with `base.bend` round-trip test. **Done** (M1.1).
+2. `gate.py` all rules; `tests/adversarial/` corpus (≥ 30 files). **Done** — 42 payloads.
+3. `tools/mutate.py`, `tools/degenerate.py`; V2/V3 wired into `validate.py`; all 20 tasks pass. **Done.**
+4. Linux bubblewrap backend + Dockerfile that installs pinned bun and copies `toolchain/`; CI runs the adversarial corpus inside it. **Written, not yet run on a Linux host** — see below.
+5. Mutant-consistency tripwire (§7.4.2) in `check.py`. **Done** (M1.5). The tripwire compares whole files rather than hashes, because a policy is free to submit a different proof for the same solution; a digest match would have to be a digest of the solution alone, which is the same comparison with less to read in the log.
+
+**M1.4 status.** `runner.BwrapBackend` (`--unshare-all`, read-only root with the
+check's directory bound back over it, `--die-with-parent`), `select_backend`,
+the `backend` field on every `CheckResult`, `Dockerfile`, `.dockerignore`, CI,
+and `tools/sandbox_check.py` are all in place. What is missing is the run: this
+machine is macOS, so there is no bubblewrap and no way to execute the path
+here, and a unit test of the argv would pass on a host where bubblewrap cannot
+create a user namespace at all — which is the failure that matters, because it
+is silent. `tools/sandbox_check.py` closes that gap by requiring a *real* check
+to reach tier 4 under the sandbox rather than by asserting on flags, and the CI
+`sandbox` job runs it plus the adversarial corpus in the container. That job is
+`continue-on-error: true` until a green run exists; flip it to blocking then.
+
+Fail-closed is the design decision worth naming: `select_backend("bwrap")`
+raises when bubblewrap is absent, and `auto` raises on Linux rather than
+downgrading. A silent fallback would produce a verdict that looks sandboxed in
+every field except the one nobody reads. A job that is genuinely not about
+isolation opts out once, at configuration time, with `GAVEL_BACKEND=plain` —
+and the resulting verdicts say `dev_only: true`.
 
 ### M2 — Bank v0.5
 

@@ -103,7 +103,8 @@ def cmd_check(args) -> int:
         files[SOLUTION_FILE] = task.reference_solution
         files[PROOF_FILE] = task.reference_proof
 
-    verdict = check_submission(task, toolchain, files, CheckConfig())
+    verdict = check_submission(task, toolchain, files,
+                               CheckConfig(backend=args.backend))
     _print_verdict(verdict, args.json)
     return 0 if verdict.tier > 0 else 1
 
@@ -217,6 +218,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_check.add_argument("--reference", action="store_true",
                          help="use the task's hidden reference")
     p_check.add_argument("--json", action="store_true")
+    p_check.add_argument("--backend", default="auto",
+                         choices=("auto", "plain", "bwrap"),
+                         help="process isolation; auto picks bwrap on Linux")
     p_check.set_defaults(func=cmd_check)
 
     p_val = sub.add_parser("validate", help="check a task's validity invariants")

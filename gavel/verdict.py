@@ -80,6 +80,13 @@ class CheckResult:
     error_location: str | None = None
     stdout: str = ""
     stderr: str = ""
+    backend: str = "plain"
+    """Which isolation the check ran under: ``plain`` or ``bwrap``.
+
+    A verdict does not say how much it can be trusted unless it says whether the
+    process was sandboxed, so the name travels with the result rather than
+    living in the caller's configuration.
+    """
 
     @property
     def failure_kind(self) -> str:
@@ -114,6 +121,7 @@ class CheckResult:
             "ok": self.ok,
             "kind": self.failure_kind,
             "ms": self.ms,
+            "backend": self.backend,
             "todo_count": self.todo_count,
             "location": self.error_location,
             "stderr": self.stderr[:4096],

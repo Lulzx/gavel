@@ -1,0 +1,11 @@
+# A host virtualenv is built for the host, and copying it in shadows the one
+# uv sync creates inside the image.
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.git/
+
+# Scratch manifests from a validation run: the image is built from the
+# published bank, and a stale subset manifest would validate a stale subset.
+manifest.*.json

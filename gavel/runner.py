@@ -8,14 +8,18 @@ the part that carries the reward, so it is deliberately literal -- see
 
 from __future__ import annotations
 
+import functools
 import os
 import re
 import resource
+import shutil
 import signal
 import subprocess
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Protocol
 
 from .toolchain import Toolchain
 from .verdict import CheckResult
@@ -80,13 +84,145 @@ def scrub_env(workdir: Path, bun: Path) -> dict[str, str]:
     }
 
 
+class BackendError(RuntimeError):
+    """The isolation that was asked for is not available here."""
+
+
+class Backend(Protocol):
+    """How the checker process is isolated.
+
+    The environment produced by :func:`scrub_env` and the rlimits applied by
+    :func:`_limit` are the same under every backend; what varies is whether
+    anything *else* can reach the process.
+    """
+
+    name: str
+    dev_only: bool
+    """True when the backend is not a security boundary and must not be used to
+    judge a policy that is trying to get out."""
+
+    def argv(self, toolchain: Toolchain, workdir: Path, target: str) -> list[str]:
+        """The full command line, including the isolation wrapper."""
+
+
+@dataclass(frozen=True)
+class PlainBackend:
+    """A subprocess with a scrubbed environment, rlimits and a wall clock.
+
+    This is what a laptop gets. It stops the checker from reading the network
+    and the rest of the filesystem by convention only -- a submission that
+    escapes the type system can still read the disk -- so it is marked dev-only
+    and the verdict it produces says so.
+    """
+
+    name = "plain"
+    dev_only = True
+
+    def argv(self, toolchain: Toolchain, workdir: Path, target: str) -> list[str]:
+        return toolchain.argv(target)
+
+
+@dataclass(frozen=True)
+class BwrapBackend:
+    """bubblewrap: namespaces, a read-only root, and no network.
+
+    The whole filesystem is bound read-only and the working directory is bound
+    back over it writable, so the checker can read its toolchain but cannot
+    touch anything outside the check. ``--unshare-all`` includes the network
+    namespace, which is what makes ``BEND_HUB`` belt-and-braces rather than the
+    only thing standing between a hub import and the internet.
+    """
+
+    bwrap: Path
+
+    name = "bwrap"
+    dev_only = False
+
+    def argv(self, toolchain: Toolchain, workdir: Path, target: str) -> list[str]:
+        workdir = Path(workdir)
+        return [
+            str(self.bwrap),
+            "--unshare-all",
+            "--die-with-parent",
+            "--new-session",
+            # Read-only everywhere, then the one directory the check owns. The
+            # order matters: the later bind wins.
+            "--ro-bind", "/", "/",
+            "--proc", "/proc",
+            "--dev", "/dev",
+            "--tmpfs", "/tmp",
+            "--bind", str(workdir), str(workdir),
+            "--chdir", str(workdir),
+            "--",
+            str(toolchain.bun), str(toolchain.main_ts), target,
+        ]
+
+    @classmethod
+    def resolve(cls, bwrap: str | Path | None = None) -> "BwrapBackend":
+        found = str(bwrap) if bwrap is not None else (shutil.which("bwrap") or "")
+        if not found:
+            raise BackendError(
+                "bubblewrap is not installed, so the Linux sandbox is "
+                "unavailable. Install it (apt install bubblewrap), or ask for "
+                "the dev-only backend explicitly with backend='plain'.")
+        path = Path(found)
+        if not path.is_file():
+            raise BackendError(f"bwrap not found at {path}")
+        return cls(bwrap=path)
+
+
+PLAIN = PlainBackend()
+
+
+@functools.lru_cache(maxsize=4)
+def _autodetect() -> Backend:
+    """The strongest backend this machine can actually run.
+
+    A missing sandbox is a fact about the machine, not a reason to silently
+    weaken a reward signal: on Linux, bubblewrap is installed or the caller is
+    told. Off Linux there is nothing to detect, and ``plain`` says so in its
+    own name.
+    """
+    if sys.platform.startswith("linux"):
+        return BwrapBackend.resolve()
+    return PLAIN
+
+
+BACKEND_ENV = "GAVEL_BACKEND"
+
+
+def default_backend() -> str:
+    """The backend a config gets when it is not told.
+
+    The environment variable exists so that a job which is *about* something
+    other than isolation -- a lint job, a laptop with no bubblewrap -- can say
+    so once, at configuration time. It is read here rather than inside
+    :func:`select_backend` so that ``auto`` keeps meaning "the strongest this
+    machine has", with no hidden third answer.
+    """
+    return os.environ.get(BACKEND_ENV) or "auto"
+
+
+def select_backend(name: str | None = "auto") -> Backend:
+    """``auto`` picks the sandbox; ``plain`` and ``bwrap`` insist."""
+    if name is None or name == "auto":
+        return _autodetect()
+    if name == "plain":
+        return PLAIN
+    if name == "bwrap":
+        return BwrapBackend.resolve()
+    raise BackendError(f"unknown backend {name!r}: expected auto, plain or bwrap")
+
+
 def run_check(toolchain: Toolchain, workdir: Path, target: str,
-              limits: Limits = DEFAULT_LIMITS) -> CheckResult:
+              limits: Limits = DEFAULT_LIMITS,
+              backend: Backend | None = None) -> CheckResult:
     """Check ``target`` (a name inside ``workdir``) with the pinned checker."""
     workdir = Path(workdir)
+    backend = backend if backend is not None else select_backend()
     stdout_path = workdir / ".gavel.stdout"
     stderr_path = workdir / ".gavel.stderr"
-    argv = toolchain.argv(target)
+    argv = backend.argv(toolchain, workdir, target)
     began = time.monotonic()
 
     with open(stdout_path, "wb") as out, open(stderr_path, "wb") as err:
@@ -100,7 +236,8 @@ def run_check(toolchain: Toolchain, workdir: Path, target: str,
         except OSError as exc:
             return CheckResult(ok=False, exit_code=None,
                                ms=int((time.monotonic() - began) * 1000),
-                               stderr=f"could not start the checker: {exc}")
+                               stderr=f"could not start the checker: {exc}",
+                               backend=backend.name)
 
         timed_out = False
         try:
@@ -134,6 +271,7 @@ def run_check(toolchain: Toolchain, workdir: Path, target: str,
         error_location=location.group(1) if location else None,
         stdout=stdout,
         stderr=stderr,
+        backend=backend.name,
     )
 
 
