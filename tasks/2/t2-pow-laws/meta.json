@@ -17,12 +17,13 @@
   ],
   "laws": [
     "pow_zero",
-    "pow_one"
+    "pow_one",
+    "pow_succ"
   ],
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "79e7c97f4a6fd6a8e9c23002164629a241b88eeee0ab744bda0c47e884fdaed5",
+    "laws": "4dafd764e15d5f624056a3d2ca879cc8c7987653e029cbe8050afeab1a722ced",
     "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
   },
   "bend_version": "2.0.5"

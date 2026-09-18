@@ -51,7 +51,7 @@
       "tier": 1,
       "path": "tasks/1/t1-even-flip",
       "reference": "references/t1-even-flip",
-      "hash": "d2173d8e9a0eaec78f6f09dbd3949a52a6af7700b2b938518bf0a39ab6e9ad8e"
+      "hash": "3665a7feada16adbe99215bccda163dc938369c4ed3d7043540951f8b4dc2c23"
     },
     {
       "task_id": "t1-len-append",
@@ -100,14 +100,14 @@
       "tier": 1,
       "path": "tasks/1/t1-mul-zero",
       "reference": "references/t1-mul-zero",
-      "hash": "4dae78e028621dc4541fb59bb058b5cabf83c3f52590240af94863c36052e3fd"
+      "hash": "866265776429c0460df6d1bea28a8c4c11a15a7a7aee6336eacc23702e2fedb5"
     },
     {
       "task_id": "t1-pred-succ",
       "tier": 1,
       "path": "tasks/1/t1-pred-succ",
       "reference": "references/t1-pred-succ",
-      "hash": "1b753653b30e71c6042cbd83c4cc3eedfcd34766a6d5ab23e2057bbf2e74381f"
+      "hash": "077c427aa1de743f4a0d53d7bd1b76842950bd79e59e2cfefdc54ff8fef11eb5"
     },
     {
       "task_id": "t1-rev-append",
@@ -128,7 +128,7 @@
       "tier": 1,
       "path": "tasks/1/t1-sub-cancel",
       "reference": "references/t1-sub-cancel",
-      "hash": "5022416197e045018a60a99ecf42dca2051f7fe2a72f76d1b2b14cd3f345ddd2"
+      "hash": "b55402e6574fc8fb920e418309947c1f4e3fe717aa604c3a4e843d8ad7c3f71a"
     },
     {
       "task_id": "t1-sum-append",
@@ -590,7 +590,7 @@
       "tier": 2,
       "path": "tasks/2/t2-take-laws",
       "reference": "references/t2-take-laws",
-      "hash": "fca11cd2488841098c5d60be26812862d42d8a33ff7eb27e12b5401a57ef7756"
+      "hash": "a50fa8d1bf49ebcf06f18a12170cca937080dfc0c54b890b97b6b85999b44daa"
     },
     {
       "task_id": "t2-triple-all-laws",
@@ -604,7 +604,7 @@
       "tier": 2,
       "path": "tasks/2/t2-zeros-prefix-laws",
       "reference": "references/t2-zeros-prefix-laws",
-      "hash": "bf43c8e9f79f0114c35889b2751dd563bafbcfa15203201a6406edc01eba83c7"
+      "hash": "7eee45c0a5087018ab1048b7dc4e0c3c886f65f17a433882014467199e0bceea"
     },
     {
       "task_id": "t3-absdiff-comm",
@@ -821,7 +821,7 @@
       "tier": 3,
       "path": "tasks/3/t3-zip-sum",
       "reference": "references/t3-zip-sum",
-      "hash": "85384436474efa364ccc31872ecaa2d7e072d2b5e49a2b9a254b2c04dbeb6941"
+      "hash": "aaf15407db5c0f245faf872e2e228ee5725d2ad556c20ff0cd29b511759f050a"
     },
     {
       "task_id": "t4-bst-insert",

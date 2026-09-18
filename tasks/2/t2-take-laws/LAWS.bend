@@ -21,3 +21,13 @@ law take_append_len:
   for xs: List<Nat>
   for ys: List<Nat>
   {S.take(P.len(xs), P.append(xs, ys)) == xs : List<Nat>}
+
+# LAW: there is nothing to take from an empty list. Neither law above reaches
+# the inner `Nil{}`: `take_succ` always hands it a cons cell, and
+# `take_append_len` reaches the count `0n` only in its own empty case, which
+# answers before the inner match. So the case where the count is positive and
+# the list has run out is unconstrained -- a body answering a one-element list
+# there proves both at tier 4, reward 1.000.
+law take_nil:
+  for k: Nat
+  {S.take(k, Nil{}) == Nil{} : List<Nat>}

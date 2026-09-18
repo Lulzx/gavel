@@ -45,3 +45,8 @@ def L.zip_sum_self(xs):
     case h <> t:
       %Equal.sym(List<Nat>, S.zip_sum(t, t), P.double_all(t), L.zip_sum_self(t)) : {(h + h) <> _ == (h + h) <> P.double_all(t) : List<Nat>}
       {==}
+
+# Both matches unfold to a cons over the same heads, so the two sides are the
+# same term.
+def L.zip_sum_cons(h1, t1, h2, t2):
+  {==}

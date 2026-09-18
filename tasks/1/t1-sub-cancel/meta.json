@@ -16,12 +16,13 @@
     "sub"
   ],
   "laws": [
-    "sub_cancel"
+    "sub_cancel",
+    "sub_saturates"
   ],
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "da58327c07329ec681849fe37d7378d89831f8550655cf23e6e5efc25dbfbc61",
+    "laws": "f53fbab0d4000ea0cf4bbda65da1b06b8d9f68051e6865e0a9bfbb76f7b0d49a",
     "prelude": "90209e424d9384ffc550c1d54ba1b0f2f64c3a09ac89b56ffe60004b97c4afd0"
   },
   "bend_version": "2.0.5"

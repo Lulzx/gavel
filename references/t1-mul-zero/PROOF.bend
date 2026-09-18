@@ -30,3 +30,8 @@ def L.mul_succ_left(x, y):
   +y = y
   %Policy.add_plus(y, S.mul(x, y)) : {S.add(y, S.mul(x, y)) == _ : Nat}
   {==}
+
+# `mul` matches its first argument, so `mul(0n, y)` is `0n` by unfolding alone,
+# whatever `y` is.
+def L.mul_zero_left(y):
+  {==}

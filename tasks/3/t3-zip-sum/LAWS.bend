@@ -36,3 +36,17 @@ law zip_sum_len:
 law zip_sum_self:
   for xs: List<Nat>
   {S.zip_sum(xs, xs) == P.double_all(xs) : List<Nat>}
+
+# LAW: the step of `zip_sum`, with both elements spelled out. The laws above fix
+# the empty cases and the *count*, and `zip_sum_self` only ever compares
+# `zip_sum(xs, xs)` with itself on the diagonal, where the two heads are the
+# same element. None of them looks inside a pair of *different* elements, so a
+# body that answers `(h1 + h1) <> zip_sum(t1, t2)` -- never reading the second
+# list's element -- proves all four at tier 4, reward 1.000. Both sides compute
+# here, so this costs one `{==}`.
+law zip_sum_cons:
+  for h1: Nat
+  for t1: List<Nat>
+  for h2: Nat
+  for t2: List<Nat>
+  {S.zip_sum(h1 <> t1, h2 <> t2) == (h1 + h2) <> S.zip_sum(t1, t2) : List<Nat>}

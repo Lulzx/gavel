@@ -3,7 +3,8 @@
   "tier": 2,
   "laws": [
     "take_succ",
-    "take_append_len"
+    "take_append_len",
+    "take_nil"
   ],
   "policy_targets": [
     "take"
@@ -11,7 +12,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "ce268b3590334b6ec6ec965231062f583785a209a4c61c5928eadcb3937db77b",
+    "laws": "ec8d0cec001a89769d5f739e1e960fe6476559493f097271b7e01342684e8833",
     "prelude": "3356dcf51f38099d986384c5ebd93606467f19c7ab902b5a62e6d6381910f8ca"
   },
   "bend_version": "2.0.5"

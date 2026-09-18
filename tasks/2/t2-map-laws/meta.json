@@ -3,7 +3,8 @@
   "tier": 2,
   "laws": [
     "len_map_cons",
-    "map_cons"
+    "map_cons",
+    "len_single"
   ],
   "policy_targets": [
     "len",
@@ -12,7 +13,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "5636d2caa4bb80c5c5ee826f9db7e7ab0accc312927752218d0e8af86f918972",
+    "laws": "4382257b544c11473f9770f0a442bb121b89d7af941c39c59e832b32befde97e",
     "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
   },
   "bend_version": "2.0.5"

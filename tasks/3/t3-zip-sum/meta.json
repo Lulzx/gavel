@@ -5,7 +5,8 @@
     "zip_sum_nil_left",
     "zip_sum_nil_right",
     "zip_sum_len",
-    "zip_sum_self"
+    "zip_sum_self",
+    "zip_sum_cons"
   ],
   "policy_targets": [
     "zip_sum"
@@ -13,7 +14,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "9fc945fb3f2cda89afa361fc12cffda773d919dc127acd17ed08ed0966221303",
+    "laws": "d575cd4a6c2e7f6648c254da80aaa7b3eb9b9563d0a4a4a4c0416098abe36d47",
     "prelude": "c75791b0bedac28e7e07e9ef0aea8e706cf9c15c243cc4709f7c7f574dc27d4e"
   },
   "bend_version": "2.0.5",

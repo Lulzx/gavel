@@ -17,12 +17,13 @@
     "even"
   ],
   "laws": [
-    "even_flip"
+    "even_flip",
+    "even_zero"
   ],
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "c342d3d55ea989ac96a0339e8b259a8cc000e1957ee7c00ed31920f054576fff",
+    "laws": "62df4845e6b99ada63d98ecde877d0027141269da8f81d4a78e62ef8cc4bdf0c",
     "prelude": "90209e424d9384ffc550c1d54ba1b0f2f64c3a09ac89b56ffe60004b97c4afd0"
   },
   "bend_version": "2.0.5"

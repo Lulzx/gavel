@@ -4,7 +4,8 @@
   "laws": [
     "pad_nil",
     "pad_single",
-    "pad_len"
+    "pad_len",
+    "pad_step"
   ],
   "policy_targets": [
     "pad"
@@ -12,7 +13,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "879cf84d1d66b3cb326d58732d1bd3bd911aeb0c3901326bff89f2c63b040a3b",
+    "laws": "52a812c82f3dd77eed9fd1356c297b8a4dbec87eb21bc5d1ba09b3ff4891c36b",
     "prelude": "ef0ec90b05b43083ae78cc7e51467536b9d2c85979099af63e858238adc7ae79"
   },
   "bend_version": "2.0.5",

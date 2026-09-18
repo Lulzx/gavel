@@ -19,3 +19,13 @@ def L.take_append_len(xs, ys):
     case h <> t:
       %L.take_append_len(t, ys) : {h <> S.take(P.len(t), P.append(t, ys)) == h <> _ : List<Nat>}
       {==}
+
+# The list is a literal `Nil{}`, so the inner match is picked for every count,
+# but the outer match on `k` is stuck while `k` is a variable: the induction is
+# on `k`, and both cases reduce to `Nil{}`.
+def L.take_nil(k):
+  match k:
+    case 0n:
+      {==}
+    case 1n+kp:
+      {==}

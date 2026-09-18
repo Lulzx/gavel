@@ -18,3 +18,13 @@ def L.sub_cancel(x, y):
     case 1n+p:
       %L.sub_cancel(p, y) : {S.sub(p + y, p) == _ : Nat}
       {==}
+
+# `sub` matches both arguments, so `sub(0n, y)` is stuck on `y` and the proof
+# splits it: the literal `0n` picks the first branch and `1n+yp` the second,
+# and both answer `0n`.
+def L.sub_saturates(y):
+  match y:
+    case 0n:
+      {==}
+    case 1n+yp:
+      {==}

@@ -18,3 +18,13 @@ law zeros_prefix_zero:
 law zeros_prefix_len:
   for xs: List<Nat>
   {S.zeros_prefix(P.len(xs), xs) == P.count_zeros(xs) : Nat}
+
+# LAW: once the list runs out the answer is zero. Neither law above reaches the
+# inner `Nil{}`: `zeros_prefix_zero` fixes only the count `0n`, and
+# `zeros_prefix_len` constrains only the diagonal, where the count and the list
+# length agree -- so the case where the list is shorter than the count is
+# unconstrained. A body answering `1n`, or the remaining count, there proves
+# both at tier 4, reward 1.000.
+law zeros_prefix_nil:
+  for k: Nat
+  {S.zeros_prefix(k, Nil{}) == 0n : Nat}

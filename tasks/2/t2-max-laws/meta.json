@@ -3,7 +3,9 @@
   "tier": 2,
   "laws": [
     "max_self",
-    "max_comm"
+    "max_comm",
+    "max_zero_left",
+    "max_succ_succ"
   ],
   "policy_targets": [
     "max"
@@ -11,7 +13,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "a0dfb25218583841fd82136bbf363eafed2c479f17c840697f8539af923d0508",
+    "laws": "3122677d250aac77efa7081def20f9e46ea0b97cd4935ae045b6df898c32a390",
     "prelude": "fd4d542749befc9d95afc1885f6331d8c2e5765c97be77974259fb7fc00e85a6"
   },
   "bend_version": "2.0.5"

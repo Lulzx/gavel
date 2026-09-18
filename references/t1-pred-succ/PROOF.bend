@@ -26,3 +26,8 @@ def L.pred_add_one(x):
     case 1n+p:
       %Policy.add_one_comm(p) : {S.add(p, 1n) == _ : Nat}
       {==}
+
+# `pred` matches on its argument, so `pred(0n)` is `0n` by unfolding. The binder
+# is there because every law in this bank is instantiated through one.
+def L.pred_zero(x):
+  {==}
