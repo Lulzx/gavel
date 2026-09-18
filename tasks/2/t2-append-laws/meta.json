@@ -6,7 +6,6 @@
     "len_append"
   ],
   "policy_targets": [
-    "add",
     "append",
     "len"
   ],

@@ -6,7 +6,6 @@
     "sum_single"
   ],
   "policy_targets": [
-    "add",
     "append",
     "sum"
   ],
