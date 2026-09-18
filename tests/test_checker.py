@@ -19,7 +19,7 @@ from gavel.runner import SUCCESS_LINE, UNSAFE_MARK, Limits, run_check, scrub_env
 from gavel.tasks import (PROOF_FILE, SOLUTION_FILE, cleanup, prepare_workdir)
 from gavel.toolchain import TOOLCHAIN_DIR, Toolchain, ToolchainError
 from gavel.verdict import (TIER_CHECKS, TIER_COMPLETE, TIER_NO_CHECK,
-                           TIER_REJECTED)
+                           TIER_PARTIAL, TIER_REJECTED)
 
 pytestmark = pytest.mark.checker
 
@@ -208,6 +208,128 @@ def test_a_verdict_round_trips_through_json(toolchain, task, submission):
     assert blob["task_id"] == task.task_id
     assert blob["tier"] == TIER_COMPLETE
     assert blob["laws_proven"] == list(task.laws)
+
+
+# --- partial credit ------------------------------------------------------------
+
+@pytest.fixture(scope="session")
+def two_law(manifest):
+    return manifest.get("t2-add-laws")
+
+
+ADD_ZERO_PROOF = (
+    "\ndef L.add_zero(x):\n"
+    "  match x:\n"
+    "    case 0n:\n"
+    "      {==}\n"
+    "    case 1n+p:\n"
+    "      %L.add_zero(p) : {1n+S.add(p, 0n) == 1n+_ : Nat}\n"
+    "      {==}\n")
+
+
+def test_a_proof_that_fills_some_laws_credits_exactly_those(toolchain, two_law):
+    laws = two_law.laws
+    files = {
+        SOLUTION_FILE: two_law.reference_solution,
+        PROOF_FILE: two_law.proof_header + ADD_ZERO_PROOF,   # add_succ left open
+    }
+    verdict = check_submission(two_law, toolchain, files)
+    # One run is enough: a hole anywhere would inflate the TODO count, so a
+    # single open law means every def that is present checked.
+    assert len(verdict.checks) == 1
+    assert verdict.tier == TIER_PARTIAL
+    assert verdict.proven == (laws[0],)
+    assert verdict.failed == (laws[1],)
+    assert verdict.reward == pytest.approx(0.1 + 0.5 * 0.5)
+
+
+def test_a_def_that_is_present_but_holed_proves_nothing(toolchain, two_law):
+    """Having a def for a law is not the same as proving it."""
+    files = {
+        SOLUTION_FILE: two_law.reference_solution,
+        PROOF_FILE: two_law.proof_header + "\ndef L.add_zero(x):\n  ?TODO\n",
+    }
+    verdict = check_submission(two_law, toolchain, files)
+    assert verdict.proven == ()
+    assert verdict.tier == TIER_CHECKS
+
+
+def test_a_broken_proof_of_one_law_still_credits_the_other(toolchain, two_law):
+    """The fixed point, which is the only reason partial credit is sound.
+
+    The full run stops at the first type error, so it cannot say that the
+    other law was fine. Isolating each law does -- and a law is credited only
+    when an isolation run leaves exactly the uncredited laws open.
+    """
+    laws = two_law.laws
+    files = {
+        SOLUTION_FILE: two_law.reference_solution,
+        PROOF_FILE: two_law.proof_header + (
+            "\ndef L.add_zero(x):\n"
+            "  match x:\n"
+            "    case 0n:\n"
+            "      {==}\n"
+            "    case 1n+p:\n"
+            "      %L.add_zero(p) : {1n+S.add(p, 0n) == 1n+_ : Nat}\n"
+            "      {==}\n"
+            # wrong: the goal is not reflexive, so this is a type error rather
+            # than a hole -- which is what forces the isolation runs
+            "\ndef L.add_succ(x, y):\n  {==}\n"),
+    }
+    verdict = check_submission(two_law, toolchain, files)
+    assert verdict.tier == TIER_PARTIAL
+    assert verdict.proven == (laws[0],)
+    assert verdict.reward == pytest.approx(0.35)
+    assert len(verdict.checks) > 1
+
+
+def test_two_laws_that_prove_each_other_are_neither_credited(toolchain, two_law):
+    """A circular pair cannot earn credit, because order forbids it.
+
+    book_valid registers each def only after checking it, so a def may cite
+    only laws declared earlier. Each isolation run therefore fails: whichever
+    law is being credited cites one that is not. Soundness does not depend on
+    the fixed point noticing the cycle -- it cannot arise.
+    """
+    laws = two_law.laws
+    files = {
+        SOLUTION_FILE: two_law.reference_solution,
+        PROOF_FILE: two_law.proof_header + (
+            "\ndef L.add_zero(x):\n"
+            "  %L.add_succ(x, 0n) : {S.add(x, 0n) == _ : Nat}\n"
+            "\ndef L.add_succ(x, y):\n"
+            "  %L.add_zero(x) : {S.add(x, 1n+y) == _ : Nat}\n"),
+    }
+    verdict = check_submission(two_law, toolchain, files)
+    assert verdict.proven == ()
+
+
+def test_a_proof_that_needs_a_law_it_has_not_credited_is_not_credited(
+        toolchain, two_law):
+    """Partial credit must not be transitive through an unproven law."""
+    laws = two_law.laws
+    files = {
+        SOLUTION_FILE: two_law.reference_solution,
+        PROOF_FILE: two_law.proof_header + (
+            # add_succ leans on add_zero; add_zero is never written
+            "\ndef L.add_succ(x, y):\n"
+            "  %L.add_zero(x) : {S.add(x, 1n+y) == _ : Nat}\n"),
+    }
+    verdict = check_submission(two_law, toolchain, files)
+    assert verdict.proven == ()
+
+
+def test_deriving_every_law_but_via_a_hole_earns_nothing(toolchain, two_law):
+    files = {
+        SOLUTION_FILE: two_law.reference_solution,
+        PROOF_FILE: two_law.proof_header + (
+            "\ndef L.add_zero(x):\n  ?TODO\n"
+            "\ndef L.add_succ(x, y):\n  ?TODO\n"),
+    }
+    verdict = check_submission(two_law, toolchain, files)
+    assert verdict.proven == ()
+    assert verdict.tier == TIER_CHECKS
+    assert verdict.reward == pytest.approx(0.1)
 
 
 # --- the pin -------------------------------------------------------------------

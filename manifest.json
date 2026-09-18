@@ -11,6 +11,14 @@
       "reference": "references/t1-add-zero",
       "hash": "e78214df4cbe59630283d876c53c1e5f2399aed5b6bd138c8147ebfdf8a6b514",
       "valid": true
+    },
+    {
+      "task_id": "t2-add-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-add-laws",
+      "reference": "references/t2-add-laws",
+      "hash": "dbff4f212496fac985d04c4f365b76bbfec5f2cf0a58e348de739eba0445d5a9",
+      "valid": true
     }
   ]
 }
