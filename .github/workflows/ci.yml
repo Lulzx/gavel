@@ -53,20 +53,27 @@ jobs:
   sandbox:
     name: adversarial corpus under bubblewrap
     runs-on: ubuntu-latest
-    # Not yet verified on a Linux host, and these three flags are the whole
-    # question. Bubblewrap has to re-mount `/` as a slave before it can unshare
-    # the mount namespace, and Docker's default set gets in the way three times:
-    # seccomp blocks the clone(CLONE_NEWUSER) bwrap starts with, capabilities
-    # omit CAP_SYS_ADMIN so the mount is refused, and AppArmor's docker-default
-    # profile denies mount outright regardless of capabilities. Measured, one at
-    # a time: seccomp alone still failed, seccomp + SYS_ADMIN still failed with
-    # "Failed to make / slave: Permission denied", which is the AppArmor
-    # signature rather than a capability one.
+    # Not yet verified on a Linux host, and the flags below are where that shows.
+    # A nested sandbox needs the outer container to be permissive, and the three
+    # obstacles were met one at a time, each verified against the real job:
     #
-    # None of this is about the sandbox being tested -- the inner bwrap still
-    # unshares everything, which is what the job exists to demonstrate. Left
-    # non-blocking until a green run exists, then flip this to false: a job that
-    # is allowed to fail is a job nobody reads.
+    #   seccomp          blocks the clone(CLONE_NEWUSER) bwrap starts with
+    #   capabilities     no CAP_SYS_ADMIN, so `mount / slave` is refused
+    #   AppArmor         docker-default denies mount outright, caps or not
+    #   masked /proc     "Can't mount proc on /proc: Operation not permitted"
+    #
+    # The last one is not a capability at all -- Docker remounts /proc and masks
+    # a set of paths inside the container, and a new procfs cannot be mounted
+    # over the result. `--privileged` is what removes all four, which is why it
+    # replaced the three narrower flags rather than joining them: SYS_ADMIN and
+    # the two security-opts are subsumed.
+    #
+    # None of this weakens what is under test. The privilege is granted to the
+    # CI container so that it can host a sandbox; the inner bwrap still unshares
+    # every namespace and is the thing the adversarial corpus is attacking.
+    #
+    # Left non-blocking until a green run exists, then flip this to false: a job
+    # that is allowed to fail is a job nobody reads.
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
@@ -77,15 +84,11 @@ jobs:
       - name: The sandbox runs a real check
         run: |
           docker run --rm \
-            --cap-add SYS_ADMIN \
-            --security-opt seccomp=unconfined \
-            --security-opt apparmor=unconfined \
+            --privileged \
             gavel:ci uv run python -m tools.sandbox_check --backend bwrap
 
       - name: The adversarial corpus under the sandbox
         run: |
           docker run --rm \
-            --cap-add SYS_ADMIN \
-            --security-opt seccomp=unconfined \
-            --security-opt apparmor=unconfined \
+            --privileged \
             gavel:ci uv run pytest -q tests/test_adversarial.py tests/test_checker.py
