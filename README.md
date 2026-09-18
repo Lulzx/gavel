@@ -220,8 +220,9 @@ of a two-argument function unless one side avoids mentioning it. Three things ma
 sweep easy to get wrong, all of them measured here. It must be run against a `{==}`-only
 proof, or it is a question about the reference proof's reach rather than about the laws.
 It must try **every** same-typed parameter, not the first: `V3` originally built its
-identity solution from `_ignore_arguments`, which returns the first, so it projected
-`t1-add-succ` onto `a` and never tried `add(a, b) = b`. And it must include the body that
+identity solution from `_ignore_arguments`, which returns the first, so it projected the
+task then called `t1-add-succ` onto `a` and never tried `add(a, b) = b`. And it must
+include the body that
 uses a parameter twice — `mul(a, b) = b + b` satisfies `mul_two` and nothing in the other
 two families does.
 
