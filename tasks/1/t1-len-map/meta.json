@@ -8,11 +8,12 @@
     "map_cons"
   ],
   "policy_targets": [
-    "inc",
     "len",
     "map"
   ],
-  "prelude_defs": [],
+  "prelude_defs": [
+    "inc"
+  ],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
     "laws": "ee4c55f5cb3f175df620ed607b3890454f3fc6872570ab09e98ad50d9dae2ac8",

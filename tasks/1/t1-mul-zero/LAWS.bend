@@ -7,9 +7,11 @@ law mul_zero:
   for x: Nat
   {S.mul(x, 0n) == 0n : Nat}
 
-# LAW: multiplying by one on the left changes nothing. Inductive in `x`, and it
-# is what keeps the pair from being satisfied by a `mul` that ignores its
-# argument.
-law mul_one_left:
+# LAW: multiplying a successor on the left is adding the other factor. The `+`
+# is Base's addition, not `S.add`, so a degenerate `add` cannot rescue it: no
+# `mul` that ignores its argument -- and no pair of argument-ignoring `mul` and
+# `add` -- satisfies it. Together with `mul_zero` it pins `mul`.
+law mul_succ_left:
   for x: Nat
-  {S.mul(1n, x) == x : Nat}
+  for y: Nat
+  {S.mul(1n+x, y) == y + S.mul(x, y) : Nat}

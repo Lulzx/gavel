@@ -9,7 +9,9 @@
   "policy_targets": [
     "len"
   ],
-  "prelude_defs": [],
+  "prelude_defs": [
+    "append"
+  ],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
     "laws": "b9b904b88b5d8cd056cfbcb5d420839b8c2e44e5dc63eac4d3108b5611800fc0",

@@ -1,12 +1,5 @@
 import Base
 
-def add(a: Nat, b: Nat) -> Nat:
-  match a:
-    case 0n:
-      b
-    case 1n+p:
-      1n + add(p, b)
-
 def append(xs: List<Nat>, ys: List<Nat>) -> List<Nat>:
   match xs:
     case Nil{}:

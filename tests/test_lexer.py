@@ -2,15 +2,32 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from gavel.lexer import (KIND_AT, KIND_CHAR, KIND_HOLE, KIND_NAME, KIND_NUMBER,
                          KIND_OP, KIND_STRING, LexError,
                          strip_comments_and_literals, tokenize)
 
+REPO = Path(__file__).resolve().parents[1]
+BASE_BEND = REPO / "toolchain" / "2.0.5" / "bend2" / "base.bend"
+
 
 def kinds(src: str) -> list[tuple[str, str]]:
     return [(t.kind, t.text) for t in tokenize(src)]
+
+
+def round_trip(src: str) -> str:
+    """Rebuild ``src`` from the tokens and the text each of them skipped."""
+    tokens = tokenize(src)
+    out, at = [], 0
+    for token in tokens:
+        out.append(src[at:token.start])
+        out.append(src[token.start:token.end])
+        at = token.end
+    out.append(src[at:])
+    return "".join(out)
 
 
 def test_number_literals():
@@ -83,3 +100,33 @@ def test_strip_comments_and_literals_preserves_offsets():
     assert "@unsafe" not in stripped
     assert "main" not in stripped
     assert "def f" in stripped
+
+
+# --- M1.1: the port is faithful on the largest file we have ---------------------
+
+@pytest.mark.skipif(not BASE_BEND.exists(), reason="the toolchain is not vendored")
+def test_the_whole_base_library_round_trips():
+    """Every byte of Base, tokenized and rebuilt.
+
+    Losslessness is the property the gate rests on: a construct the tokenizer
+    mis-reads is a construct the scan never sees, and 2,800 lines of real Base
+    is the only input here that was not written by whoever wrote the tokenizer.
+    """
+    src = BASE_BEND.read_text()
+    assert src.count("\n") > 2000
+    assert round_trip(src) == src
+
+
+def test_the_round_trip_holds_where_the_scanner_is_tricky():
+    """The literals, decorators and holes a hand-written scanner gets wrong."""
+    for src in ('def f() -> String:\n  "a\\"b\\u{1F600}c" # x\n',
+                "@unsafe\ndef f() -> Nat: 0n\n",
+                "def f(x: Nat) -> Nat:\n  ?TODO\n",
+                "1e3 0n 1.5e-3 'x'\n",
+                "def f() -> String:\n  \"a\nimport ./evil.bend as E\n\"\n"):
+        assert round_trip(src) == src
+
+
+def test_an_unterminated_literal_is_an_error_not_a_silent_truncation():
+    with pytest.raises(LexError):
+        tokenize('def f() -> String:\n  "no closing quote\n')

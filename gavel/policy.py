@@ -22,7 +22,9 @@ from typing import Any, Protocol
 from .env import Action
 from .tasks import PROOF_FILE, SOLUTION_FILE
 
-API_URL = "https://api.anthropic.com/v1/messages"
+API_BASE = "https://api.anthropic.com"
+MESSAGES_PATH = "/v1/messages"
+API_URL = API_BASE + MESSAGES_PATH
 API_VERSION = "2023-06-01"
 DEFAULT_MODEL = "claude-opus-5"
 DEFAULT_MAX_TOKENS = 8192
@@ -140,7 +142,7 @@ class AnthropicPolicy:
     model: str = DEFAULT_MODEL
     api_key: str = field(default_factory=lambda: os.environ.get("ANTHROPIC_API_KEY", ""))
     base_url: str = field(default_factory=lambda: (
-        os.environ.get("ANTHROPIC_BASE_URL") or API_URL))
+        os.environ.get("ANTHROPIC_BASE_URL") or API_BASE))
     max_tokens: int = DEFAULT_MAX_TOKENS
     temperature: float = 1.0
     timeout: float = 300.0
@@ -156,6 +158,19 @@ class AnthropicPolicy:
             raise PolicyError(
                 "ANTHROPIC_API_KEY is not set; calibration needs one to spend")
 
+    @property
+    def endpoint(self) -> str:
+        """Where the POST goes.
+
+        ``ANTHROPIC_BASE_URL`` names a *base*, and the route is appended to it.
+        Both spellings are accepted: an operator who pasted the whole URL out of
+        a gateway's docs should not be punished for it, and neither should one
+        who set the bare host.
+        """
+        if self.base_url.rstrip("/").endswith(MESSAGES_PATH):
+            return self.base_url
+        return self.base_url.rstrip("/") + MESSAGES_PATH
+
     def complete(self, prompt: str) -> str:
         body = json.dumps({
             "model": self.model,
@@ -165,7 +180,7 @@ class AnthropicPolicy:
             "messages": [{"role": "user", "content": prompt}],
         }).encode()
         request = urllib.request.Request(
-            self.base_url, data=body, method="POST",
+            self.endpoint, data=body, method="POST",
             headers={"content-type": "application/json",
                      "x-api-key": self.api_key,
                      "anthropic-version": API_VERSION})
@@ -219,6 +234,6 @@ class EchoPolicy:
                              PROOF_FILE: observation["proof_header"]})
 
 
-__all__ = ["API_URL", "DEFAULT_MODEL", "SYSTEM", "AnthropicPolicy", "EchoPolicy",
-           "Policy", "PolicyError", "ScriptedPolicy", "action_from_reply",
-           "build_prompt", "extract_json"]
+__all__ = ["API_BASE", "API_URL", "DEFAULT_MODEL", "MESSAGES_PATH", "SYSTEM",
+           "AnthropicPolicy", "EchoPolicy", "Policy", "PolicyError",
+           "ScriptedPolicy", "action_from_reply", "build_prompt", "extract_json"]

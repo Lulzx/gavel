@@ -1,10 +1,7 @@
 import Base
 
-# TODO(policy): implement all three. `add` recurses on `a`, `append` recurses
-# on `xs`, and `len` recurses on `xs`.
-def add(a: Nat, b: Nat) -> Nat:
-  ?TODO
-
+# TODO(policy): implement both. `append` recurses on `xs`, and `len` recurses on
+# `xs` too.
 def append(xs: List<Nat>, ys: List<Nat>) -> List<Nat>:
   ?TODO
 

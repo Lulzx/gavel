@@ -7,8 +7,10 @@ law pred_succ:
   for x: Nat
   {S.pred(1n+x) == x : Nat}
 
-# LAW: taking the predecessor of a sum that ends in a successor drops one.
-law pred_add_succ:
+# LAW: adding one on the right is adding one on the left. This is the law that
+# pins `add`: `pred_succ` constrains only `pred`, and an `add` that returned its
+# second argument would satisfy a law stated over `S.add` as easily as the real
+# one.
+law add_one:
   for x: Nat
-  for y: Nat
-  {S.pred(S.add(x, 1n+y)) == S.add(x, y) : Nat}
+  {S.add(x, 1n) == 1n+x : Nat}

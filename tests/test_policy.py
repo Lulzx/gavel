@@ -127,3 +127,27 @@ def test_the_base_url_can_be_redirected(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
     monkeypatch.setenv("ANTHROPIC_BASE_URL", "http://127.0.0.1:9/v1/messages")
     assert AnthropicPolicy().base_url == "http://127.0.0.1:9/v1/messages"
+
+
+def test_the_route_is_appended_to_a_base_that_does_not_carry_it(monkeypatch):
+    """The env var names a base, so the route goes on the end.
+
+    Every gateway that speaks the Messages API documents itself as a base URL
+    with a path prefix -- ``https://opencode.ai/zen/go`` -- and posting to that
+    verbatim asks for the gateway's root, which is not the API.
+    """
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
+    monkeypatch.setenv("ANTHROPIC_BASE_URL", "https://gateway.example/zen/go")
+    assert AnthropicPolicy().endpoint == "https://gateway.example/zen/go/v1/messages"
+
+
+def test_a_base_url_that_already_ends_at_the_route_is_not_doubled(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
+    monkeypatch.setenv("ANTHROPIC_BASE_URL", "https://gateway.example/zen/go/v1/messages")
+    assert AnthropicPolicy().endpoint == "https://gateway.example/zen/go/v1/messages"
+
+
+def test_the_default_endpoint_is_anthropic_itself(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
+    monkeypatch.delenv("ANTHROPIC_BASE_URL", raising=False)
+    assert AnthropicPolicy().endpoint == "https://api.anthropic.com/v1/messages"

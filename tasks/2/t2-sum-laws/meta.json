@@ -13,7 +13,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "354cf7b9854e3e5d922d07080507406df860401c259e54852a969f3513de83f4",
+    "laws": "22a3f563f6a22e71513142eae046def8074031e1ef6fc702f37a1a5dd6bb20da",
     "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
   },
   "bend_version": "2.0.5"

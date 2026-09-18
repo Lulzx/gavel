@@ -8,21 +8,13 @@ import ./LAWS.bend as L
 def L.pred_succ(x):
   {==}
 
-# `pred_add_succ` splits on `x`. The successor case has to move the successor
-# out of the second argument of `add`, which is the helper below; the equation
-# is used flipped so that the occurrence in the goal is the one it rewrites.
-def Policy.add_succ(x: Nat, y: Nat) -> {S.add(x, 1n+y) == 1n+S.add(x, y) : Nat}:
+# `add_one` is inductive in `x`. The successor case needs the fact that
+# `add(p, 1n)` is `1n+p`, which is the induction hypothesis itself, so the step
+# is just the hypothesis rewritten at `p`.
+def L.add_one(x):
   match x:
     case 0n:
       {==}
     case 1n+p:
-      %Policy.add_succ(p, y) : {1n+S.add(p, 1n+y) == 1n+_ : Nat}
-      {==}
-
-def L.pred_add_succ(x, y):
-  match x:
-    case 0n:
-      {==}
-    case 1n+p:
-      %Equal.sym(Nat, S.add(p, 1n+y), 1n+S.add(p, y), Policy.add_succ(p, y)) : {_ == 1n+S.add(p, y) : Nat}
+      %L.add_one(p) : {1n+S.add(p, 1n) == 1n+_ : Nat}
       {==}

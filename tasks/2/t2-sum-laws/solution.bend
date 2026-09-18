@@ -1,13 +1,10 @@
 import Base
 
-# TODO(policy): implement all three. `add` recurses on `a`, while `append` and
-# `sum` recurse on `xs`. `sum_append` is stated over unrestricted lists, so keep
-# the `List<&2, Nat>` signatures exactly as written.
-def add(a: Nat, b: Nat) -> Nat:
+# TODO(policy): implement both, each recursing on `xs`: `append` returns the
+# elements of `xs` followed by the elements of `ys`, and `sum` adds the head of
+# each cons onto the sum of the tail.
+def append(xs: List<Nat>, ys: List<Nat>) -> List<Nat>:
   ?TODO
 
-def append(xs: List<&2, Nat>, ys: List<&2, Nat>) -> List<&2, Nat>:
-  ?TODO
-
-def sum(xs: List<&2, Nat>) -> Nat:
+def sum(xs: List<Nat>) -> Nat:
   ?TODO
