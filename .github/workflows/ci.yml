@@ -53,11 +53,15 @@ jobs:
   sandbox:
     name: adversarial corpus under bubblewrap
     runs-on: ubuntu-latest
-    # Not yet verified on a Linux host: bubblewrap inside Docker needs a user
-    # namespace that the default seccomp profile does not grant, and whether
-    # the flags below are enough depends on the host kernel. Left non-blocking
-    # until a green run exists, then flip this to false -- a job that is
-    # allowed to fail is a job nobody reads.
+    # Not yet verified on a Linux host, and the two flags below are the whole
+    # question. Bubblewrap has to re-mount `/` as a slave before it can unshare
+    # the mount namespace, and that needs CAP_SYS_ADMIN: Docker's default set
+    # omits it, so bwrap dies with "Failed to make / slave: Permission denied"
+    # and every check under it comes back tier 1 for a reason that has nothing
+    # to do with the submission. seccomp=unconfined is the other half -- the
+    # default profile blocks the clone(CLONE_NEWUSER) that bwrap starts with.
+    # Left non-blocking until a green run exists, then flip this to false -- a
+    # job that is allowed to fail is a job nobody reads.
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
@@ -68,11 +72,13 @@ jobs:
       - name: The sandbox runs a real check
         run: |
           docker run --rm \
+            --cap-add SYS_ADMIN \
             --security-opt seccomp=unconfined \
             gavel:ci uv run python -m tools.sandbox_check --backend bwrap
 
       - name: The adversarial corpus under the sandbox
         run: |
           docker run --rm \
+            --cap-add SYS_ADMIN \
             --security-opt seccomp=unconfined \
             gavel:ci uv run pytest -q tests/test_adversarial.py tests/test_checker.py
