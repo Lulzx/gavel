@@ -662,3 +662,11 @@ read and the records are made true. Until then this line stays in M4.
 1. `uv init`, vendor 2.0.5 into `toolchain/`, commit the hash.
 2. Port the §0 probe files into `tests/fixtures/add_zero/` as the first task and the first adversarial cases.
 3. Implement `runner.py` and `check.py` against that fixture, then iterate on tasks.
+
+**How it went.** Steps 1 and 3 as written. Step 2 became the bank instead of a
+fixture directory: `tests/fixtures/` was never created, because a fixture task
+and a real one would have been two places to keep the same facts, and the
+degenerate corpus is generated from whichever task is under test (Fact 22,
+Fact 28). The probe files survive as `tests/adversarial/`, which is what item 2
+was actually for — one file per construct the gate must refuse, re-run against
+a new Bend version.
