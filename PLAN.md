@@ -122,6 +122,17 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     The repair is mechanical now. `gavel.degenerate.corpus` emits the family that catches this — one function degenerated with the rest left at the reference — beside the whole-solution cross product, one checker run per argument-ignoring body per function. The whole-solution family alone was blind to it by construction: it projected only onto the first same-typed parameter, so `add(a, b) = b` was never tried. `tests/test_validate.py::test_the_corpus_varies_one_function_at_a_time` pins the new family's shape, and the second projection is the assertion that matters.
 
+29. **A law set can leave a whole case of the reference unconstrained, and V3 is blind to it because no argument-ignoring body is involved.** Facts 17, 22 and 28 are all the same failure: a body that ignores an argument. This is a different one — the reference body is wrong only on a branch that **no law's left-hand side can reach**, so the laws are silent about it while the body they describe is wrong. Two shipped tier-2 tasks were paying full reward for exactly that, both found by writing the plausible wrong body rather than by any invariant.
+
+    | task | the lie | why no law reaches it | reward |
+    |---|---|---|---|
+    | `t2-at-laws` | `at(Nil{}, n) = 1n` | `at_succ`'s LHS is a cons and `at_len_append`'s is `at(append(xs, y <> Nil{}), …)`, and `append(xs, ·)` is never `Nil{}` — so neither equation ever applies `at` to the empty list | 1.000 |
+    | `t2-count-prefix-laws` | inner `case Nil{}: 1n` | the inner match is reached only when the outer count is `1n+k`, and the only law that fixes the outer count is `count_odd_prefix(len(xs), xs)`, where `len(xs) ≥ 1` forces `xs` non-empty — so the inner `Nil{}` case is unreachable | 1.000 |
+
+    Both are measured, not argued: each wrong body reaches tier 4 at exit 0 against the task's own reference proof (`t2-at-laws: tier 4 (complete) reward 1.000`, 216 ms; `t2-count-prefix-laws: tier 4 (complete) reward 1.000`, 203 ms). The cross product does not see either, because every body in it is well-typed and agrees with the reference everywhere the laws look.
+
+    The tell is structural and cheap, and it belongs beside Fact 28's sweep: **read each law's left-hand side and ask which cases of the reference it can actually reach.** A case that no LHS lands on is a case the laws do not constrain, however inductive the law looks and however strong V2 reports the corpus. The repair is a law whose LHS *does* land there: `at_nil: for n: Nat {S.at(Nil{}, n) == 0n : Nat}` and `count_odd_prefix_nil: for k: Nat {S.count_odd_prefix(k, Nil{}) == 0n : Nat}`. Both are the reference's own unfolding, and V3 tolerates a definitional law within a set that still needs a real proof — the reflexive attempt discharges the pin and fails the inductive law beside it, so no degenerate combination reaches tier 4. The pin does not take the inductive law's weight here either, which is the one thing to check before adding one: this law reaches a case the inductive law structurally cannot, so it is adding coverage rather than restating it.
+
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
 ## 1. Deviations from SPEC.md
