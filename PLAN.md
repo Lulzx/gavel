@@ -300,6 +300,36 @@ runs verdicts through a `concurrent.futures` process pool for throughput.
 - `tools/migrate.py`: re-validates the whole bank against a new toolchain and
   writes a quarantine report.
 
+### 3.9 The tiers
+
+SPEC §10 defines five tiers by proof technique rather than by code length, and
+the milestones below are written in those numbers. The definitions are SPEC's;
+they are repeated here because M2 ("tiers 1–4") and M4 ("including tier 5") are
+phrased in tiers that a reader of this file otherwise cannot decode.
+
+| Tier | Proof technique | The bank's example |
+|---|---|---|
+| 1 | Reflexivity, direct computation | `t1-add-succ` |
+| 2 | Single structural induction, one rewrite | `t2-rev-append` |
+| 3 | Induction with auxiliary lemmas the policy must state | `t3-tree-flatten` |
+| 4 | Invariant preservation over a data structure | — |
+| 5 | Program-level laws with state and multiple interacting functions | — |
+
+**The bank's ceiling is tier 3.** Of the 81 registered tasks, 20 are tier 1, 46
+are tier 2 and 15 are tier 3; no task is tier 4 or tier 5. A tier is not part of
+the curriculum until a task exists at it and a reference proves it, so both
+numbers in M2 and M4 are currently unmet by construction rather than by
+oversight.
+
+Tier 4 is the first tier whose *law* is about a predicate the task declares
+rather than about a function it defines — `t3-tree-flatten` already carries a
+`P.Tree` in its prelude and is the closest the bank comes, but its laws measure
+the tree, they do not preserve an invariant across a step. Tier 5's two
+canonical examples in SPEC §10 (`you_cant_win`, a ledger summing to zero) are
+not in the vendored tree: `toolchain/2.0.5/bend2/` is `main.ts`, `bend.ts`,
+`comp.ts`, `base.bend` and `effs/`, with no `demos/`, so tier 5 has to be
+written fresh rather than ported.
+
 ## 4. Milestones and work packages
 
 ### M0 — Feasibility (target: 2 weeks)
@@ -379,9 +409,11 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 59 tasks (20 tier 1, 27 tier 2, 12 tier 3), validated together
+   progress** — 81 tasks (20 tier 1, 46 tier 2, 15 tier 3), validated together
    rather than per task, because a task is sound only against a corpus that
-   shares the degenerate generator with it: 59/59 valid over 906 checker runs.
+   shares the degenerate generator with it: 81/81 valid over 1210 checker runs.
+   Tiers 4 and 5 are empty (§3.9), so the 200 has a ceiling on what the bank
+   can currently contribute to it.
 
    The CI job is `uv run python -m tools.validate`, deliberately without
    `--strict`. Every task in the bank carries the same warning — calibration
