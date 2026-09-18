@@ -219,7 +219,13 @@ def run_check(toolchain: Toolchain, workdir: Path, target: str,
               backend: Backend | None = None) -> CheckResult:
     """Check ``target`` (a name inside ``workdir``) with the pinned checker."""
     workdir = Path(workdir)
-    backend = backend if backend is not None else select_backend()
+    # Through ``default_backend`` rather than straight to ``select_backend()``,
+    # so that the one opt-out reaches both ways of asking for a backend. It
+    # used to reach a ``CheckConfig`` and not this, which is invisible off
+    # Linux -- there ``auto`` resolves to ``plain`` anyway -- and on Linux
+    # without bubblewrap it is the difference between the documented opt-out
+    # and a hard failure.
+    backend = backend if backend is not None else select_backend(default_backend())
     stdout_path = workdir / ".gavel.stdout"
     stderr_path = workdir / ".gavel.stderr"
     argv = backend.argv(toolchain, workdir, target)

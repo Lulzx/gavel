@@ -208,6 +208,21 @@ def test_an_unknown_backend_is_refused():
         select_backend("chroot")
 
 
+def test_run_check_reads_the_same_opt_out_a_config_does(monkeypatch):
+    """There is one ``GAVEL_BACKEND`` and two ways to ask for a backend.
+
+    ``CheckConfig`` read the variable and ``run_check``'s default did not, so a
+    job that opted out was still asking the machine for a sandbox. Off Linux
+    that is invisible -- ``auto`` resolves to ``plain`` there anyway -- and on
+    Linux without bubblewrap it is the difference between the opt-out the
+    variable exists for and a hard failure.
+    """
+    monkeypatch.setenv("GAVEL_BACKEND", "bwrap")
+    monkeypatch.setattr("shutil.which", lambda _: None)
+    with pytest.raises(BackendError, match="bubblewrap"):
+        run_check(Toolchain.load(), Path("."), PROOF_FILE)
+
+
 def test_a_job_can_opt_out_of_isolation_once(monkeypatch):
     """``GAVEL_BACKEND`` is read when a config is built, not when a check runs.
 
