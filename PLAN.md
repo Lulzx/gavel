@@ -775,34 +775,37 @@ and the resulting verdicts say `dev_only: true`.
    nor the count is worth having alone.
 
    The 92 is the census as measured, not a running total, and the work against
-   it landed the same day. Tier 2: batches one and two (`5187735`, `060ad97`)
-   author four mutants each into twelve of the 66 — `t2-add-laws`, the three
-   `all-*` tasks, `t2-at-laws`, `t2-count-prefix-laws`, `t2-elem-laws`,
-   `t2-has-mult5-laws`, `t2-has-one-laws`, `t2-dec2-all-laws`, `t2-drop-laws`,
-   `t2-init-laws` — all strong, 12/12 valid with no problems. Tier 3: the
-   background backlog starts at `26aca27` (five authored mutants each into
-   `t3-absdiff-comm`, `t3-merge-len` and `t3-rle-expand`) and continues at
-   `db3543b` (`t3-bin-inc`, `t3-concat-len`) and `56e04da` (`t3-count-append`),
-   then `562cbce` (`t3-filter-bound`, `t3-interleave-nil`, `t3-isort-perm`,
-   `t3-isort-sorted`) and `0eeeacb` (`t3-mul-comm`). That is **eleven of the 18
-   repaired and seven still carrying no hand-authored file** — measured by
-   re-running the classifier over the manifest, which is also how the numbers
-   this paragraph carried before were found to be wrong: it said the count
-   moved from 8 of 18 to 11 of 18, and the commit message on `db3543b` says
-   nine of the 18 now carry an authored corpus. Those were tallies carried
-   forward from previous tallies rather than re-measured, and both overstate
-   the work by three tasks. `db3543b` is on `origin/master`, so the correction
-   is here rather than in the commit, and the check that would have caught it
-   is the classifier run, not the running total. The same race produced a
-   second, smaller error the honest way: `562cbce` says the count went from six
-   to ten, which was true when it was written and false a few minutes later,
-   because `t3-mul-comm`'s corpus landed while the commit message was being
-   typed — `0eeeacb` carries the correction. The seven outstanding are
-   `t3-pad`, `t3-replicate-append`, `t3-rev-rev`, `t3-sum-replicate`,
-   `t3-take-drop-split`, `t3-zip-len` and `t3-zip-sum`, with
-   `t3-split-even-odd` and `t3-sum-to-double` one authored file each under the
-   floor of four. The ratios are what moved; the finding stands until the
-   counts reach zero.
+   it landed the same day, in four batches: `5187735` and `060ad97` (twelve
+   tier-2 tasks), `26aca27`, `db3543b`, `56e04da`, `562cbce`, `0eeeacb`,
+   `9ea0048` and `d756adc` (sixteen tier-3 tasks), and `4c47c55` (six tier-2
+   tasks). Every task in every batch is strong and validates with no problems;
+   the per-task detail is in the commit messages and is not repeated here,
+   because the counts below are the part that has to be right.
+
+   **The state of the census after that work, measured rather than tallied:**
+   of the 92 tasks that had no hand-authored file, **40 now have one and 52 do
+   not** — tier 1 is untouched at 8, tier 2 is 24 of 66 authored with 42 left,
+   and tier 3 is 29 of 31 authored with 2 left. Among the authored, three are
+   still under the rule's floor of four files: `t3-split-even-odd` and
+   `t3-sum-to-double` at three each, and `t3-zip-sum` at three. The two tier-3
+   tasks still at zero are `t3-rev-rev` and `t3-take-drop-split`, which is down
+   from eighteen at the census.
+
+   **Two limits on that paragraph are worth stating, because both have already
+   produced a wrong number here.** First, the classifier reads the working
+   tree, so it counts an agent's uncommitted files as authored — it leads the
+   verified-and-committed count rather than equalling it, and a number quoted
+   in a commit message can be overtaken between the message and the push.
+   Three of this document's own counts were wrong for that reason or its
+   cousin: it said the tier-3 repair moved "from 8 of 18 to 11 of 18" and the
+   message on `db3543b` said nine of the 18 were repaired, when the classifier
+   said six — both were tallies carried forward from earlier tallies instead of
+   re-derived from the files; and `4c47c55` says the tier-2 census reads
+   eighteen of sixty-six where the next measurement said twenty-four. Pushed
+   commit messages cannot be corrected in place, so the corrections live here.
+   Second, per the caveat above, a "zero" rests on the corpus that exists and
+   not on history. The rule to follow is the classifier run, and the fact to
+   quote is the number measured at the moment of quoting.
 
    The related finding from `t3-zip-len` is worse and was caught before it
    shipped. A corpus is not the only thing that can be thin. Its original two
