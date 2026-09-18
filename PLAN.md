@@ -446,6 +446,13 @@ and the resulting verdicts say `dev_only: true`.
    were running on the same box; the runner has no neighbours, which is why the
    local figure was the pessimistic one.
 
+   The series continues, because one point is a coincidence and three are a
+   slope: at **81 tasks the step took 9 m 29 s** (run `35343671771`), which is
+   a third more bank for 12% more time. 1210 checks in 569 s on four jobs is
+   about 2.1 checks/s. That is the shape a per-check process should have --
+   throughput set by the runner's cores rather than by the bank's size -- and
+   it is also the reason a worker (M3.4) would buy a constant and not a curve.
+
    `--jobs` is off by default, and that is not timidity. V4 asserts
    `reference_ms` against a wall-clock budget, so validating concurrently
    inflates the very quantity being checked: a loaded box can fail a task that
