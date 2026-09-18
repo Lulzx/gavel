@@ -6,8 +6,8 @@ import ./prelude.bend as P
 # with the reference on the list `nth_zero` is easiest to read at -- a one
 # element tail-less cons -- which is what makes it worth having: the law is
 # quantified over `t` as well as `h`, so any `t` with at least two elements
-# separates `Some{h2}` from `Some{h}`. The step law and both domain laws hold;
-# `nth_zero` alone rejects it.
+# separates `Some{h2}` from `Some{h}`. The step law holds, and so does the
+# out-of-range law; `nth_zero` is the law it is false of.
 def nth(k: Nat, xs: List<&2, Nat>) -> Maybe<&2, Nat>:
   match k:
     case 0n:

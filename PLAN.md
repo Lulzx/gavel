@@ -605,7 +605,14 @@ and the resulting verdicts say `dev_only: true`.
    measured locally as **122/122 valid over 2172 checker runs**, with no
    problems and one warning per task — the missing calibration measurement, which
    is the warning `--strict` would promote (the last CI run over a whole bank was
-   at 83, `83/83` over 1544, run `35350369509`). The 121 tasks at tiers 1–4 are
+   at 83, `83/83` over 1544, run `35350369509`). That run is bound to the
+   122-task revision: the two tasks registered since were each validated against
+   their own revision at 1/1, and re-measuring the whole bank is a quiet-box job
+   under the same precondition M4.3's throughput number waits on — V4 reads
+   wall-clock latency, so a bank measured while an authoring agent is checking
+   it is a bank measured under contention, and the numbers would be about the
+   box rather than about the harness.
+   The 121 tasks at tiers 1–4 are
    short of the 200 by 79, and 20 of the 124 are the tier-2 family §3.9 records:
    the count and the number of distinct problems are not the same number, and
    only one of the two is what a curriculum buys.
