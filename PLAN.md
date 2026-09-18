@@ -381,9 +381,7 @@ and the resulting verdicts say `dev_only: true`.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
    progress** — 59 tasks (20 tier 1, 27 tier 2, 12 tier 3), validated together
    rather than per task, because a task is sound only against a corpus that
-   shares the degenerate generator with it. 58 of the 59 were validated as one
-   bank in 894 checker runs, and `t3-rev-rev` landed after that run started and
-   was validated on its own at 12 more.
+   shares the degenerate generator with it: 59/59 valid over 906 checker runs.
 
    The CI job is `uv run python -m tools.validate`, deliberately without
    `--strict`. Every task in the bank carries the same warning — calibration
@@ -399,6 +397,23 @@ and the resulting verdicts say `dev_only: true`.
    than a generator, which is why `tools/author.py`'s mutants stage keeps one
    rather than replacing it. Registering a task that fails validation is worse
    than leaving it out, since the manifest is what a training loop trusts.
+
+   **The CI gate outgrew a serial pass, and that was measured rather than
+   foreseen.** At 58 tasks, "The bank validates" ran for over 18 minutes with
+   nothing else on the runner — the cost is one bun process per check and about
+   15 checks per task, so it grows with the bank and would have been hours at
+   M4's 500. `tools/validate.py` now takes `--jobs N` and CI passes 4; a task's
+   checks are independent (own workdir, own checker process, no shared mutable
+   state in the check path), and `map` keeps the reports in task order so the
+   output is unchanged. Measured on 12 tier-3 tasks: 200 s serial against 110 s
+   at `--jobs 4`, and that 1.8x is a floor rather than a ceiling — the box had
+   five other checker processes running throughout, so four workers were
+   competing with them. The runner has no such neighbours.
+
+   `--jobs` is off by default, and that is not timidity. V4 asserts
+   `reference_ms` against a wall-clock budget, so validating concurrently
+   inflates the very quantity being checked: a loaded box can fail a task that
+   is fine, and it would fail it with a confident number beside it.
 3. `tools/migrate.py` and a dry run against 2.0.4 to measure churn. **Done, and the answer is not the expected one** — see below.
 
 **M2.3 churn, measured.** The plan assumed syntax drift across releases ("three

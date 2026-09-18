@@ -6,6 +6,7 @@ checker are marked ``checker``.
 
 from __future__ import annotations
 
+import json
 from dataclasses import replace
 
 import pytest
@@ -141,6 +142,32 @@ def test_the_report_serialises(task, toolchain):
     assert blob["task_id"] == task.task_id
     assert blob["valid"] is True
     assert blob["laws"] == list(task.laws)
+
+
+def test_validating_in_parallel_gives_the_same_verdicts(capsys):
+    """``--jobs`` is a speed knob, not a second code path with its own answers.
+
+    The bank outgrew a serial pass -- 58 tasks took over 18 minutes in CI -- and
+    the speedup is only sound if a task's verdict does not depend on what else
+    was running. The timings are expected to differ; ``reference_ms`` is what
+    V4 measures, which is exactly why ``--jobs`` is off by default.
+    """
+    from tools.validate import main
+    ids = ["t1-add-succ", "t1-len-append"]
+
+    def reports(jobs: int) -> dict:
+        assert main([*ids, "--json", "--jobs", str(jobs)]) == 0
+        out = capsys.readouterr().out
+        # The summary line is printed after the JSON, so decode the document
+        # rather than the whole stream.
+        blob, _ = json.JSONDecoder().raw_decode(out)
+        return {t["task_id"]: t for t in blob["tasks"]}
+
+    serial, parallel = reports(1), reports(2)
+    for task_id in ids:
+        for field in ("valid", "tier", "laws", "hash", "problems", "warnings",
+                      "checked", "mutant_tiers", "mutant_strong"):
+            assert serial[task_id][field] == parallel[task_id][field], field
 
 
 # --- V3 is not vacuous ----------------------------------------------------------

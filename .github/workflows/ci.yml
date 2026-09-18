@@ -43,7 +43,12 @@ jobs:
         run: uv run pytest -q
 
       - name: The bank validates
-        run: uv run python -m tools.validate
+        # --jobs because the bank outgrew a serial pass: the cost is one bun
+        # process per check and ~15 checks per task, so 58 tasks took over 18
+        # minutes on a runner with nothing else to do. A task's checks are
+        # independent, so this is the whole speedup, and the runner's cores are
+        # the ceiling.
+        run: uv run python -m tools.validate --jobs 4
 
       - name: The bank is in sync with its tasks
         run: |
