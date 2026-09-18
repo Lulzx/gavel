@@ -4,8 +4,8 @@ import Base
 # diagonal law `min(x, x) == x` is satisfied -- both arguments are the same
 # number -- and the symmetry law is not, because the body answers `x` where
 # the law asks for the answer to `(y, x)`.
-# Measured: `proof_tier=2 bare_tier=2`, nothing proven, first failure at
-# `LAWS.min_self`.
+# Measured: `proof_tier=3 bare_tier=2`, proven ['min_zero_left'], first
+# failure at `LAWS.min_self`.
 def min(a: Nat, b: Nat) -> Nat:
   match a b:
     case 0n 0n:

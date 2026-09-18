@@ -5,8 +5,8 @@ import Base
 # the body is the second projection as soon as the first argument is zero. The
 # diagonal law is satisfied at `x = 0n` and symmetry fails, since the body
 # answers `y` where it should answer the `0n` it gives for `(y, 0n)`.
-# Measured: `proof_tier=3 bare_tier=2`, proven ['min_self'], first failure
-# at `LAWS.min_comm`.
+# Measured: `proof_tier=3 bare_tier=2`, proven ['min_self',
+# 'min_succ_succ'], first failure at `LAWS.min_comm`.
 def min(a: Nat, b: Nat) -> Nat:
   match a b:
     case 0n 0n:

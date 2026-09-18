@@ -4,8 +4,8 @@ import Base
 # the recursion is dropped from the last case. The diagonal law fails at
 # `x = 2n`, where the body answers `1n`, and the statement is at a variable
 # `x`, so the proof never gets that far.
-# Measured: `proof_tier=2 bare_tier=2`, nothing proven, first failure at
-# `LAWS.min_self`.
+# Measured: `proof_tier=3 bare_tier=2`, proven ['min_zero_left'], first
+# failure at `LAWS.min_self`.
 def min(a: Nat, b: Nat) -> Nat:
   match a b:
     case 0n 0n:
