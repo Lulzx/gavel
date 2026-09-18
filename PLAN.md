@@ -69,6 +69,12 @@ Added while implementing M0, each with a test in `tests/`:
 
 23. **The corpus generator was silently vacuous twice, in the same way.** Two spellings made `signatures()` and `_zero_of()` produce submissions that fail before any law is consulted, so every degenerate attempt landed at tier 1 and V3 passed having asked nothing — a guard reporting "fine" without having looked. `Bool` values are `False{}`/`True{}` (base.bend:13), and the generator emitted a bare `False`. And `signatures()` split parameters on a bare comma, so `List<&2, Nat>` became a parameter of type `List<&2` plus a fragment with no type, and the def was dropped — leaving a generated solution missing a function its laws call. Both are fixed (`_split_params` respects `<…>`/`(…)`/`{…}` nesting; `_zero_of("Bool")` is `False{}`), and the second failure mode now has a name: `gavel.degenerate.unmodelled(stub)` returns the stub defs the generator could not rebuild, and `tools.validate` turns a non-empty result into a warning, because an unbuildable corpus is "not yet known" rather than "fine" — which is what `--strict` is for.
 
+24. **At this size, a check's cost is entirely fixed overhead — the checking itself is not measurable.** A file containing `import Base` and nothing else, and a file containing the bank's full inductive reference proof for a tier-1 task, cost **the same**: 10 runs each, 1.80 s total, ~180 ms/run, through the pinned bun. Whatever the checker spends on the proof is under the resolution of the measurement, and the measured constant is bun startup plus one parse of `base.bend`.
+
+    Two things follow, both of which the plan had wrong by omission. M3 item 4's prize is exactly this constant and nothing more: a persistent worker removes process startup, and that is the entire win — it cannot make a *large* proof cheaper, because proof size is not what is being paid for. And `reference_ms` as V4 records it measures the runtime, not the task, which is why the V4 budget (2000 ms) is a catastrophic-failure tripwire rather than a difficulty signal.
+
+    The numbers are also only comparable within one measurement. The 10k soak below reports p50 320 ms against the ~180 ms measured here quiet, because the soak ran on 8 jobs on the same machine while this session was building, testing, and committing. The honest reading of the soak latency is "contended"; the honest reading of ~180 ms is "idle".
+
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
 ## 1. Deviations from SPEC.md
@@ -391,14 +397,39 @@ looks.
    **Half done: the numbers are published, the backend is not built.**
    `tools/soak.py` reports p50/p95/p99 and verdicts/min/core from a real run,
    but every check is still a fresh `bun bend2/main.ts`, so what those numbers
-   measure is the process-per-check design rather than a check. The soak also
-   bounds what a worker could win: the difference between its per-check time
-   and the reference's own `reference_ms` is bun startup plus one parse of
-   `base.bend`, and that constant is the whole prize. Not built because the
-   checker process *is* the thing the sandbox is a boundary around —
+   measure is the process-per-check design rather than a check. Fact 24 is the
+   bound on what a worker could win, measured rather than argued: a file
+   containing `import Base` and nothing else costs what the bank's heaviest
+   reference proof costs, so the whole per-check time *is* the constant a
+   worker would eliminate. It is a real win and it is the only one. Not built
+   because the checker process *is* the thing the sandbox is a boundary around —
    `gavel/runner.py` reasons about a process it starts, scrubs, limits, and
    kills, and none of those apply to a worker that outlives the check.
-5. 10k-episode unattended soak with a scripted policy.
+5. 10k-episode unattended soak with a scripted policy. **Done** —
+   `runs/soak-10000`, run `20260918T092845Z-189b5e5b`, exit 0, no human in the
+   loop and none needed: the log's printed counters were reconciled against
+   `metrics.json` and agree, and the run was left unattended to completion.
+
+   | | |
+   |---|---|
+   | episodes | 10000 of 10000 (33538 turns) |
+   | solved | 4939 (49.4%), mean reward 0.573, mean turns 3.35 |
+   | best tier | 0:1015 2:2635 3:1411 4:4939 |
+   | throughput | 636 verdicts/min (80/core) over 3165 s on 8 jobs |
+   | latency | p50 320 ms, p90 418, p95 456, p99 524 (29478 fresh checks) |
+   | cache | 0 hits / 33538 lookups, 33538 rows |
+   | incidents | 0, and 0 unexpected; 4060 gate rejections |
+
+   Three things this bought beyond the number. The **0% cache hit rate is a
+   property of `--policy noisy`**, not of the cache: a scripted policy that
+   varies its submission every turn never asks the same question twice, so the
+   soak measures the cache's cold path and none of its warm one. Mean turns
+   3.35 against `max_turns 4` with 10% of episodes ending at tier 0 says the
+   policy is being pushed to the bound rather than idling inside it. And the
+   latency figures are **contended** — the soak ran on 8 jobs on this machine
+   while the session was building and testing on it, which is why p50 320 ms
+   here and ~180 ms quiet (Fact 24) are both true and not in conflict. Re-run
+   on an idle box before quoting a throughput number to anyone.
 
 ### M4 — Bank v1.0
 
