@@ -61,4 +61,34 @@ def test_every_task_carries_its_own_hash(manifest):
 def test_the_bank_knows_its_tiers(manifest):
     assert manifest.by_tier(1)
     assert all(t.tier == 1 for t in manifest.by_tier(1))
-    assert sum(len(manifest.by_tier(t)) for t in (1, 2, 3)) == len(manifest)
+    tiers = {task.tier for task in manifest}
+    assert sum(len(manifest.by_tier(t)) for t in tiers) == len(manifest)
+
+
+def test_a_quarantined_task_is_loaded_out_of_the_bank(manifest, repo, tmp_path):
+    """The exclusion has to be enforced where the bank is read.
+
+    Written against a manifest on disk rather than against ``Manifest``
+    directly, because the flag's whole job is to stop ``load_task`` from ever
+    seeing the directory -- a task that fails to load *after* its files were
+    read has already had whatever the exclusion was protecting against.
+    """
+    import json
+
+    from gavel.tasks import load_manifest
+
+    bank = json.loads(json.dumps(manifest.bank))
+    held, kept = bank["tasks"][0]["task_id"], bank["tasks"][1]["task_id"]
+    for entry in bank["tasks"]:
+        # Absolute, so the copy can live anywhere: ``bank_root / path`` returns
+        # the absolute path unchanged.
+        entry["path"] = str(repo / entry["path"])
+        entry["reference"] = str(repo / entry["reference"])
+        if entry["task_id"] == held:
+            entry["quarantined"] = True
+
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps(bank))
+    loaded = load_manifest(path)
+    assert kept in loaded.tasks
+    assert held not in loaded.tasks

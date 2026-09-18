@@ -6,6 +6,15 @@ metadata field that can disagree with the file it describes is a field that
 eventually will, and the gate's integrity check would then reject a task that
 is perfectly fine.
 
+This tool does not claim a task is valid. It used to -- every entry it wrote
+carried ``"valid": true``, which nothing had measured, and a bare run rebuilt
+the entries from scratch so a quarantine set by hand was silently erased by the
+very command CI runs. Validity is V1-V5's to state (``tools/validate.py``) and
+this tool's job is only to describe the files. What it does carry is
+``quarantined``: a task excluded from the bank on purpose, which survives a
+republish because dropping it would make the exclusion expire on its own.
+Lifting one is a deliberate edit, not a side effect of editing the task.
+
 Usage:
     uv run python -m tools.publish            # every task under tasks/
     uv run python -m tools.publish tasks/1/t1-add-succ
@@ -47,7 +56,8 @@ def target_names(src: str) -> list[str]:
             if c.kind == "def" and not c.name.startswith("Policy.")]
 
 
-def publish_task(root: Path, version: str, repo: Path = REPO_ROOT) -> dict:
+def publish_task(root: Path, version: str, repo: Path = REPO_ROOT,
+                 previous: dict | None = None) -> dict:
     meta_path = root / "meta.json"
     meta = json.loads(meta_path.read_text()) if meta_path.is_file() else {}
     laws_src = (root / LAWS_FILE).read_text()
@@ -74,15 +84,19 @@ def publish_task(root: Path, version: str, repo: Path = REPO_ROOT) -> dict:
         "bend_version": version,
     })
     meta_path.write_text(json.dumps(meta, indent=2, sort_keys=False) + "\n")
-    return {
+    entry = {
         "task_id": task_id,
         "tier": tier,
         "path": root.relative_to(repo).as_posix(),
         "reference": f"references/{task_id}",
         "hash": hash_files({LAWS_FILE: laws_src, PRELUDE_FILE: prelude_src,
                             SOLUTION_FILE: stub_src}),
-        "valid": True,
     }
+    # Carried forward whether or not the task's files changed. A quarantine that
+    # expires when someone edits the task is not an exclusion, it is a delay.
+    if previous and previous.get("quarantined"):
+        entry["quarantined"] = True
+    return entry
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -95,16 +109,19 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     manifest = Path(args.manifest).resolve()
 
-    if args.paths:
-        roots = [Path(p).resolve() for p in args.paths]
-        existing = json.loads(manifest.read_text()) if manifest.is_file() else {"tasks": []}
-    else:
-        roots = sorted(p.parent for p in (REPO_ROOT / "tasks").glob("*/*/LAWS.bend"))
-        existing = {"tasks": []}
+    # Read the bank even on a bare run. Rebuilding the entries from scratch is
+    # what erased hand-set quarantines; a task whose directory is gone is still
+    # dropped below, because that is the one thing the filesystem decides.
+    existing = json.loads(manifest.read_text()) if manifest.is_file() else {"tasks": []}
+    roots = ([Path(p).resolve() for p in args.paths] if args.paths else
+             sorted(p.parent for p in (REPO_ROOT / "tasks").glob("*/*/LAWS.bend")))
 
     entries = {e["task_id"]: e for e in existing.get("tasks", [])}
+    if not args.paths:
+        entries = {name: e for name, e in entries.items()
+                   if (REPO_ROOT / e["path"]).is_dir()}
     for root in roots:
-        entry = publish_task(root, args.version)
+        entry = publish_task(root, args.version, previous=entries.get(root.name))
         entries[entry["task_id"]] = entry
         print(f"published {entry['task_id']} (tier {entry['tier']}, "
               f"{len(json.loads((root / 'meta.json').read_text())['laws'])} laws)")

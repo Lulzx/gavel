@@ -226,7 +226,9 @@ def load_manifest(path: Path | str) -> Manifest:
     bank_root = path.resolve().parent
     manifest = Manifest(path=path, bank=bank)
     for entry in bank.get("tasks", []):
-        if not entry.get("valid", True):
+        # A quarantined task is excluded on purpose -- see ``tools/publish.py``
+        # for why this is not a claim about validity.
+        if entry.get("quarantined"):
             continue
         root = (bank_root / entry["path"]).resolve()
         task = load_task(root, entry, bank_root)
