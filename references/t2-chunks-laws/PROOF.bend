@@ -26,6 +26,13 @@ def L.chunks_single(x):
 def L.chunks_three_by_two():
   {==}
 
+# The entry point's second arm. `1n + n` is a successor, so the size match takes
+# the step arm and binds the predecessor back as `n`; the body is then the
+# worker called on the tail, with `Nat.sub(1n + n, 1n)` reducing to `n` and the
+# first element opening the new block. Both sides are that same call.
+def L.chunks_cons(x, xs, n):
+  {==}
+
 # `x <> xs` is a cons cell and `1n + k` is a successor, so the worker takes the
 # arm that adds the element to the block being built. Both sides are that same
 # self-call.

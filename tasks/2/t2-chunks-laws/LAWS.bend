@@ -38,6 +38,30 @@ law chunks_three_by_two:
 # first of the two laws about the worker, and it fixes what the recursion does
 # while the block is not yet full -- `1n + k` is a successor, so the match takes
 # that arm, and both sides are the same self-call.
+# LAW: the entry point's own unfolding, at a full size. Everything above names a
+# *closed* list -- `Nil{}`, `x <> Nil{}`, and the one literal `1n <> (2n <> (3n
+# <> Nil{}))` -- so nothing said what `chunks` does with a list of two or more
+# elements at a size of two or more, and the two laws that looked like they did
+# are values rather than calls. A body that answers the hard-coded
+# `(1n <> (2n <> Nil{})) <> ((3n <> Nil{}) <> Nil{})` at *every* list of length
+# two or more otherwise proves all of the laws here: measured 2026-09-19, with
+# the reference proof unchanged, **tier 4, complete, reward 1.000, `failed`
+# empty.** This is the law that closes it, and it is the entry point's second
+# arm written out in terms of the worker the two laws below govern: a cons at a
+# successor size opens a block with its first element and hands the tail to
+# `chunks_go` with the room that element left. It is definitional for the
+# reference, because that is exactly what the reference's step arm computes.
+# The room is written `Nat.sub(1n + n, 1n)` rather than `n` because `Nat.sub`
+# recurses on its *first* argument: `Nat.sub(1n + n, 1n)` steps to
+# `Nat.sub(n, 0n)`, which is stuck on a variable and does not reduce to `n`. The
+# law has to name the term the body computes, not the value it is worth.
+law chunks_cons:
+  for x: Nat
+  for xs: List<&2, Nat>
+  for n: Nat
+  {S.chunks(x <> xs, 1n + n)
+     == S.chunks_go(xs, 1n + n, Nat.sub(1n + n, 1n), x <> Nil{}, Nil{}) : List<&2, List<&2, Nat>>}
+
 law chunks_go_fill:
   for x: Nat
   for xs: List<&2, Nat>

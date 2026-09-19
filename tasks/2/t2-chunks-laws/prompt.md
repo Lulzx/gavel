@@ -1,5 +1,5 @@
 Implement `chunks` and its worker `chunks_go` on lists of `Nat`, then prove the
-six laws.
+seven laws.
 
 `chunks(xs, n)` must split `xs` into consecutive blocks of `n` elements, in
 order, keeping a short final block if the last one is not full. `chunks([1, 2,
@@ -53,7 +53,22 @@ of the two arms is taken for every `k`, `1n + k` is a successor so the match
 takes the first, and `0n` is the literal so the match takes the second. Both
 are definitional.
 
+`chunks_cons` is the one law that says what `chunks` itself does at a size of
+two or more, and it is here because the four laws above do not. Every one of
+them names a *closed* list -- `Nil{}`, `x <> Nil{}`, and the single literal
+`[1, 2, 3]` -- so a body is free at every other list of length two or more, and
+free there for a body that agrees at those points. `chunks_single` and
+`chunks_three_by_two` are values rather than calls, and agreeing with two values
+is not agreeing with a rule. The law writes the entry point's step arm out in
+terms of the worker: a cons cell at size `1n + n` opens a block with its first
+element and hands the tail to `chunks_go` with the room that element left. Note
+the room is `Nat.sub(1n + n, 1n)` and not `n`: `Nat.sub` recurses on its *first*
+argument, so that term steps to `Nat.sub(n, 0n)`, which is stuck and does not
+reduce to `n`. Write the term the body computes. It is definitional, so `{==}`
+closes it.
+
 Write the implementations in `solution.bend` and the proofs in `PROOF.bend`, as
 `def L.chunks_nil(n)`, `def L.chunks_zero(xs)`, `def L.chunks_single(x)`,
-`def L.chunks_three_by_two()`, `def L.chunks_go_fill(x, xs, n, k, cur, out)` and
+`def L.chunks_three_by_two()`, `def L.chunks_cons(x, xs, n)`,
+`def L.chunks_go_fill(x, xs, n, k, cur, out)` and
 `def L.chunks_go_close(x, xs, n, cur, out)`.
