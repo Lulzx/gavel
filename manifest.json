@@ -695,7 +695,7 @@
       "tier": 3,
       "path": "tasks/3/t3-merge-len",
       "reference": "references/t3-merge-len",
-      "hash": "0a2170244d399cbd3fbe2279a0ab8aeb49630212d40c97e9703b25ba1a9d0e14"
+      "hash": "2df62bbea28bf6292385e8483db9254b9ac0ce2d9adf7e8c1a588a59f74f5d6f"
     },
     {
       "task_id": "t3-mul-comm",

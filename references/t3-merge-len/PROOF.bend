@@ -125,3 +125,49 @@ def L.merge_len(xs, ys):
           %Policy.merge_go_len(tx, hx, ty, hy, P.le(hx, hy))
               : {P.len(S.merge(hx <> tx, hy <> ty)) == _ : Nat}
           {==}
+
+def L.merge_le_head(hx, tx, hy, ty, e):
+  match tx:
+    case Nil{}:
+      match ty:
+        case Nil{}:
+          %Equal.cong(Bool, List<&2, Nat>, k => S.merge_go(Nil{}, hx, Nil{}, hy, k), P.le(hx, hy), True{}, e)
+              : {S.merge_go(Nil{}, hx, Nil{}, hy, P.le(hx, hy)) == _ : List<&2, Nat>}
+          {==}
+        case hy2 <> ty2:
+          %Equal.cong(Bool, List<&2, Nat>, k => S.merge_go(Nil{}, hx, hy2 <> ty2, hy, k), P.le(hx, hy), True{}, e)
+              : {S.merge_go(Nil{}, hx, hy2 <> ty2, hy, P.le(hx, hy)) == _ : List<&2, Nat>}
+          {==}
+    case hx2 <> tx2:
+      match ty:
+        case Nil{}:
+          %Equal.cong(Bool, List<&2, Nat>, k => S.merge_go(hx2 <> tx2, hx, Nil{}, hy, k), P.le(hx, hy), True{}, e)
+              : {S.merge_go(hx2 <> tx2, hx, Nil{}, hy, P.le(hx, hy)) == _ : List<&2, Nat>}
+          {==}
+        case hy2 <> ty2:
+          %Equal.cong(Bool, List<&2, Nat>, k => S.merge_go(hx2 <> tx2, hx, hy2 <> ty2, hy, k), P.le(hx, hy), True{}, e)
+              : {S.merge_go(hx2 <> tx2, hx, hy2 <> ty2, hy, P.le(hx, hy)) == _ : List<&2, Nat>}
+          {==}
+
+def L.merge_gt_head(hx, tx, hy, ty, e):
+  match tx:
+    case Nil{}:
+      match ty:
+        case Nil{}:
+          %Equal.cong(Bool, List<&2, Nat>, k => S.merge_go(Nil{}, hx, Nil{}, hy, k), P.le(hx, hy), False{}, e)
+              : {S.merge_go(Nil{}, hx, Nil{}, hy, P.le(hx, hy)) == _ : List<&2, Nat>}
+          {==}
+        case hy2 <> ty2:
+          %Equal.cong(Bool, List<&2, Nat>, k => S.merge_go(Nil{}, hx, hy2 <> ty2, hy, k), P.le(hx, hy), False{}, e)
+              : {S.merge_go(Nil{}, hx, hy2 <> ty2, hy, P.le(hx, hy)) == _ : List<&2, Nat>}
+          {==}
+    case hx2 <> tx2:
+      match ty:
+        case Nil{}:
+          %Equal.cong(Bool, List<&2, Nat>, k => S.merge_go(hx2 <> tx2, hx, Nil{}, hy, k), P.le(hx, hy), False{}, e)
+              : {S.merge_go(hx2 <> tx2, hx, Nil{}, hy, P.le(hx, hy)) == _ : List<&2, Nat>}
+          {==}
+        case hy2 <> ty2:
+          %Equal.cong(Bool, List<&2, Nat>, k => S.merge_go(hx2 <> tx2, hx, hy2 <> ty2, hy, k), P.le(hx, hy), False{}, e)
+              : {S.merge_go(hx2 <> tx2, hx, hy2 <> ty2, hy, P.le(hx, hy)) == _ : List<&2, Nat>}
+          {==}

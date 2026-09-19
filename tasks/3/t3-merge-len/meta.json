@@ -6,7 +6,9 @@
     "merge_nil_r",
     "merge_go_true",
     "merge_go_false",
-    "merge_len"
+    "merge_len",
+    "merge_le_head",
+    "merge_gt_head"
   ],
   "policy_targets": [
     "merge_go",
@@ -15,7 +17,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "9fde7f0259886b0ad825ace89e45f8189c6cae908e42f4e28af432cd86ac62ad",
+    "laws": "5d7ba56af24ee563950547b6305af224f906d59a4e371e42dd1232dd470c53f4",
     "prelude": "cbe2d38658fbbde749dd1cc4405c5ebcf1a59400fb1a832101d99e5608fc4e8b"
   },
   "bend_version": "2.0.5"

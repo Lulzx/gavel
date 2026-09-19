@@ -1,4 +1,4 @@
-Implement `merge` on the prelude's `List<&2, Nat>`, and prove all three laws.
+Implement `merge` on the prelude's `List<&2, Nat>`, and prove all seven laws.
 
 `merge(xs, ys)` combines the two lists by comparing their heads with `P.le`: the
 list with the smaller head is advanced and the other keeps its head, until one
@@ -26,7 +26,7 @@ of the side being advanced is not available until its tail has been matched. The
 recursive call also has to pass the shrinking list as the argument that differs
 first, or the decreasing self-call check rejects it.
 
-Four of the five laws are pins, and they come in two pairs. `merge_nil_l` fixes
+Five of the seven laws are pins, and they come in two pairs. `merge_nil_l` fixes
 what an empty left list answers, and in `merge` both sides compute, so `{==}`
 closes it. `merge_nil_r` takes a variable left list, so the match in `merge` is
 stuck and it is an induction rather than an unfolding -- which is what makes it
@@ -37,9 +37,40 @@ worth stating: a body that read only one of its arguments satisfies
 branch whose two heads have nothing left to compare against owes its answer to
 the comparison alone, and the two laws say which order each value of the
 comparison calls for. They are definitional -- `merge_go(Nil, a, Nil, b, True)`
-computes to `a <> b <> Nil` -- and they are what stops a body that gave the same
-pair on both branches, or gave the pair the wrong way round: every length in
-sight is the same, and only the order is wrong.
+computes to `a <> b <> Nil`.
+
+They are also the narrowest laws here, and it is worth being exact about how
+narrow. Both are stated at `merge_go(Nil{}, a, Nil{}, b, k)`, so between them
+they constrain exactly one of `merge_go`'s eight leaves -- the one where both
+lists are exhausted, which `merge` reaches only when the caller handed it two
+lists of one element each. Every other branch is reached through the recursion,
+and `merge_len` is blind to order by construction. An earlier version of this
+task shipped those two laws as the whole account of the decision, and an
+order-swapping body -- the `(cons, cons, True)` branch recursing with
+`P.le(hy, hx2)` where the reference recurses with `P.le(hx2, hy)` -- reached
+**tier 4, complete, reward 1.000 against the reference proof**. That body is now
+`mutants/merge_go-swap-args-27.bend`.
+
+`merge_le_head` and `merge_gt_head` are the step, stated as an equation rather
+than transcribed from the body, and they are what closes the gap the two
+decision pins leave. Each carries the comparison as a premise on its own
+binder -- `for e: {P.le(hx, hy) == True{} : Bool}` -- and concludes
+`merge(hx <> tx, hy <> ty) == hx <> merge(tx, hy <> ty)`, with the mirror law
+taking the `False{}` premise and answering `hy <> merge(hx <> tx, ty)`. That
+sentence is the specification of the algorithm: *the list with the smaller head
+is advanced and the other keeps its head*. Between them the two laws reach every
+branch `merge` can produce -- one for each value of the top comparison, with the
+tails arbitrary -- so there is no branch left for a body to answer differently.
+
+The premise is not decoration. `merge_go`'s last parameter is the decision, and
+`match` cannot see a computed value, so in the goal the decision sits there as a
+stuck `P.le(hx, hy)` and the `match k` under it does not fire. The proof has to
+spend the premise to get the body moving: `Equal.cong` over the decision
+argument, with the motive `k => S.merge_go(tx, hx, ty, hy, k)` and the equality
+thought of as `P.le(hx, hy) == True{}`, rewrites the stuck call to one whose
+decision is `True{}` and the branch computes. A proof of the law that only says
+`{==}` is refused, and that refusal is the checker telling you the premise is
+load-bearing.
 
 The real work is `merge_len`. It says `merge` keeps every element of both lists,
 and it is the law that says the head is chosen by the comparison rather than by
@@ -74,7 +105,8 @@ it is `S.merge_go`.
 
 The law-defs are written with no signature and bare binder names, in the fixed
 order `def L.merge_nil_l(ys)`, `def L.merge_nil_r(xs)`,
-`def L.merge_go_true(a, b)`, `def L.merge_go_false(a, b)` and
-`def L.merge_len(xs, ys)`, and each may cite the earlier helpers but never one of
-the other laws. Write the implementation in `solution.bend` and the proofs in
-`PROOF.bend`.
+`def L.merge_go_true(a, b)`, `def L.merge_go_false(a, b)`,
+`def L.merge_len(xs, ys)`, `def L.merge_le_head(hx, tx, hy, ty, e)` and
+`def L.merge_gt_head(hx, tx, hy, ty, e)`, and each may cite the earlier helpers
+but never one of the other laws. Write the implementation in `solution.bend` and
+the proofs in `PROOF.bend`.
