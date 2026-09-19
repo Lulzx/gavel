@@ -123,9 +123,9 @@ These are the defects that survive every stage, so they are on you:
 
 ## Distinctness: the hard constraint
 
-The bank already has **179 registered tasks** (plus one tier-3 task held at the
-review checkpoint and one directory parked under `tasks/2/_abandoned/`), **587
-distinct law names** across **307 distinct def names** and **178 distinct policy
+The bank already has **189 registered tasks** (plus one tier-3 task held at the
+review checkpoint and one directory parked under `tasks/2/_abandoned/`), **625
+distinct law names** across **317 distinct def names** and **188 distinct policy
 targets**. A new task must be a new *function*, not the same function at another
 tier, and its law names must not collide with an existing one.
 
@@ -139,7 +139,7 @@ And grep for the specific function you intend to introduce:
     grep -rn 'def <name>' tasks/*/*/prelude.bend tasks/*/*/solution.bend \
                           references/*/solution.bend
 
-The full list of taken def names is 307 entries long, so grep rather than
+The full list of taken def names is 317 entries long, so grep rather than
 guess. `append`, `len`, `map`, `rev`, `sum`, `take`, `drop`, `zip`, `filter`,
 `is_sorted`, `replicate`, `snoc`, `max`, `min`, `pow2`, `insert`, `merge`,
 `mirror`, `inorder`, `flatten`, `nth`, `pad`, `absdiff`, `sub`, `mul`,
@@ -169,7 +169,7 @@ functor and the snoc, mutual recursion between two small functions, and any
 two-function *interaction law* (a law whose two sides use two different
 functions the policy must both implement) that is not already in the bank.
 
-**Check the target set as well as the law names.** The 178 policy targets in
+**Check the target set as well as the law names.** The 188 policy targets in
 the bank are the names a task *asks a policy to implement*; two tasks asking
 for the same function at the same tier is the collision, and the verifier
 reads `meta.json`, not the preludes, to find it. A prelude helper name like

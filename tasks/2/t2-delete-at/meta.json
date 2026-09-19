@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-delete-at",
+  "tier": 2,
+  "laws": [
+    "delete_at_zero",
+    "delete_at_nil",
+    "delete_at_succ",
+    "delete_at_take_drop"
+  ],
+  "policy_targets": [
+    "delete_at"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3040b906f5b1c1fe406fb24715ced3d1f3f4997712a36aa2645a52ccc88c31c9",
+    "prelude": "23528caa2917f7495687d0b88b92a5c508531cbfbea19442c896db44059eb072"
+  },
+  "bend_version": "2.0.5"
+}

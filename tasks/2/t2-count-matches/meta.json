@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-count-matches",
+  "tier": 2,
+  "laws": [
+    "count_matches_nil",
+    "count_matches_nil_right",
+    "count_matches_cons",
+    "count_matches_self"
+  ],
+  "policy_targets": [
+    "count_matches"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "47d3748f82a8633e18bbcca039f9e87b365f4a0b9f14e3488e64e1488536bb00",
+    "prelude": "e173d7064793d8614e618df3722fdc2d335262d546b7068a7c6147e3adbc6245"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-is-prefix",
+  "tier": 2,
+  "laws": [
+    "is_prefix_nil",
+    "is_prefix_nil_right",
+    "is_prefix_cons",
+    "is_prefix_append",
+    "is_prefix_self"
+  ],
+  "policy_targets": [
+    "is_prefix"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3e9703e37b400160f8c5052804d47676d54ab25eacce017f348355dad9994cb4",
+    "prelude": "c8fcf70d196f036351ebd49169a164a950e09e37ab330a74933d498d735a4d8d"
+  },
+  "bend_version": "2.0.5"
+}

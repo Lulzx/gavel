@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-is-suffix",
+  "tier": 2,
+  "laws": [
+    "is_suffix_nil",
+    "is_suffix_nil_right",
+    "is_suffix_cons",
+    "is_suffix_self",
+    "is_suffix_append"
+  ],
+  "policy_targets": [
+    "is_suffix"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7353d6480ef01c685a3264dc3f98333c7d9be2363f0f226cd6aee213a6295275",
+    "prelude": "b277fa093578390e1b0eba930ca27474a04388b74c3fc95bae73ba155b58f5c0"
+  },
+  "bend_version": "2.0.5"
+}

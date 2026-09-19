@@ -1,0 +1,18 @@
+import Base
+import ./prelude.bend as P
+
+def delete_at(n: Nat, xs: List<Nat>) -> List<Nat>:
+  match n:
+    case 0n:
+      match xs:
+        case Nil{}:
+          Nil{}
+        case h <> t:
+          t
+    case 1n+p:
+      match xs:
+        case Nil{}:
+          h <> delete_at(p, t)
+
+        case h <> t:
+          Nil{}

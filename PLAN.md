@@ -459,6 +459,16 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     **The bank goes 172 → 179 and the manifest diff is a pure append**: 49 insertions, no entry modified and none removed, which is also what makes the batch's validation composable with the bank's. The brief's self-cited counts are refreshed against the new tree — **179 registered tasks, 587 distinct law names, 307 distinct def names, 178 distinct policy targets** — and the refresh turned up a small correction worth recording, because it is the failure the brief's own instruction exists to prevent. At the pre-publish bank the brief's own commands give **554 law names**, matching the 554 it stated, but **285 distinct def names and 169 distinct policy targets** against the 287 and 171 it claimed: the law count was right and the other two were each two high. "Re-derive them with the commands under Distinctness" is in the brief as advice to the next author; it is here as a note to the next person who edits the brief, that the advice applies to the person editing it.
 
+55. **Ten more tier-2 tasks went in from the same two-agent round as Fact 54, and the fact worth recording is not their quality — it is that both agents handed in a set of functions skewed away from the ones that need a law about a global property.** The ten are `t2-alternate` (4 laws), `t2-count-matches` (4), `t2-delete-at` (4), `t2-insert-at` (4), `t2-is-prefix` (5), `t2-is-suffix` (5), `t2-tree-insert-laws` (3), `t2-tree-leaf-count-laws` (3), `t2-tree-max-laws` (3) and `t2-tree-size-laws` (3): **38 laws, 111 mutants, 47 of them strong.** They are a second batch from the round Fact 54 opened — the same two agents, still working after that fact was written — and they are a batch and not a leftover because nothing in Fact 54's seven appeared in them.
+
+    **The skew is the reading.** `author-d5` was assigned `range`, `qsort`, `msort`, `nat_to_bin`, `pair_up` and `carry_add`, and shipped **none of the six**; `author-c5` was assigned `tree_depth`, `tree_size`, `tree_leaf_count`, `flat_map`, `apply_n` and `rotate_left`, and shipped four of the six functions it was asked for plus `tree_insert` and `tree_max` in place of `tree_depth`, `flat_map`, `apply_n` and `rotate_left`. Every one of the ten delivered functions is a **single-function structural recursion whose laws are equations over its own recursive call** — `is_prefix(xs, ys)` at a cons, `tree_size` at a node, `insert_at` at a successor count. Not one of them needs the kind of law the dropped four needed: `qsort` and `msort` need a *sortedness* or *permutation* predicate stated against something other than the function, `nat_to_bin` needs the round-trip through the taken `bin_to_nat`, and `carry_add` needs a value law relating two representations. **Which is the same pressure Fact 50 named, arriving through the authors rather than through the checker**: a law that is the function's own unfolding fails `V3`, and a law about a global property is the hardest thing in this dialect to state and prove, so an author optimising for a green run has every reason to pick the structural recursion and none to pick the sort. I asked both agents for the reason they dropped their assignments and **the answers had not arrived when this was written**; the artifacts say what the reasons do not, and the artifact reading is that the difficulty is in the law and not in the function.
+
+    **Verified by me before publishing, exactly as Fact 54 was.** The static half: no stub ships its reference, no law name or policy target collides with the bank, no corpus is thin (8–17 mutants), and `tools/screens.py batch` reads 10 of 10 clean. Then all three screens over the batch: `anchors` 0 of 10, `general` 0 of 10, `positions` 0 cells. Then `tools/validate` against a scratch manifest holding the ten: **exit 0, 10 of 10 valid, no problems, no mutant at tier 4, no law with a zero-kill count** (38 laws, mean 2.61 kills, min 1), the only warning per task being the bank-wide calibration line. Every one of the ten also carries hand-written mutants with measured headers, which is the base-case rule's evidence and the thing Facts 43 and 45 are about: 29 of the 111 are hand-written.
+
+    **Two distinctness judgements I made rather than inherited.** The first is `is_prefix` and `is_suffix`: they are mirrors of each other over the same two-list signature, and the rule is that the same function at another tier is a variation, so the question is whether a mirror is the same function. It is not — one tests the front of `ys` and one the back, the laws differ (`is_prefix_nil` against `is_suffix_nil_right`), and the bank already ships related pairs (`count_up` and `count_down` in one task, `take` and `drop` in another), so both went in and the pair is recorded here so the next person does not re-litigate it. The second is `tree_insert`, which is a structural insert at the leftmost leaf and **not** `t4-bst-insert`'s ordered `insert`/`ins_at`: the tier-4 task's function is driven by a comparison, this one by the shape of the tree, and its laws are about `P.flatten` rather than about `count`. The other eight are free of the bank by name and by shape, checked with the greps the brief prescribes rather than by eye.
+
+    **The bank goes 179 → 189 and the manifest diff is a pure append again**: 70 insertions, no entry modified and none removed, so the ten are composable with everything already validated. The brief's counts move with it and are refreshed in the same pass — **189 registered tasks, 625 distinct law names, 317 distinct def names, 188 distinct policy targets**.
+
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
 ## 1. Deviations from SPEC.md
@@ -674,7 +684,7 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf`, `t4-queue-rep`; `t4-nth-maybe` is the same tier stated as a *domain* instead of an invariant |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 179 registered tasks, 29 are tier 1, 111
+**The bank's ceiling is tier 5.** Of the 189 registered tasks, 29 are tier 1, 121
 are tier 2, 31 are tier 3, 5 are tier 4 and 3 are tier 5. One more tier-3 task
 (`t3-swap-sum-pair`) is on disk and unregistered, held at the review checkpoint
 Fact 43 records. No tier is empty, so what M2's 200 and M4's 500 are short of is
@@ -1007,7 +1017,7 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 179 tasks (29 tier 1, 111 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
+   progress** — 189 tasks (29 tier 1, 121 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
    validated together rather than per task, because a task is sound only against
    a corpus that shares the degenerate generator with it. The whole bank was
    re-measured locally on 2026-09-19, after Fact 54's batch and Fact 51's three
@@ -1025,7 +1035,7 @@ and the resulting verdicts say `dev_only: true`.
    This measurement is the one M4.3 used to argue *against* waiting for a quiet
    box: V4 reads wall-clock latency, so a bank measured while an authoring agent
    is checking it is a bank measured under contention — but the contention makes
-   a *latency* number about the box, and it does not change whether 179 of 179
+   a *latency* number about the box, and it does not change whether 189 of 189
    validate. The 172-task run was taken under exactly that contention — two
    authoring agents were checking against the same tree — and its reference
    latency reads 71–91 ms, median 78, which is a number about a quiet enough box
@@ -1041,8 +1051,8 @@ and the resulting verdicts say `dev_only: true`.
    later readings were taken at `--jobs 8` and their per-task `reference_ms`
    spread runs 74–352 ms, which is a number about eight checkers sharing the box
    and not about a task; the serial reading is the one to quote.
-   The 176 tasks at tiers 1–4 are
-   short of the 200 by 24, and 27 of the 179 are the two families §3.9 records:
+   The 186 tasks at tiers 1–4 are
+   short of the 200 by 14, and 27 of the 189 are the two families §3.9 records:
    the count and the number of distinct problems are not the same number, and
    only one of the two is what a curriculum buys.
 
@@ -1430,16 +1440,16 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 179, of which five are tier 4 and three are
+1. **500+ tasks including tier 5. 189, of which five are tier 4 and three are
    tier 5.** None of the five tiers is empty, so what is left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
-   the same shape of work has since produced 94 more (a 35-task batch from two
+   the same shape of work has since produced 104 more (a 35-task batch from two
    authoring agents, the third tier-5 task, the third and fourth tier-4 ones, the
    Bool-fold duality, the 17-task batch of Fact 42, Fact 43's three — one of
    which is held at review — Fact 44's nine, Fact 45's six, Fact 48's twelve,
-   Fact 50's one and Fact 54's seven; the `t2-chunks-laws` repair moved no count,
-   Fact 51's three repairs moved no count, and Facts 49, 52 and 53 are
-   a screen, a screen and a brief rather than tasks), so the remaining 321 are
+   Fact 50's one, Fact 54's seven and Fact 55's ten; the `t2-chunks-laws` repair
+   moved no count, Fact 51's three repairs moved no count, and Facts 49, 52 and 53
+   are a screen, a screen and a brief rather than tasks), so the remaining 311 are
    volume and nothing else. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
@@ -1561,7 +1571,7 @@ waiting room.
    per-task records. `--json` also had to be fixed to be JSON: the summary
    lines used to follow the document, so the mode existed for callers who could
    not parse it. Two of the four report the bank as it is rather than as a
-   score: calibration is **0 of 179 recorded**, which is item 4's blocked state
+   score: calibration is **0 of 189 recorded**, which is item 4's blocked state
    as a number, and the review fraction is **0 of the 39 tasks that need
    review** — which is *not* the same as thirty-nine tasks having been reviewed,
    and the paragraph here has been wrong in two different directions before
@@ -1578,7 +1588,7 @@ waiting room.
    which is all the check can witness. The eleven forged records were then
    deleted rather than migrated, so the field now reads 0 as well: the 0.205 is
    gone because the records are gone, not because anyone read the laws (Fact
-   27). It is a fraction of the tasks that need review rather than of all 179,
+   27). It is a fraction of the tasks that need review rather than of all 189,
    because below `REVIEW_TIER` the author's own reading *is* the review and
    counting those would report the bank as unreviewed for following its own
    rule.

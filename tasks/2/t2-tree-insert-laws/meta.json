@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-tree-insert-laws",
+  "tier": 2,
+  "laws": [
+    "tree_insert_leaf",
+    "tree_insert_node",
+    "tree_insert_flatten"
+  ],
+  "policy_targets": [
+    "tree_insert"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "127653b23ce6ca9b2536583b51c90560b2de1498d4df83242d187fe9cde54906",
+    "prelude": "fdacaecb56d191fbb1a72a9e666cfb30da187729304d2732ec1255eb68827643"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-tree-max-laws",
+  "tier": 2,
+  "laws": [
+    "tree_max_leaf",
+    "tree_max_node",
+    "tree_max_flatten"
+  ],
+  "policy_targets": [
+    "tree_max"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "99d6d374fa0745647003bfb6898838dbb4586ce4dcb6dbb5b5ef54d75b78cd70",
+    "prelude": "47192786c7559dc9fadca02656d83f44e613aacb5fee944537e9b8e85cbd8818"
+  },
+  "bend_version": "2.0.5"
+}

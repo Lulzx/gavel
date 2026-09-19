@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-tree-leaf-count-laws",
+  "tier": 2,
+  "laws": [
+    "tree_leaf_count_leaf",
+    "tree_leaf_count_node",
+    "tree_leaf_count_flatten"
+  ],
+  "policy_targets": [
+    "tree_leaf_count"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "a569b14097f22cae5b59d2b1068a2566ac4c6d8e91a0b65beece826910049758",
+    "prelude": "a6d22376cbe90624484097e70759285c60137db5d7f8c0f0e204ca239ce05314"
+  },
+  "bend_version": "2.0.5"
+}

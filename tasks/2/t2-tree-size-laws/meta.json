@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-tree-size-laws",
+  "tier": 2,
+  "laws": [
+    "tree_size_leaf",
+    "tree_size_node",
+    "tree_size_nodes"
+  ],
+  "policy_targets": [
+    "tree_size"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "bd03863daf6b36e2c7dc8063bf2c5bbb302e36bc087320402035d3a3e617b973",
+    "prelude": "2b599de41b73213dcc667f33252eeb24fcf103045169ef82bb66e1916710db3a"
+  },
+  "bend_version": "2.0.5"
+}
