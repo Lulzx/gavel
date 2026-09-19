@@ -1,0 +1,29 @@
+{
+  "task_id": "t2-zip-longest",
+  "tier": 2,
+  "laws": [
+    "zl_pad_left_nil",
+    "zl_pad_left_cons",
+    "zl_pad_right_nil",
+    "zl_pad_right_cons",
+    "zip_longest_nil_nil",
+    "zip_longest_cons_cons",
+    "zip_longest_nil_cons",
+    "zip_longest_cons_nil",
+    "zip_longest_equal_lengths",
+    "zip_longest_pads_the_right",
+    "zip_longest_pads_the_left"
+  ],
+  "policy_targets": [
+    "zl_pad_left",
+    "zl_pad_right",
+    "zip_longest"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "0c100f5362440f1cb6db38107c999ae4e9707f83b4bbee101fb851d9ca92eee4",
+    "prelude": "9cc5cf615a20c0d3dc60a2c6d67dc5ece94129b91146835bacc5b084ff5c4efa"
+  },
+  "bend_version": "2.0.5"
+}

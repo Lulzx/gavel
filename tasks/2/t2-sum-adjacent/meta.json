@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-sum-adjacent",
+  "tier": 2,
+  "laws": [
+    "sum_adjacent_nil",
+    "sum_adjacent_single",
+    "sum_adjacent_cons",
+    "sum_adjacent_pair",
+    "sum_adjacent_len",
+    "sum_adjacent_three"
+  ],
+  "policy_targets": [
+    "sum_adjacent"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "b48bf99ff60f38b9e4f773e727de1c5ad87b9b5a8213ad23fc1867744bfe38bc",
+    "prelude": "c3ac7d64ec8c895677698febc08ee217e2b771c9008f093db2b413554dfc3e97"
+  },
+  "bend_version": "2.0.5"
+}

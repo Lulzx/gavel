@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-lcp-list",
+  "tier": 2,
+  "laws": [
+    "lcp_list_nil_left",
+    "lcp_list_nil_right",
+    "lcp_list_cons_heads",
+    "lcp_list_self",
+    "lcp_list_stops_at_a_mismatch",
+    "lcp_list_shorter_runs_out"
+  ],
+  "policy_targets": [
+    "lcp_list"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "80ae6af7f31823dd455d6af8145b720e1fa945baea9ec1669de4cb21da74d0d4",
+    "prelude": "7461a7bd0d2ac28aacf32b25c3ac5b063c44a18b74b164674ffe69f4cbe93261"
+  },
+  "bend_version": "2.0.5"
+}

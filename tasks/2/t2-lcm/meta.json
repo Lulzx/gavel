@@ -1,0 +1,27 @@
+{
+  "task_id": "t2-lcm",
+  "tier": 2,
+  "laws": [
+    "lcm_zero_left",
+    "lcm_zero_right",
+    "lcm_handoff",
+    "lcm_go_no_fuel",
+    "lcm_go_step",
+    "lcm_one_one",
+    "lcm_four_six",
+    "lcm_six_four",
+    "lcm_seven_three",
+    "lcm_five_seven"
+  ],
+  "policy_targets": [
+    "lcm_go",
+    "lcm"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "367eee54a3afbf243c3b7f7610aea3d5e6a8d531e0c723354f7a1aa2252edd6a",
+    "prelude": "d8553c2f682b087326d88fd2aa47ab648626a576119df4806a22dc2580ae70bb"
+  },
+  "bend_version": "2.0.5"
+}

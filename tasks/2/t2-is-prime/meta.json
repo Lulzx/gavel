@@ -1,0 +1,27 @@
+{
+  "task_id": "t2-is-prime",
+  "tier": 2,
+  "laws": [
+    "no_divisor_zero",
+    "no_divisor_one",
+    "no_divisor_step",
+    "is_prime_handoff",
+    "is_prime_zero",
+    "is_prime_one",
+    "is_prime_two",
+    "is_prime_four",
+    "is_prime_seven",
+    "is_prime_nine"
+  ],
+  "policy_targets": [
+    "no_divisor",
+    "is_prime"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "57cb3b82fb4668a888f596eafafa734f8a61924dc8d9053ef490522483776cad",
+    "prelude": "e74d70b6c3c297bb7a87ce6a8fd89b864d4dd56e2e84e2b77015f76f48ddc710"
+  },
+  "bend_version": "2.0.5"
+}

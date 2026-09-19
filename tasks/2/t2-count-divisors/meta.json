@@ -1,0 +1,23 @@
+{
+  "task_id": "t2-count-divisors",
+  "tier": 2,
+  "laws": [
+    "cd_go_zero",
+    "cd_go_step",
+    "count_divisors_handoff",
+    "count_divisors_one",
+    "count_divisors_seven",
+    "count_divisors_twelve"
+  ],
+  "policy_targets": [
+    "count_divisors",
+    "cd_go"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ace594272e5bc7968a7c5400261bf6aaa1a0fa6b53ba66c3fc58b5bab7a88852",
+    "prelude": "a0de1ce5ad6d993dd71599f6df1d40aeb77d7921f29d1621b5ea9a614f44a9bc"
+  },
+  "bend_version": "2.0.5"
+}

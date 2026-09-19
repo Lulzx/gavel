@@ -1,0 +1,26 @@
+{
+  "task_id": "t2-take-every-nth",
+  "tier": 2,
+  "laws": [
+    "take_every_nth_zero",
+    "take_every_nth_nil",
+    "take_every_nth_one",
+    "take_every_nth_step",
+    "every_nth_go_nil",
+    "every_nth_go_take",
+    "every_nth_go_skip",
+    "take_every_nth_five",
+    "take_every_nth_seven"
+  ],
+  "policy_targets": [
+    "take_every_nth",
+    "every_nth_go"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "28bc3723b979b68146ef96918377b78d8ccaabf6218393f92076db0e6fe3ab21",
+    "prelude": "e88ed7aaa65b362f6959a447aea393426bf90472872ed4e45aacf57c85f5bb38"
+  },
+  "bend_version": "2.0.5"
+}

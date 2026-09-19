@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-replicate-each",
+  "tier": 2,
+  "laws": [
+    "replicate_each_nil",
+    "replicate_each_zero",
+    "replicate_each_cons",
+    "replicate_each_one",
+    "replicate_each_two"
+  ],
+  "policy_targets": [
+    "replicate_each"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "36c244a8cc2bd8c533a89fada814cf982367dd488723fbfcddc41eb90778d272",
+    "prelude": "b16fc43fdf24a042ae2eed3057d11623d08fd9ec05ea77cce9366b6a5de12180"
+  },
+  "bend_version": "2.0.5"
+}

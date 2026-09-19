@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-count-at-depth",
+  "tier": 2,
+  "laws": [
+    "count_at_depth_tip",
+    "count_at_depth_zero",
+    "count_at_depth_step",
+    "count_at_depth_three"
+  ],
+  "policy_targets": [
+    "count_at_depth"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "46704086ba08580673e28dcf866f1b735e1056b62b27578a39a404bc42b3a793",
+    "prelude": "f6936252a4c3cebabdbd9a78d72f868705aa41c85a48ca143b9062fdda455532"
+  },
+  "bend_version": "2.0.5"
+}

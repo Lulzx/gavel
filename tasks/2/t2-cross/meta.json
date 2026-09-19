@@ -1,0 +1,23 @@
+{
+  "task_id": "t2-cross",
+  "tier": 2,
+  "laws": [
+    "cross_nil",
+    "row_nil",
+    "row_cons",
+    "cross_cons",
+    "cross_one",
+    "cross_two_two"
+  ],
+  "policy_targets": [
+    "row",
+    "cross"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3d9621783354764ed6ecf34bb62abde36ec809be589de84097dbb8283db20a29",
+    "prelude": "780d349880d5a1b77b4424ff75290009659e4430d4a842661a349fbf0148b7b0"
+  },
+  "bend_version": "2.0.5"
+}

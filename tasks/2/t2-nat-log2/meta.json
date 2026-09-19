@@ -1,0 +1,27 @@
+{
+  "task_id": "t2-nat-log2",
+  "tier": 2,
+  "laws": [
+    "log2_go_no_fuel",
+    "log2_go_zero",
+    "log2_go_one",
+    "log2_go_step",
+    "nat_log2_handoff",
+    "nat_log2_zero",
+    "nat_log2_one",
+    "nat_log2_two",
+    "nat_log2_seven",
+    "nat_log2_eight"
+  ],
+  "policy_targets": [
+    "log2_go",
+    "nat_log2"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "c943be2dd035badd69332cb97ae264d11575b9cf54126c02d322e294e7eb4b93",
+    "prelude": "ba78bad8e357d5ffb8c2d81e5ec82a3a81198de0b90443fd47d5892f00cf142d"
+  },
+  "bend_version": "2.0.5"
+}

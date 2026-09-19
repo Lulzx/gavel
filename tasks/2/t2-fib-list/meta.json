@@ -1,0 +1,23 @@
+{
+  "task_id": "t2-fib-list",
+  "tier": 2,
+  "laws": [
+    "fib_list_zero",
+    "fib_list_succ",
+    "fib_go_zero",
+    "fib_go_succ",
+    "fib_go_len",
+    "fib_list_three"
+  ],
+  "policy_targets": [
+    "fib_go",
+    "fib_list"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "5180bb3a691e42e325ce35ccc1f104729754035082b7cd84ad57872aaa7265f0",
+    "prelude": "ff4ec3be483a31c9418aa8b1ea33eee737e98748026625164e23889c3ded84f7"
+  },
+  "bend_version": "2.0.5"
+}

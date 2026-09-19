@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-nat-sqrt",
+  "tier": 2,
+  "laws": [
+    "nat_sqrt_zero",
+    "nat_sqrt_succ",
+    "nat_sqrt_mono",
+    "nat_sqrt_four",
+    "nat_sqrt_eight",
+    "nat_sqrt_nine"
+  ],
+  "policy_targets": [
+    "nat_sqrt"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "0d56efe9e681ef7cf6995b8091ee6ced8aa01768b99949f9745e5fece2ebe325",
+    "prelude": "0aebbe44735ca52a90a4d6ff9706f89108d94dcc82664d970f40e0431d3cd618"
+  },
+  "bend_version": "2.0.5"
+}

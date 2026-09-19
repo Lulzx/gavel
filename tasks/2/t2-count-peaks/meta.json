@@ -1,0 +1,23 @@
+{
+  "task_id": "t2-count-peaks",
+  "tier": 2,
+  "laws": [
+    "count_peaks_nil",
+    "count_peaks_single",
+    "count_peaks_step",
+    "peaks_go_nil",
+    "peaks_go_cons",
+    "count_peaks_three"
+  ],
+  "policy_targets": [
+    "count_peaks",
+    "peaks_go"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "a824a2969844172c05659686767bc4af56bc28c0943b6cf000e4a9bf394630b4",
+    "prelude": "a198a62015b331600282e492bdf5042a5c366c4e10efd890525549eb9e04f059"
+  },
+  "bend_version": "2.0.5"
+}
