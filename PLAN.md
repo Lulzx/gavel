@@ -61,6 +61,8 @@ Added while implementing M0, each with a test in `tests/`:
 
 21. **The configured model gateway refuses this client, and the route is not the reason.** `ANTHROPIC_BASE_URL` is set to `https://opencode.ai/zen/go` and every calibration call returns `HTTP 403: error code: 1010`. 1010 is Cloudflare's client-signature block, not an API-level refusal: the request never reaches the gateway's own routing. Ruling out the obvious first — the base was posted to verbatim, so the path was missing — `AnthropicPolicy.endpoint` now appends `/v1/messages` to a base that does not already end at it (tests in `tests/test_policy.py`). The 403 is unchanged, which is the measurement: the path was never the problem. **Consequence for M0 item 8:** `zero_shot_solve_rate` cannot be recorded from this environment. `tools/calibrate.py` is complete and `--dry-run` assembles the prompt correctly, so the number is a matter of pointing `ANTHROPIC_BASE_URL` at an endpoint that answers — a file-scope one (`https://api.anthropic.com`) or a gateway that does not gate on client signature. Gavel does **not** spoof an approved client's User-Agent to get past the block; a reward harness that misrepresents itself to a third party to obtain a calibration number is not a harness whose numbers mean anything. `tools/validate.py --strict` therefore still reports "no zero_shot_solve_rate recorded" for every task, and that warning is correct until a real number exists.
 
+    **Re-measured 2026-09-19, and the block is no longer the one recorded above.** A `POST` to `$ANTHROPIC_BASE_URL/v1/messages` with the configured key now returns `HTTP 400` and `{"type":"MissingSessionID","message":"Request is missing x-opencode-session and cannot be routed efficiently."}` — the gateway changed its interface, and the Cloudflare client-signature block is gone. Two consequences, and the second is the one that matters. First, the *reason* M0 item 8 is unrecorded has changed, so the sentence above is now history rather than diagnosis. Second, **`https://api.anthropic.com` is not a drop-in alternative here**: the configured key is gateway-issued and is not in Anthropic's `sk-ant-` format, so pointing the base URL at the file-scope endpoint would fail on the key rather than on the route. The item is therefore blocked on a *credential* rather than on a client signature. Adding the session header the gateway asks for was not attempted and will not be: obtaining whatever an `x-opencode-session` is, in order to make a non-browser client indistinguishable from the approved one, is the same act as the User-Agent spoof this Fact already refuses, and it was refused on the same grounds one layer up. Closing this item needs either a gateway credential that answers or an Anthropic-format key supplied by the operator, and that is a decision for the operator rather than a measurement left to run.
+
 22. **A two-law task can pin at most two functions, and V3 does not catch the third.** The degenerate corpus builds its identity solution from the *first* same-typed parameter (`gavel/degenerate.py:_ignore_arguments`), so a law set that an argument-ignoring body satisfies while the corpus is looking at a *different* argument is invisible to V3. Measured, not argued: for each of five shipped law-pairs, a degenerate solution plus a `{==}`-only proof reached `All terms check.` at exit 0 — full marks for a function nobody implemented. The pairs were rewritten so that no argument-ignoring body satisfies both laws, and each such hack now ships as a mutant so V2 guards it too.
 
     The decisive test is therefore not V3 and not V2 but the **cross product**: every argument-ignoring body (each same-typed parameter, and the zero of the return type) against a `{==}`-only proof, run through the checker. V2 is *proof-relative* — it asks whether the reference proof happens to apply to a mutant — so a mutant V2 reports as "caught" can still reach tier 4 under a trivial proof. Both authors ran that sweep by hand for their batches.
@@ -1367,12 +1369,17 @@ waiting room.
 4. **External training run. Blocked on a model, and the harness half is now
    demonstrated rather than assumed.** Nothing in this repository conjures the
    policy, and the calibration path that would record a `zero_shot_solve_rate`
-   still answers 403 from here — re-run 2026-09-19 and unchanged:
-   `HTTP 403: error code: 1010`, with `api_calls 1`, `input_tokens 0` and
-   `output_tokens 0`, which is the shape of a request that never reached the
-   gateway's own routing. That block is deliberately left standing rather than
-   worked around: a harness that misrepresents itself to a third party to obtain
-   a number is not a harness whose numbers mean anything.
+   does not answer from here — re-run 2026-09-19 and **the refusal had changed
+   shape**: `HTTP 400` and `{"type":"MissingSessionID","message":"Request is
+   missing x-opencode-session and cannot be routed efficiently."}`, with
+   `input_tokens 0` and `output_tokens 0`. The Cloudflare 1010 this item was
+   first blocked on is gone and Fact 21 carries the correction; what replaced it
+   is a session header, and the configured key is gateway-issued rather than
+   Anthropic-format, so `https://api.anthropic.com` is not a substitute. The
+   header was deliberately not pursued: obtaining one in order to make this
+   client indistinguishable from the approved one is the User-Agent spoof on
+   Fact 21's terms, one layer up. Closing the item needs a credential the
+   operator supplies, which is a decision rather than a measurement.
 
    **What can be closed without a model is the half that is not the model, and
    it is closed.** `tools/calibrate.py --echo` runs the whole path with a policy
@@ -1387,7 +1394,8 @@ waiting room.
 
    So the item stands as: the observation, the reward, the recording and the
    curve are all exercised end-to-end and are not what is missing. What is
-   missing is an endpoint that will answer a non-browser client, and that is one
+   missing is a credential the gateway will accept from this client — a
+   supplied Anthropic-format key, or an answered session — and that is one
    configuration value rather than any part of this repository.
 5. **SPEC §12's environment-quality metrics. Built 2026-09-19, and the first
    thing they did was report the bank's honest state.** `SPEC.md` §12 asks for
