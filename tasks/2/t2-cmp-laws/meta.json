@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-cmp-laws",
+  "tier": 2,
+  "laws": [
+    "cmp_zero_zero",
+    "cmp_zero_succ",
+    "cmp_succ_zero",
+    "cmp_succ_succ",
+    "cmp_self",
+    "cmp_antisym"
+  ],
+  "policy_targets": [
+    "cmp"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "4b9dee494b3bbf535d51f60bb9390b64665423e4acfc3be9e499248761d72d7b",
+    "prelude": "8413366334b614b33e9996d5f939b7bcfd988abb0638a882b7a04d786ce0a5dc"
+  },
+  "bend_version": "2.0.5"
+}

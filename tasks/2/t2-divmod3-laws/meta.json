@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-divmod3-laws",
+  "tier": 2,
+  "laws": [
+    "divmod3_zero",
+    "divmod3_one",
+    "divmod3_two",
+    "divmod3_succ3",
+    "divmod3_rem"
+  ],
+  "policy_targets": [
+    "divmod3"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "5198631b9e32e4130dc3980edfb19978b7b5566bdc93e54f878a0e1d8bf0eae7",
+    "prelude": "94f064ff82206bc338894fc5dfc1f357c433336114635ddd5b1fd6f8e0b90b99"
+  },
+  "bend_version": "2.0.5"
+}

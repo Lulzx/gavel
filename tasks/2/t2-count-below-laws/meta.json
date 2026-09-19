@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-count-below-laws",
+  "tier": 2,
+  "laws": [
+    "count_below_nil",
+    "count_below_keep",
+    "count_below_drop",
+    "count_below_split"
+  ],
+  "policy_targets": [
+    "count_below",
+    "count_above"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "f35687694afe1676475e1baf8a521b1409f9cd920041ceebe83ee3a7fe4fb9d1",
+    "prelude": "b4640a4b003c6295d290cd419a65f9df001513269ddf1632343f2ed0bb247b5d"
+  },
+  "bend_version": "2.0.5"
+}

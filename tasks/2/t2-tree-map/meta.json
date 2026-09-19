@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-tree-map",
+  "tier": 2,
+  "laws": [
+    "tree_map_leftmost",
+    "tree_map_rightmost",
+    "tree_map_leaves"
+  ],
+  "policy_targets": [
+    "tree_map"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "677bc0d3e730a9244a4836ec4c724375d3126c01f3bfa861981034346ccc4a15",
+    "prelude": "7ad315066ee2ec9e8d0b7ccee5f31ef35547b4329715748a29c74bc61eed54f6"
+  },
+  "bend_version": "2.0.5"
+}

@@ -55,6 +55,11 @@ law pad_step:
 # and `pad_len` because `max` does not change a length. This law is the empty
 # case read back, and it is what makes the filler the only thing that can be
 # put there.
+#
+# The body needs `case 1n++k:` -- the owned binding -- because `k` is used
+# twice in it, in the `max` and in the recursive call. Written as the plain
+# `case 1n+k:` it does not compile, and a non-compiling body measures tier 1,
+# which is evidence of nothing; that spelling was the earlier record's gap.
 law pad_nil_step:
   for n: Nat
   for x: Nat

@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-dedup",
+  "tier": 2,
+  "laws": [
+    "dedup_nil",
+    "dedup_single",
+    "dedup_cons",
+    "dedup_same"
+  ],
+  "policy_targets": [
+    "dedup"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "022823f75e4ff53be62799c08b989488bbad02940c551ee14419817645feb6f4",
+    "prelude": "7de7f326ed22275b90d5a4d58689734d06b6162b27cf20fcabd778e720131559"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-fib-pair-sum-laws",
+  "tier": 2,
+  "laws": [
+    "fib_pair_zero",
+    "fib_pair_succ",
+    "sum_fib_zero",
+    "sum_fib_succ",
+    "sum_fib_pair"
+  ],
+  "policy_targets": [
+    "fib_pair",
+    "sum_fib"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3bbc1ace196f1ac90e87136bc9c5bdadf022c21251c37cac6d4d76ef1fa68c3f",
+    "prelude": "3c3be57777bdc5452b2066e1c4fef01bc565f56d419329062eb1eb3968ff056a"
+  },
+  "bend_version": "2.0.5"
+}

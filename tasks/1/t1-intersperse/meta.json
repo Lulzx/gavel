@@ -1,0 +1,20 @@
+{
+  "task_id": "t1-intersperse",
+  "tier": 1,
+  "laws": [
+    "intersperse_nil",
+    "intersperse_single",
+    "intersperse_cons",
+    "intersperse_len"
+  ],
+  "policy_targets": [
+    "intersperse"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "c80b24b43d75862ad5c69036e21c0f05424cccd5c1965a8b5450caa6ba4fd22c",
+    "prelude": "c76ad1a18aaaa95886f5bbc496130b8688a3829106bdf06934cb01bb4a077ddb"
+  },
+  "bend_version": "2.0.5"
+}

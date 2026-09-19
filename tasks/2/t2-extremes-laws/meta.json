@@ -1,0 +1,23 @@
+{
+  "task_id": "t2-extremes-laws",
+  "tier": 2,
+  "laws": [
+    "extremes_nil",
+    "extremes_single",
+    "extremes_cons",
+    "ext_go_nil",
+    "ext_go_cons",
+    "ext_go_len"
+  ],
+  "policy_targets": [
+    "extremes",
+    "ext_go"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "f76db8b4036defc654870c9d9f0e0ad0e9a51b941326ee402d639e338f0c4f94",
+    "prelude": "e5e7a5329d194d1bd074ba8032938b6238c75b0099151624e2727b52e04e183b"
+  },
+  "bend_version": "2.0.5"
+}

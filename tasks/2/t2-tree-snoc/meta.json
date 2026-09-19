@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-tree-snoc",
+  "tier": 2,
+  "laws": [
+    "snoc_tree_rightmost",
+    "snoc_tree_leftmost",
+    "snoc_tree_right_spine"
+  ],
+  "policy_targets": [
+    "snoc_tree"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "90d4020b745603178ef9435f705460b8bb1f2aaf2c7d201089e8392978af897b",
+    "prelude": "e54e372bd9336cffa8ed61f6c33c7a7d0897d239777c56ae3c78a854a5db69e6"
+  },
+  "bend_version": "2.0.5"
+}
