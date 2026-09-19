@@ -704,10 +704,10 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf`, `t4-queue-rep`; `t4-nth-maybe` is the same tier stated as a *domain* instead of an invariant |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 189 registered tasks, 29 are tier 1, 121
+**The bank's ceiling is tier 5.** Of the 195 registered tasks, 29 are tier 1, 127
 are tier 2, 31 are tier 3, 5 are tier 4 and 3 are tier 5. One more tier-3 task
 (`t3-swap-sum-pair`) is on disk and unregistered, held at the review checkpoint
-Fact 43 records. No tier is empty, so what M2's 200 and M4's 500 are short of is
+Fact 43 records and marked by a `HOLD` file so that a bare publish skips it. No tier is empty, so what M2's 200 and M4's 500 are short of is
 volume rather than a design nobody has done yet.
 
 Thirty-nine of them came in one run — a 35-task batch from the two authoring
@@ -1636,7 +1636,7 @@ waiting room.
    which is all the check can witness. The eleven forged records were then
    deleted rather than migrated, so the field now reads 0 as well: the 0.205 is
    gone because the records are gone, not because anyone read the laws (Fact
-   27). It is a fraction of the tasks that need review rather than of all 189,
+   27). It is a fraction of the tasks that need review rather than of all 195,
    because below `REVIEW_TIER` the author's own reading *is* the review and
    counting those would report the bank as unreviewed for following its own
    rule.
