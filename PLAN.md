@@ -497,7 +497,16 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     **The measurement has one trap in it that would have inverted the result, and it is Fact 54's trap in a different costume.** A mutant that does not type-check reads `tier 1` with `laws_proven: []` and `checker.kind: type-error`, and its `laws_failed` is therefore *every* law in the task — not because it broke them but because the proof never started. Counted naively, `intercalate`'s corpus reads 11 mutants failing `intercalate_nil_sep` out of 14, and the task looks like the most thoroughly-killed law set in the bank; filtered to the tier-3 mutants that actually compiled, it is 5 of 7. The rule is the brief's own — a tier-1 reading is evidence of nothing — and the reason it is worth writing down a second time is that the artifact is not random: it is biased *toward* whatever law is being counted, so a corpus analysis that forgets to filter tier will find every law well covered and no law redundant, which is the answer that ends the question.
 
-**Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
+59. **The g1/g2 batch of ten, and ten probes that say why they hold.** `author-g1` shipped `t2-dot-laws`, `t2-count-inv-laws`, `t2-best-gain-laws`, `t2-lcp-len-laws` and `t2-longest-run-laws`; `author-g2` shipped `t2-collatz-len`, `t2-digit-sum`, `t2-is-pow2`, `t2-second-max` and `t2-tree-depth-sum` — ten tier-2 tasks, **46 laws, 105 corpus mutants, 57 strong**, one policy target each except `t2-second-max`, which asks for two (`second_max` and its walk `sec_go`) and gives each laws of its own — `sec_go_nil`/`sec_go_cons` for the walk, `second_max_nil`/`_cons`/`_three` for the wrapper — which is the shape the brief requires of a helper rather than the premise-only shape it forbids. Ten of the ten carry a hand mutant for a ground-LHS law (`dot-empty-first-answers-one`, `count-inv-nil-answers-one`, `best-gain-nil-answers-one`, `lcp-len-nil-left/right-answers-one`, `longest-run-len-nil-answers-one`, `collatz-len-fuel-zero-answers-one`, `digit-sum-no-fuel-answers-one`, `is-pow2-no-fuel-answers-true`, `second_max-nil-answers-one`, `tds-leaf-answers-the-value`), so Fact 45's base-case rule was applied per task and not asserted per batch.
+
+    **Measured independently, against each author's own scratch manifest, serially.** `tools.validate` reads **10/10 valid**, **kill_min 1 on all 46 laws** — no zero-kill law anywhere — and no mutant at tier 4. The three screens read `batch` **10/10 clean**, `anchors` **0/10 flagged**, `general` **0/10**, `positions` **0 cells**. Static distinctness: no law name collides with the bank's 643, no policy target with its 194, every stub ships `?TODO` (`1/1` or `2/2` defs unimplemented), and every task's `prelude.bend` is byte-identical to its reference's.
+
+    **I probed all ten rather than one of them, because this batch is the first where the answer was available from the shape of the laws rather than from a sample.** Every one of the ten is a *complete recursion equation system*: an absolute anchor — a law whose right-hand side calls no target — plus a step law that names the target once and the prelude everywhere else, with the recursion forced onto a structural argument (a list, a tree, a width, a budget) that the checker's decreasing-self-call rule will not let a body restructure. A body satisfying the whole set therefore agrees with the reference by induction on that argument, which is why the hole this bank has paid for four times is not merely unflagged here — it is unavailable. The probes test that reasoning rather than restating it: each is the reference with one case changed to a *different reading of the specification*, and each is extensionally unlike the reference. `dot` counts pairs instead of multiplying them; `count_inv` is off by one per cell; `best_gain` takes `Nat.min` of its two candidates; `lcp_len` weighs a matched pair as two; `longest_run_len` measures the block starting at the *second* element; `tree_depth_sum` descends without spending a level — the level-sum's shape; `second_max` seeds the walk's second slot with the head; `collatz_len` subtracts one on the odd branch; `digit_sum` hands the number on unchanged; `is_pow2` never halves. **All ten read tier 3.** Nine are killed by the step law together with the closed law that iterates it; `second_max`'s is killed by `second_max_cons` and `second_max_three` *alone*, with both walk laws untouched, which is the wrapper/helper split doing exactly what it is there for — the seed is wrong and the walk is right, and only the law stated over the wrapper can see it. The empty-case anchors survive in nearly every probe, because the probes were built to answer the empty inputs correctly; that is not a weakness of the reading but the reason the anchors need their own mutants, which each task has.
+
+    **Two probes were refused rather than disproven, and both refusals are facts about the checker rather than about the laws.** The first `lcp_len` probe swapped the two tails — `lcp_len(u, t)` — and the checker answered `expected : a decreasing self-call`, so a call whose first argument is not a subterm of the matched one is *unrunnable*, not unproven: the mechanism Fact 56 records refusing `qsort`, `msort` and width-free `nat_to_bin`. The tail swap is thus not a hole these laws have to close, and the probe was rewritten to weigh the matched pair instead, which the step law does catch. The second is the `+` marking: seeding `second_max` with the head reads the head twice, and a cons-bound binder read twice must be written `+h` in the pattern (`case +h <> t:`) or the file answers `h (consumed more than once)` and lands at tier 1 with a `failed` list naming every law. `author-g1`'s report named this same family — a cons-bound `+` binder cannot be a `match` scrutinee — in a section that arrived truncated, and the tail was never delivered; the two probes above reproduce the limits from my own measurement, which is the reading Fact 56 says to prefer over an account.
+
+    **Published, and this time the whole bank was re-measured rather than the batch.** `tools.publish` over the ten named directories takes the manifest **195 → 205**, a pure append — nothing removed, no existing entry's fields changed — and `meta["hashes"]` is fresh on all 205 (**0 stale**), the four-line check Fact 58 ran. The bank then reads **205/205 valid over 4,451 checker runs**, **735 laws at mean 3.86 kills and min 1**, **2,193 mutants of which 1,191 are strong**, **no law with a zero-kill count and no mutant at tier 4** — the same shape the 195-task reading had, moved by exactly the batch (689 → 735 laws, 2,088 → 2,193 mutants, mean 3.92 → 3.86). The reference latency is **70–191 ms, median 78**, but like Fact 57's bank-wide figure that one was taken under contention — `pytest` ran against the same tree for the first three and a half minutes of it — so it is a number about the box and not the one to quote. The brief's census is refreshed to what the registered bank now holds: **205 tasks, 689 distinct law names, 340 distinct def names, 205 distinct policy targets**, with the prescribed greps printing **695** and **342** because `tasks/*/*/LAWS.bend` also matches the held `t3-swap-sum-pair` (6 laws, 2 defs), and the eleven new target names are added to the brief's list of taken functions. `uv run pytest` is **439 passed**. M2 item 2's 200-task exit is met at **202 of 205 at tiers 1–4** (29 tier 1, 137 tier 2, 31 tier 3, 5 tier 4, and the 3 tier-5 tasks outside the count), against the 192 the previous reading carried.
+
 
 ## 1. Deviations from SPEC.md
 
@@ -712,7 +721,7 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf`, `t4-queue-rep`; `t4-nth-maybe` is the same tier stated as a *domain* instead of an invariant |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 195 registered tasks, 29 are tier 1, 127
+**The bank's ceiling is tier 5.** Of the 205 registered tasks, 29 are tier 1, 137
 are tier 2, 31 are tier 3, 5 are tier 4 and 3 are tier 5. One more tier-3 task
 (`t3-swap-sum-pair`) is on disk and unregistered, held at the review checkpoint
 Fact 43 records and marked by a `HOLD` file so that a bare publish skips it. No tier is empty, so what M2's 200 and M4's 500 are short of is
@@ -745,7 +754,14 @@ batch is worth its full nine, which is the opposite of what the two families
 above are worth and worth saying plainly for that reason. **Fact 45's six add
 none either** — `rotate`, `nat_bits`, `sum_odd`/`sum_even`, `clamp`, `indexed`
 and `build` are first appearances on the same screen — so the count moves
-127 → 133 and the task count 153 → 159.
+127 → 133 and the task count 153 → 159. **Fact 59's ten add none either**, for
+the same reason and by the same screen: `dot`, `count_inv`, `best_gain`,
+`lcp_len`, `longest_run_len`, `second_max`/`sec_go`, `collatz_len`,
+`digit_sum`, `is_pow2` and `tree_depth_sum` collide with no target in the bank's
+`meta.json` files. The running distinct-problem figure has not been re-derived
+since Fact 45's 133 — the batches between then and now were checked for target
+collisions one at a time rather than against a maintained total — so this
+paragraph records the last figure it was computed at and no later one.
 
 One task in the batch is the same function as a committed one at another tier,
 and the distinctness rule that would have parked it is deliberately not applied.
@@ -1044,16 +1060,16 @@ and the resulting verdicts say `dev_only: true`.
    `prelude.bend`, so editing either makes the approval stale and reopens the
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
-2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 195 tasks (29 tier 1, 127 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
-   validated together rather than per task, because a task is sound only against
-   a corpus that shares the degenerate generator with it. The whole bank was
-   re-measured locally on 2026-09-19, after Fact 54's, Fact 55's and Fact 57's
-   batches and Fact 51's three repairs before them, as
-   **195/195 valid over 4,241 checker runs**, with no problems, no law with a
-   zero-kill count (**689 laws, mean 3.92 kills, min 1**), no mutant reading
-   tier 4, and no task free of warnings: the missing calibration
-   measurement on all 195, and on the 39 tasks at or above `REVIEW_TIER` a
+2. **200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. Met** —
+   205 tasks (29 tier 1, 137 tier 2, 31 tier 3, 5 tier 4, 3 tier 5), of which
+   **202 sit at tiers 1–4**, validated together rather than per task, because a
+   task is sound only against a corpus that shares the degenerate generator with
+   it. The whole bank was re-measured locally on 2026-09-19, after Fact 59's ten
+   and Fact 54's, Fact 55's and Fact 57's batches and Fact 51's three repairs
+   before them, as **205/205 valid over 4,451 checker runs**, with no problems,
+   no law with a zero-kill count (**735 laws, mean 3.86 kills, min 1**), no
+   mutant reading tier 4, and no task free of warnings: the missing calibration
+   measurement on all 205, and on the 39 tasks at or above `REVIEW_TIER` a
    review warning as well — all 39 with no record, because the 11 records that
    used to sit in `meta.json` were forgeries and were deleted rather than
    migrated (Fact 27). The calibration warning is the one `--strict` promotes,
@@ -1063,7 +1079,7 @@ and the resulting verdicts say `dev_only: true`.
    This measurement is the one M4.3 used to argue *against* waiting for a quiet
    box: V4 reads wall-clock latency, so a bank measured while an authoring agent
    is checking it is a bank measured under contention — but the contention makes
-   a *latency* number about the box, and it does not change whether 195 of 195
+   a *latency* number about the box, and it does not change whether 205 of 205
    validate. The 172-task run was taken under exactly that contention — two
    authoring agents were checking against the same tree — and its reference
    latency reads 71–91 ms, median 78, which is a number about a quiet enough box
@@ -1076,8 +1092,12 @@ and the resulting verdicts say `dev_only: true`.
    sharing a 12-core box, and the plan records it only so that nobody quotes it.
    Measured serially, the six tasks Fact 57 added read 81–91 ms, median 87.5 —
    the upper end of the band and the first reading above 78, on a host whose
-   load was not measured. A bank-wide latency figure has to come from a serial
-   run; the contended one is good for validity and for nothing else.
+   load was not measured. **The 205-task run is serial but was taken with
+   `pytest` running against the same tree for its first three and a half
+   minutes, so its 70–191 ms, median 78, is a number about the box as well**;
+   validity is unaffected and the median is unchanged a fourth time. A
+   bank-wide latency figure has to come from a serial run on a quiet box; every
+   reading so far has been good for validity and for little else.
    The 122-task reading that stood here was taken the same way, and
    the 142-, 144-, 153- and 159-task ones were taken harder: the load average was
    14–17 throughout because of a ChatGPT/Codex process outside this repository,
@@ -1085,10 +1105,9 @@ and the resulting verdicts say `dev_only: true`.
    later readings were taken at `--jobs 8` and their per-task `reference_ms`
    spread runs 74–352 ms, which is a number about eight checkers sharing the box
    and not about a task; the serial reading is the one to quote.
-   The 192 tasks at tiers 1–4 are
-   short of the 200 by 8, and 27 of the 195 are the two families §3.9 records:
-   the count and the number of distinct problems are not the same number, and
-   only one of the two is what a curriculum buys.
+   The 202 tasks at tiers 1–4 clear the 200 by 2, and 27 of the 205 are the two
+   families §3.9 records: the count and the number of distinct problems are not
+   the same number, and only one of the two is what a curriculum buys.
 
    The CI job is `uv run python -m tools.validate`, deliberately without
    `--strict`. Every task in the bank carries the same warning — calibration
@@ -1474,8 +1493,9 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 195, of which five are tier 4 and three are
-   tier 5.** None of the five tiers is empty, so what is left here is volume: the
+1. **500+ tasks including tier 5. 205, of which 202 are at tiers 1–4, five are
+   tier 4 and three are tier 5.** None of the five tiers is empty, so what is
+   left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
    the same shape of work has since produced 110 more (a 35-task batch from two
    authoring agents, the third tier-5 task, the third and fourth tier-4 ones, the
@@ -1627,7 +1647,7 @@ waiting room.
    per-task records. `--json` also had to be fixed to be JSON: the summary
    lines used to follow the document, so the mode existed for callers who could
    not parse it. Two of the four report the bank as it is rather than as a
-   score: calibration is **0 of 195 recorded**, which is item 4's blocked state
+   score: calibration is **0 of 205 recorded**, which is item 4's blocked state
    as a number, and the review fraction is **0 of the 39 tasks that need
    review** — which is *not* the same as thirty-nine tasks having been reviewed,
    and the paragraph here has been wrong in two different directions before
@@ -1644,7 +1664,7 @@ waiting room.
    which is all the check can witness. The eleven forged records were then
    deleted rather than migrated, so the field now reads 0 as well: the 0.205 is
    gone because the records are gone, not because anyone read the laws (Fact
-   27). It is a fraction of the tasks that need review rather than of all 195,
+   27). It is a fraction of the tasks that need review rather than of all 205,
    because below `REVIEW_TIER` the author's own reading *is* the review and
    counting those would report the bank as unreviewed for following its own
    rule.

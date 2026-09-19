@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-tree-depth-sum",
+  "tier": 2,
+  "laws": [
+    "tree_depth_sum_leaf",
+    "tree_depth_sum_node",
+    "tree_depth_sum_three"
+  ],
+  "policy_targets": [
+    "tree_depth_sum"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "f233641ab389f31031fc0c7b197689fdd7b2673d0e59dc481171b921698b21d0",
+    "prelude": "ef7f7bf0ba7a1d84a8d7e5f145e1f190d0aad108d5bbeba9dde9712bbe37d531"
+  },
+  "bend_version": "2.0.5"
+}

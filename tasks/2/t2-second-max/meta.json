@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-second-max",
+  "tier": 2,
+  "laws": [
+    "second_max_nil",
+    "second_max_cons",
+    "sec_go_nil",
+    "sec_go_cons",
+    "second_max_three"
+  ],
+  "policy_targets": [
+    "second_max",
+    "sec_go"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "32ece6a8681e10fddb304af69e518b1fd15e90886a266b3b55dc8d5a5284d3fd",
+    "prelude": "19610bca85e2c19d53b601c2ac1c221b5478b65cccbf4f96e0c6d18a7cfce9cc"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-longest-run-laws",
+  "tier": 2,
+  "laws": [
+    "longest_run_len_nil",
+    "longest_run_len_single",
+    "longest_run_len_cons",
+    "longest_run_len_one_pair",
+    "longest_run_len_no_pair"
+  ],
+  "policy_targets": [
+    "longest_run_len"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "81b824127ad07651edfb9b76108f364c99e229ebebd6f1ac938c903c85bd74f8",
+    "prelude": "72acb51055dec1dd4743253415ed4416daab997c193a38a04d617d668a41f296"
+  },
+  "bend_version": "2.0.5"
+}

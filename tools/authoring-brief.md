@@ -123,16 +123,16 @@ These are the defects that survive every stage, so they are on you:
 
 ## Distinctness: the hard constraint
 
-The bank already has **195 registered tasks** (plus one tier-3 task held at the
+The bank already has **205 registered tasks** (plus one tier-3 task held at the
 review checkpoint — it carries a `HOLD` file, which is what keeps it out of the
-bank — and three directories parked under `tasks/2/_abandoned/`), **643
-distinct law names** across **324 distinct def names** and **194 distinct policy
+bank — and three directories parked under `tasks/2/_abandoned/`), **689
+distinct law names** across **340 distinct def names** and **205 distinct policy
 targets**. A new task must be a new *function*, not the same function at another
 tier, and its law names must not collide with an existing one.
 
 Those three counts are over the *registered* bank. The grep below reads
 `tasks/*/*/LAWS.bend`, which also matches a task held on disk but not published,
-so it prints **649** law names and **326** def names for the same tree — the 6
+so it prints **695** law names and **342** def names for the same tree — the 6
 and the 2 are `t3-swap-sum-pair`'s. Quote the registered figures; if a grep
 disagrees, find the task that accounts for the difference before changing the
 count.
@@ -147,7 +147,7 @@ And grep for the specific function you intend to introduce:
     grep -rn 'def <name>' tasks/*/*/prelude.bend tasks/*/*/solution.bend \
                           references/*/solution.bend
 
-The full list of taken def names is 324 entries long, so grep rather than
+The full list of taken def names is 340 entries long, so grep rather than
 guess. `append`, `len`, `map`, `rev`, `sum`, `take`, `drop`, `zip`, `filter`,
 `is_sorted`, `replicate`, `snoc`, `max`, `min`, `pow2`, `insert`, `merge`,
 `mirror`, `inorder`, `flatten`, `nth`, `pad`, `absdiff`, `sub`, `mul`,
@@ -159,7 +159,9 @@ guess. `append`, `len`, `map`, `rev`, `sum`, `take`, `drop`, `zip`, `filter`,
 `swap_each`, `sum_pair`, `keys`, `values`, `intersperse`, `cmp`,
 `count_below`, `dedup`, `divmod3`, `extremes`, `ext_go`, `fib_pair`,
 `sum_fib`, `tree_map`, `snoc_tree`, `rotate`, `nat_bits`, `sum_odd`,
-`sum_even`, `clamp`, `indexed`, `build` are all taken. If the function you
+`sum_even`, `clamp`, `indexed`, `build`, `dot`, `count_inv`, `best_gain`,
+`lcp_len`, `longest_run_len`, `second_max`, `sec_go`, `collatz_len`,
+`digit_sum`, `is_pow2`, `tree_depth_sum` are all taken. If the function you
 want is on that list, pick another one.
 
 Good hunting grounds that the list above does not cover — **but check the
@@ -195,7 +197,7 @@ Beyond names: mutual recursion between two small functions, and any two-function
 *interaction law* (a law whose two sides use two different functions the policy
 must both implement) that is not already in the bank.
 
-**Check the target set as well as the law names.** The 194 policy targets in
+**Check the target set as well as the law names.** The 205 policy targets in
 the bank are the names a task *asks a policy to implement*; two tasks asking
 for the same function at the same tier is the collision, and the verifier
 reads `meta.json`, not the preludes, to find it. A prelude helper name like

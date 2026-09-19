@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-count-inv-laws",
+  "tier": 2,
+  "laws": [
+    "count_inv_nil",
+    "count_inv_single",
+    "count_inv_cons",
+    "count_inv_replicate"
+  ],
+  "policy_targets": [
+    "count_inv"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7abf982400d98819724ad59bc5e6a57b78ca93a4176cdfcdaf8e14711bf5d61a",
+    "prelude": "91f3d58e894916b3b3f118d16c9973769f62000057d33e23000d926a9c6a2f12"
+  },
+  "bend_version": "2.0.5"
+}

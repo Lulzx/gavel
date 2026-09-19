@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-lcp-len-laws",
+  "tier": 2,
+  "laws": [
+    "lcp_len_nil_left",
+    "lcp_len_nil_right",
+    "lcp_len_equal_singletons",
+    "lcp_len_cons",
+    "lcp_len_self"
+  ],
+  "policy_targets": [
+    "lcp_len"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ee32fc3611c07914744e2d24df8de20cc7084a1d6c3265947d73c18c03248f18",
+    "prelude": "058e4e29024cbf1bb89c4ea9a87a1fab5074deb4535691a942245873f2c993b7"
+  },
+  "bend_version": "2.0.5"
+}

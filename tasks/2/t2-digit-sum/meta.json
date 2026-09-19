@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-digit-sum",
+  "tier": 2,
+  "laws": [
+    "digit_sum_no_fuel",
+    "digit_sum_step",
+    "digit_sum_123",
+    "digit_sum_thousand"
+  ],
+  "policy_targets": [
+    "digit_sum"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "983e915622e27072d5d3e91d08727c4484f2f893da8275c92672ba3f7ca9ee64",
+    "prelude": "33313d78c3339a6c9daf20ac77f0d62bb81f169f6cdc481d25cd6c5dd8ec57df"
+  },
+  "bend_version": "2.0.5"
+}

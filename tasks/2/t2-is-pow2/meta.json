@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-is-pow2",
+  "tier": 2,
+  "laws": [
+    "is_pow2_no_fuel",
+    "is_pow2_zero",
+    "is_pow2_one",
+    "is_pow2_step",
+    "is_pow2_four",
+    "is_pow2_six"
+  ],
+  "policy_targets": [
+    "is_pow2"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "90ef72b432bad8014f21e04ccb83fd1c4d8d79f925c055237cefab5d1d36dcff",
+    "prelude": "2911ab1a2216a0b1b499be63f3df0cf2e4ebaa8c2d2670cd926a1f4964c4aeb1"
+  },
+  "bend_version": "2.0.5"
+}

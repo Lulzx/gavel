@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-collatz-len",
+  "tier": 2,
+  "laws": [
+    "collatz_len_no_fuel",
+    "collatz_len_zero",
+    "collatz_len_one",
+    "collatz_len_step",
+    "collatz_len_six",
+    "collatz_len_twentyseven"
+  ],
+  "policy_targets": [
+    "collatz_len"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "5d33dc3ba7a6790814b2bb4e1ab78acbf66dd342e88081dba8e2e2e6bd962e46",
+    "prelude": "dfa753f148a2269717bdbae66ed67f3cd21865cecc10775004d9ad911a2dfa55"
+  },
+  "bend_version": "2.0.5"
+}
