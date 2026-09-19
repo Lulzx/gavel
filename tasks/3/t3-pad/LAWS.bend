@@ -42,3 +42,21 @@ law pad_step:
   for y: Nat
   for ys: List<Nat>
   {S.pad(1n + n, x, y <> ys) == y <> S.pad(n, x, ys) : List<Nat>}
+
+# LAW: the empty list's step. `pad_len` counts and `pad_step` needs a cons, so
+# the one case neither reaches is a target that outruns an *empty* input: the
+# count says how many elements the answer has, and nothing says which ones.
+# **Measured 2026-09-19:** a body whose empty case answers `P.max(k, x)` in
+# front of the recursion instead of `x` -- so the filler is replaced by the
+# remaining count wherever that is larger -- reads **tier 4, complete, reward
+# 1.000, all four laws proven by the reference proof unchanged**, and it is
+# wrong: `pad(2n, 0n, Nil{})` is `[1n, 0n]` where the reference answers
+# `[0n, 0n]`. It satisfies `pad_single` because `P.max(0n, x)` reduces to `x`,
+# and `pad_len` because `max` does not change a length. This law is the empty
+# case read back, and it is what makes the filler the only thing that can be
+# put there.
+law pad_nil_step:
+  for n: Nat
+  for x: Nat
+  {S.pad(1n + n, x, Nil{}) == x <> S.pad(n, x, Nil{}) : List<Nat>}
+

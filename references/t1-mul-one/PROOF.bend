@@ -16,3 +16,9 @@ def L.mul_one(x):
 # `mul` steps on its first argument, so the step law is reflexive.
 def L.mul_succ(x, y):
   {==}
+
+# `mul`'s own `0n` case, read back: the left-hand side computes on the `0n`
+# branch of the body's first match whatever the second argument is.
+def L.mul_zero(y):
+  {==}
+

@@ -32,3 +32,29 @@ law absdiff_comm:
   for a: Nat
   for b: Nat
   {S.absdiff(a, b) == S.absdiff(b, a) : Nat}
+
+# LAW: the interior step. The four laws above pin `absdiff` on the two axes and
+# on the diagonal, and those three lines do not determine the function between
+# them: nothing above relates `absdiff(a, b)` to `absdiff(a-1, b-1)`, so every
+# point off the axes and off the diagonal is free. **Measured 2026-09-19:** a
+# body that answers the reference value *plus its own product with the smaller
+# argument* -- `E + E * min(a, b)` for `E = P.sub(a, b) + P.sub(b, a)` -- is
+# symmetric, vanishes on the diagonal (where `E` is `0n`), and answers `b` and
+# `a` on the two axes (where `min` is `0n`), so it satisfies all four laws, and
+# it is wrong: it answers `2n` where the reference answers `1n`.
+#
+# The demonstration is weaker than the other holes in this bank and is stated
+# plainly. Against the reference proof the body reads **tier 2**: `absdiff_comm`'s
+# step is `Policy.add_comm(P.sub(a, b), P.sub(b, a))`, which rewrites a subterm
+# the reference body *is* rather than one it *contains*, so no body but the
+# reference's own can clear it. The claim here rests on the laws, checked by hand
+# on both axes, the diagonal and the symmetry, not on a mechanised 1.000 -- the
+# same position as `t4-bst-insert` in Fact 34.
+#
+# This law is the missing interior: `sub` steps on both arguments at once, so
+# `absdiff(1n + x, 1n + y)` reduces to `absdiff(x, y)` and the whole function
+# follows from the axes by induction on the smaller argument.
+law absdiff_succ_succ:
+  for x: Nat
+  for y: Nat
+  {S.absdiff(1n + x, 1n + y) == S.absdiff(x, y) : Nat}

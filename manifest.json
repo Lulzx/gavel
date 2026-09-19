@@ -86,7 +86,7 @@
       "tier": 1,
       "path": "tasks/1/t1-mul-one",
       "reference": "references/t1-mul-one",
-      "hash": "e48a18fcd44b2516fc6e771665dfd58b64d5aa1f7423148b8521dbbf3a391f9c"
+      "hash": "0b88e52d165d511c298f2155bb22fe93f26cfda9b21f6144827d16e963a75d2a"
     },
     {
       "task_id": "t1-mul-two",
@@ -611,7 +611,7 @@
       "tier": 3,
       "path": "tasks/3/t3-absdiff-comm",
       "reference": "references/t3-absdiff-comm",
-      "hash": "24d8b7e93048ccf02f89bcfb48f6fd82144d27b5a0bebd1c0955bd5e12caac2d"
+      "hash": "7e77c38eb0e778d614e11e9f93de4e24eb391b47e96ee8fdd7280f24e7cb588c"
     },
     {
       "task_id": "t3-any-append",
@@ -723,7 +723,7 @@
       "tier": 3,
       "path": "tasks/3/t3-pad",
       "reference": "references/t3-pad",
-      "hash": "a2e75ca7a1860a8d1443973129866589a9e04a992b3a54a93c9c9463bc4a0d1c"
+      "hash": "cf8cdc15b875e314ed28ae5a0b64094344891811cde0f35f2f673302bc5a23da"
     },
     {
       "task_id": "t3-prefixes-len",

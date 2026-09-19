@@ -1,4 +1,4 @@
-Implement `absdiff` on Nat, then prove all four laws.
+Implement `absdiff` on Nat, then prove all five laws.
 
 `absdiff(a, b)` is the difference between `a` and `b`, as a Nat. Nat has no
 negative numbers, so a difference is the sum of the two truncated subtractions:
@@ -8,7 +8,7 @@ the vocabulary the laws are stated in, and the only thing under test is
 variable neither side reduces, and that is why the two zero laws below are a
 case analysis rather than an unfolding.
 
-The four laws split into a pin pair and two theorems. `absdiff_zero_left` and
+The four laws below split into a pin pair and two theorems. `absdiff_zero_left` and
 `absdiff_zero_right` are the pins: the first says a difference from zero is the
 other number, the second says a difference *to* zero is the number itself. A body
 that ignored its arguments -- `absdiff(a, b) = 0n`, or `= a` -- fails one of
@@ -23,6 +23,20 @@ difference does not care which way round it is taken; nothing above mentions the
 order of the two subtractions, so this is the law that pins it, and its two sides
 are the same two additions in the other order -- an addition that commutes, not
 an unfolding.
+
+`absdiff_succ_succ` is the interior step, and it is the law that says the
+function is not free where the pins do not reach. The four above fix `absdiff`
+on the two axes (`b == 0n`, `a == 0n`) and on the diagonal (`a == b`), and those
+three lines leave everything between them open: nothing related `absdiff(a, b)`
+to `absdiff(a-1, b-1)`, so a body could agree with the reference on all three
+lines and disagree elsewhere. One does: the reference value plus its own product
+with the smaller argument, `E + E * min(a, b)` where `E` is the sum of the two
+subtractions. It is symmetric, it vanishes on the diagonal because `E` does, and
+it answers `b` and `a` on the axes because `min` is `0n` there -- so it satisfies
+all four laws above and answers `2n` where the reference answers `1n`.
+`absdiff_succ_succ` says the two arguments move together, which is the step the
+induction on the smaller argument needs, and `P.sub` steps on both arguments at
+once so it closes by reduction rather than by an induction.
 
 The arithmetic the proof needs is not in Base under the names the goals want:
 `a + 0n` and `a + b == b + a` are both stuck on a variable, because `Nat.add`
@@ -52,6 +66,7 @@ which also reads like a proof bug and is not one.
 
 The law-defs are written with no signature and bare binder names, in the fixed
 order `def L.absdiff_zero_left(b)`, `def L.absdiff_zero_right(a)`,
-`def L.absdiff_self(a)` and `def L.absdiff_comm(a, b)`, and each may cite the
+`def L.absdiff_self(a)`, `def L.absdiff_comm(a, b)` and
+`def L.absdiff_succ_succ(x, y)`, and each may cite the
 earlier helpers but never one of the other laws. Write the implementation in
 `solution.bend` and the proofs in `PROOF.bend`.

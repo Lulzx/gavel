@@ -50,3 +50,9 @@ def L.pad_len(n, x, xs):
 # which needs `x == y` at variables.
 def L.pad_step(n, x, y, ys):
   {==}
+
+# The empty case of the step, read back: whatever the count is, the body's
+# `Nil{}` branch leaves `x` in front of the recursion on the shorter count.
+def L.pad_nil_step(n, x):
+  {==}
+

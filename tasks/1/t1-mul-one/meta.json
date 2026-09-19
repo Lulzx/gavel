@@ -14,7 +14,8 @@
   ],
   "laws": [
     "mul_one",
-    "mul_succ"
+    "mul_succ",
+    "mul_zero"
   ],
   "policy_targets": [
     "add",
@@ -23,7 +24,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "7c90596d046e80273af8c75d5ae602f82c1fa721968e121416a0c48bb26e8df1",
+    "laws": "35df9dc7cc755e86a006bef0840dca0140a34ef63be7e9eb31e0f6995ecc49d2",
     "prelude": "90209e424d9384ffc550c1d54ba1b0f2f64c3a09ac89b56ffe60004b97c4afd0"
   },
   "bend_version": "2.0.5"

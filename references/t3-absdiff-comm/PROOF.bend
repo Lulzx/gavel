@@ -86,3 +86,9 @@ def L.absdiff_comm(a, b):
   +b = b
   %Policy.add_comm(P.sub(a, b), P.sub(b, a)) : {P.sub(a, b) + P.sub(b, a) == _ : Nat}
   {==}
+
+# `sub` steps on both arguments at once, so both sides reduce to the same
+# `sub(x, y) + sub(y, x)` -- the step is the unfolding, not an induction.
+def L.absdiff_succ_succ(x, y):
+  {==}
+

@@ -5,7 +5,8 @@
     "absdiff_zero_left",
     "absdiff_zero_right",
     "absdiff_self",
-    "absdiff_comm"
+    "absdiff_comm",
+    "absdiff_succ_succ"
   ],
   "policy_targets": [
     "absdiff"
@@ -13,7 +14,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "808d7ef278d1a2ad4b6aa04d4321fe0371aacd1944c4a12bc301ffda854af232",
+    "laws": "448565a5dee8cb4910bb0a5b9af674223de24c8267050dcad79567bf0e919632",
     "prelude": "edcac4a5011fad5a7524294ce1a9c311108224520997f6be990a83fea2ae28eb"
   },
   "bend_version": "2.0.5"
