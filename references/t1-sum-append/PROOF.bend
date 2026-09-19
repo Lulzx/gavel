@@ -30,3 +30,11 @@ def L.sum_append(xs, ys):
 # `sum` steps on the cons cell, so both sides reduce to `x + sum(xs)`.
 def L.sum_cons(x, xs):
   {==}
+
+# Both are `append`'s own unfolding: the head goes out in front of the recursive
+# call, and the empty case answers its second argument outright.
+def L.append_cons(h, t, ys):
+  {==}
+
+def L.append_nil_left(ys):
+  {==}

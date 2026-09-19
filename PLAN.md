@@ -150,7 +150,7 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     Two constraints on the repair, both measured here. The anchor must sit **beside** an inductive law rather than replace one, or the whole set becomes definitional and V3 rejects the task; all six repairs leave an induction in place, and all six tasks validate with no problems. And each repair brings the body it exists for into the corpus as a strong mutant, so the evidence V2 reads is the escape itself. An earlier draft of this fact also asserted that a law with **no binder** is untested in this bank; that is **wrong and was measured wrong**. `t2-count-odd-laws` states `law count_odd_nil: {S.count_odd(Nil{}) == 0n : Nat}` with no `for` at all, and a body answering `1n` there fails at `LAWS.count_odd_nil` with `expected : 1n / observed : 0n`; `t2-has-odd-laws` states `has_odd_nil` the same way and a body answering `True{}` fails at it identically. The reference proves both. So a binder-less law is checked, value-level and by name, and the `for x: Nat` on `even_zero` and `pred_zero` is a stylistic choice rather than a requirement. The correction matters because the false version tells an author that a bare closed law buys nothing, which is the opposite of the truth.
 
-    The three defect classes now have a common prompt, and it is the one to run over any law set before certifying it: **which wrong function do the laws fail to distinguish?** (Fact 33 adds a fourth class that this prompt does not reach, because nothing is being *distinguished* — the question there is whether a stub obligation has a law at all; Fact 34 adds a fifth, where the wrong function *is* distinguished but only on a branch the laws reach solely under a premise; Fact 35 adds a sixth, where every branch is reached and the only law that reaches the recursive ones measures a property of the answer rather than naming it.) Argument-ignoring bodies (V3's corpus covers those), branches no left-hand side reaches, and transformations that preserve every stated property. **Thirty-three full-reward holes have been closed in the bank in two days** — two by the Fact 29 repair, six by the Fact 30 one, seven by Fact 31, eight by Fact 32, one in `t2-append-laws` whose earlier "clean" verdict this page records as falsified, two by Fact 33, three by Fact 34, one by Fact 35 and three by Fact 36 — and **every one was found by writing a body, not by running an invariant.**
+    The three defect classes now have a common prompt, and it is the one to run over any law set before certifying it: **which wrong function do the laws fail to distinguish?** (Fact 33 adds a fourth class that this prompt does not reach, because nothing is being *distinguished* — the question there is whether a stub obligation has a law at all; Fact 34 adds a fifth, where the wrong function *is* distinguished but only on a branch the laws reach solely under a premise; Fact 35 adds a sixth, where every branch is reached and the only law that reaches the recursive ones measures a property of the answer rather than naming it.) Argument-ignoring bodies (V3's corpus covers those), branches no left-hand side reaches, and transformations that preserve every stated property. **Thirty-three full-reward holes have been closed in the bank in two days** — two by the Fact 29 repair, six by the Fact 30 one, seven by Fact 31, eight by Fact 32, one in `t2-append-laws` whose earlier "clean" verdict this page records as falsified, two by Fact 33, three by Fact 34, one by Fact 35 and three by Fact 36 — and **every one was found by writing a body, not by running an invariant.** Fact 38 is the exception and is deliberately outside that count: it strengthened a law set on a reading of the laws alone, with no body and no proof, which makes it a repair rather than a thirty-fourth hole.
 
 31. **Seven more full-reward holes, in all three shapes, and one published defect behind them.** Reported by both authoring agents, every body reproduced by me at tier 4 against the pre-repair law set before anything was touched, all seven repaired in `90ae125` (2026-09-18), each escape added to its corpus as a strong mutant.
 
@@ -268,9 +268,17 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     **`t1-sum-append`.** Both laws are about `sum` (`sum_append`, `sum_cons`) and `sum` cannot see a permutation, so the set never inspects `append`'s order — Fact 30's missing anchor, structurally identical to `t2-append-laws` before its Fact 32 repair, which is the precedent that makes this worth taking seriously rather than dismissing. The body recurses on its own list and pushes the head onto the other one, so it returns `reverse(xs) <> ys`: `append([1n, 2n], [3n])` is `[2n, 1n, 3n]`, and `sum` is unchanged because `sum(reverse(xs)) == sum(xs)`. **Measured 2026-09-19:** the bare body reads **tier 2 (checks), 0.100** — well-typed, and both laws are mathematically true of it — and **tier 3 (partial), 0.350** with the reference proof, which is the reference proof's shape failing rather than a law failing. So the entry is a *candidate*, not a hole, and the distinction is the whole of Fact 35: a corpus tier is a statement about the law set under the reference proof, and a hole is a statement about the law set under *some* proof.
 
-    **Why no proof was built.** The step needs the reassociation every rotation needs, `sum(t) + (h + S) == (h + sum(t)) + S`, applied in a term where `sum(t)` is *evaluated* — and `t` is a `List<&1, Nat>` binder from the match, so it is Lone and may be spent live exactly once. The recursive call at `append(t, h <> ys)` already spends it. Every route tried arrived at the same wall: the lemma's first parameter has to be live (its proof cases on it), so passing `S.sum(t)` there is a second live use and the checker answers `observed : t (consumed more than once)`; stating the lemma over the list instead moves the case split onto a list parameter, which cannot be Many (`+xs: List<Nat>` is refused at `expected : Data / observed : Type`), so `sum(xs)` cannot be produced without spending the list. The `+k = k` rebinding does not apply to a list binder for the same modality reason. Fifteen proof shapes were tried; none checked. **This is a statement about this checker's linearity, not a proof that no body escapes** — a stronger proof system, or a different formulation of the arithmetic, might close it. The bank should either build the proof and add the order-observing law if it reads tier 4, or record the body in the corpus at tier 3 as a *known-reference-proof-shape* case and say so. Left open deliberately: **not repaired**, because repairing on a structural argument alone is what Fact 35 warns against, and no corpus entry was added.
+    **Why no proof was built.** The step needs the reassociation every rotation needs, `sum(t) + (h + S) == (h + sum(t)) + S`, applied in a term where `sum(t)` is *evaluated* — and `t` is a `List<&1, Nat>` binder from the match, so it is Lone and may be spent live exactly once. The recursive call at `append(t, h <> ys)` already spends it. Every route tried arrived at the same wall: the lemma's first parameter has to be live (its proof cases on it), so passing `S.sum(t)` there is a second live use and the checker answers `observed : t (consumed more than once)`; stating the lemma over the list instead moves the case split onto a list parameter, which cannot be Many (`+xs: List<Nat>` is refused at `expected : Data / observed : Type`), so `sum(xs)` cannot be produced without spending the list. The `+k = k` rebinding does not apply to a list binder for the same modality reason. Fifteen proof shapes were tried; none checked. **This is a statement about this checker's linearity, not a proof that no body escapes** — a stronger proof system, or a different formulation of the arithmetic, might close it. The bank should either build the proof and add the order-observing law if it reads tier 4, or record the body in the corpus at tier 3 as a *known-reference-proof-shape* case and say so. **Resolved on the first of those routes, without the proof — see Fact 38: the law was added on the anchor argument, which is readable off the two laws and needs no escape to justify it.** The proof itself was still never built, so the escape remains unmeasured and is not entered as a confirmed hole.
 
     Two further candidates from the same sweep are in the same state and are recorded here so they are not re-discovered as new: `t3-isort-sorted` (ignores length ≥ 3) and `t3-rev-rev` (the element action is unobserved), both reported by prober-b as semantic-only gaps with no proof built.
+
+38. **An anchorless law set was repaired without proof that anything escaped it, and that is a different justification from the thirty-three.** `t1-sum-append`'s set was `sum_append` and `sum_cons`, and **every occurrence of `append` in it sits under `sum`** — the function the task is about is reachable in the laws only through a predicate that cannot see a permutation. So the set constrains `append` up to the multiset of its elements and says nothing about their order: Fact 30's "no absolute anchor," with a permissive `sum` where `t2-append-laws` had a counting `len`. That is a statement about the two laws, and it is checkable by reading them; it is not a statement about a body, and it does not need one.
+
+    **The repair adds the two laws Fact 32 added, in the same shape.** `append_cons` (`S.append(h <> t, ys) == h <> S.append(t, ys)`) puts the head of the first list at the front of the answer, and `append_nil_left` (`S.append(Nil{}, ys) == ys`) makes the base a value rather than a sum. Together they are `append`'s definition written out and determine it by induction on the first argument — the same two laws, with the same job, that `t2-append-laws` needed. Both are definitional for the reference, proved with `{==}`, and **the reference re-measured tier 4, complete, reward 1.000, four of four.** The count moved from two laws to four, so partial credit on this task is now in quarters rather than halves and every existing mutant re-tiers; all five read tier 3 and none reaches tier 4.
+
+    The rotation body is now `mutants/append-rotates-the-front.bend`. Measured 2026-09-19 against the repaired set: **tier 3 (partial), failing `append_cons` and `sum_append`**, with the checker's own error at `LAWS.append_cons` reading `expected : solution.append(t, h <> ys) / observed : h <> solution.append(t, ys)`. The reward is withheld on top of the tier, because the file is byte-identical to a shipped mutant and SPEC 7.4.2's tripwire fires — which is the tripwire working, not a second measurement. **What is caught here is caught for real**: `append_cons` is *false* of the rotation body, not merely unproven by the reference proof, so no hand-written proof could recover it. That is the difference between this entry and the ones Fact 35 warns about, and it is why the body could be filed at all.
+
+    **What is not claimed.** The escape was never proved and this is **not** entered as a thirty-fourth confirmed full-reward hole; the count at the head of this section stays at thirty-three. What justifies the law is the anchor argument, and a stronger law set cannot create a hole — it can only close one — so no escape is needed to license it. The honest limit on that is the same one Fact 37 records: fifteen proof shapes failed on this checker's linearity, so the possibility that the rotation body was provable against the old two laws is *unrefuted*, not established either way. The prompt was updated with the two new laws and their law-defs in the same pass.
 
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
@@ -922,28 +930,33 @@ and the resulting verdicts say `dev_only: true`.
    **A 125th task was registered concurrently, and it is not in any count on
    this page.** `t4-inorder-transport` was created by another session while
    this pass was running: `tasks/4/t4-inorder-transport/` and
-   `references/t4-inorder-transport/` are untracked, have no git history, and
-   were written between 00:35 and 00:40 on 2026-09-19. A `tools.publish` run
-   here picked it up and the manifest went from 124 tasks to 125. It reads
-   sound as far as it was checked — tier 4, all six laws proven, the reference
-   checks clean, `meta.json`'s hash matching `LAWS.bend` — but it was still
-   being edited while it was being measured, so **nothing here counts it**:
-   the sweeps, the screens and the file count below are all over the 124 tasks
-   that were fixed at the time. Its 14 mutant files are on disk and not in git.
-   The registration is a side effect of publishing, not a certification.
+   `references/t4-inorder-transport/` were untracked when the run began and were
+   written between 00:35 and 00:40 on 2026-09-19. A `tools.publish` run here
+   picked it up and the manifest went from 124 tasks to 125. It reads sound as
+   far as it was checked — tier 4, all six laws proven, the reference checks
+   clean, `meta.json`'s hash matching `LAWS.bend` — but it was still being
+   edited while it was being measured, so **nothing here counts it**: the
+   sweeps, the screens and the file count below are all over the 124 tasks that
+   were fixed at the time. **It was committed on its own the same day, in
+   `db21d89`, to keep the manifest coherent** — its 14 mutant files and both
+   directories are now tracked, so the "untracked" caveat above applies only to
+   the moment this paragraph describes. The registration is a side effect of
+   publishing, not a certification.
 
    **The census is closed, measured 2026-09-19.** All 124 registered tasks carry
    at least one hand-authored mutant file, and **every one of them is at or
    above the four-file floor** — the first time both have been true. The
-   classifier reads 1,329 mutant files across the bank, 1,326 of them committed
-   plus the three the repairs above added — `append-swaps-the-two-lists.bend`
-   for the Fact 32 correction, `push-drops-the-back.bend` and
-   `opt-leaves-a-redundant-zero.bend` for Fact 34 (`4f07ac7` committed 98 files
-   the classifier was already counting) — and two more from Fact 36,
-   `mul-wrong-at-zero-times-two.bend` and `pad-filler-becomes-the-count.bend`,
-   both of which hold bodies that read 1.000 before their repairs. Fact 36's
-   third instance adds none, for the reason recorded there. The working tree carries 14 more, from
-   the concurrent task, which are excluded on purpose. Fact 34's third instance
+   classifier reads **1,344 mutant files** across the bank, all of them in git
+   as of the Fact 38 repair — the 14 the concurrent task above was holding in
+   the working tree when this paragraph was first written have since landed in
+   `db21d89` — and the day's repairs are what moved the number:
+   `append-swaps-the-two-lists.bend` for the Fact 32 correction,
+   `push-drops-the-back.bend` and `opt-leaves-a-redundant-zero.bend` for Fact 34
+   (`4f07ac7` committed 98 files the classifier was already counting),
+   `mul-wrong-at-zero-times-two.bend` and `pad-filler-becomes-the-count.bend`
+   from Fact 36, both of which hold bodies that read 1.000 before their
+   repairs, and `append-rotates-the-front.bend` from Fact 38. Fact 36's
+   third instance adds none, for the reason recorded there. Fact 34's third instance
    deliberately adds none, for the reason recorded there, and **Fact 35 adds none
    either — its escaping body was already in `t3-merge-len`'s corpus**, filed as
    an ordinary generated mutant; what that task needed was a law, not a file.

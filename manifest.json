@@ -135,7 +135,7 @@
       "tier": 1,
       "path": "tasks/1/t1-sum-append",
       "reference": "references/t1-sum-append",
-      "hash": "6afea6c811bbd4035cb107b83c542c3740c029f00be226692fae0cb9ad432609"
+      "hash": "8d72986205cd1a8bf4bbf2dbf07a46571920255b161404aec9a90fe5f3778ce3"
     },
     {
       "task_id": "t1-take-drop",
