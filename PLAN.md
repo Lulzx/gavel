@@ -1016,6 +1016,13 @@ and the resulting verdicts say `dev_only: true`.
    before the repair. A corpus floor is a statement about evidence, and these
    three are the counter-example to reading it as a statement about soundness.
 
+   **The whole bank re-validated on the settled tree, 2026-09-19, after Facts 39,
+   40 and 41: 125 of 125 valid, no failures, 2,755 checker runs.** Every task
+   reads `[ok]` with no problems reported. The "125 with unchecked invariants"
+   in the summary is the standing calibration note — no `zero_shot_solve_rate`
+   is recorded anywhere, which is M4 item 4's blocked state rather than a
+   defect — and not a validation failure.
+
    **Two limits on that paragraph are worth stating, because both have already
    produced a wrong number here.** First, the classifier reads the working
    tree, so it counts an agent's uncommitted files as authored — it leads the
