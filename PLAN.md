@@ -997,13 +997,14 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 159 tasks (29 tier 1, 91 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
+   progress** — 172 tasks (29 tier 1, 104 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
    validated together rather than per task, because a task is sound only against
    a corpus that shares the degenerate generator with it. The whole bank was
-   measured locally on 2026-09-19 as **159/159 valid over 3,461 checker runs**,
-   with no problems, no task holding a law with a zero-kill count, and no task
-   free of warnings: the missing calibration
-   measurement on all 159, and on the 39 tasks at or above `REVIEW_TIER` a
+   re-measured locally on 2026-09-19, after Fact 51's three repairs, as
+   **172/172 valid over 3,745 checker runs**, with no problems, no law with a
+   zero-kill count (**594 laws, mean 4.15 kills, min 1**), no mutant reading
+   tier 4, and no task free of warnings: the missing calibration
+   measurement on all 172, and on the 39 tasks at or above `REVIEW_TIER` a
    review warning as well — all 39 with no record, because the 11 records that
    used to sit in `meta.json` were forgeries and were deleted rather than
    migrated (Fact 27). The calibration warning is the one `--strict` promotes,
@@ -1013,16 +1014,20 @@ and the resulting verdicts say `dev_only: true`.
    This measurement is the one M4.3 used to argue *against* waiting for a quiet
    box: V4 reads wall-clock latency, so a bank measured while an authoring agent
    is checking it is a bank measured under contention — but the contention makes
-   a *latency* number about the box, and it does not change whether 159 of 159
-   validate. The 122-task reading that stood here was taken the same way, and
+   a *latency* number about the box, and it does not change whether 172 of 172
+   validate. The 172-task run was taken under exactly that contention — two
+   authoring agents were checking against the same tree — and its reference
+   latency reads 71–91 ms, median 78, which is a number about a quiet enough box
+   and not about the tasks.
+   The 122-task reading that stood here was taken the same way, and
    the 142-, 144-, 153- and 159-task ones were taken harder: the load average was
    14–17 throughout because of a ChatGPT/Codex process outside this repository,
    and every task still read `[ok]` at a reference latency of 81–152 ms. The
    later readings were taken at `--jobs 8` and their per-task `reference_ms`
    spread runs 74–352 ms, which is a number about eight checkers sharing the box
    and not about a task; the serial reading is the one to quote.
-   The 156 tasks at tiers 1–4 are
-   short of the 200 by 44, and 27 of the 159 are the two families §3.9 records:
+   The 169 tasks at tiers 1–4 are
+   short of the 200 by 31, and 27 of the 172 are the two families §3.9 records:
    the count and the number of distinct problems are not the same number, and
    only one of the two is what a curriculum buys.
 
@@ -1541,7 +1546,7 @@ waiting room.
    per-task records. `--json` also had to be fixed to be JSON: the summary
    lines used to follow the document, so the mode existed for callers who could
    not parse it. Two of the four report the bank as it is rather than as a
-   score: calibration is **0 of 159 recorded**, which is item 4's blocked state
+   score: calibration is **0 of 172 recorded**, which is item 4's blocked state
    as a number, and the review fraction is **0 of the 39 tasks that need
    review** — which is *not* the same as thirty-nine tasks having been reviewed,
    and the paragraph here has been wrong in two different directions before
@@ -1558,7 +1563,7 @@ waiting room.
    which is all the check can witness. The eleven forged records were then
    deleted rather than migrated, so the field now reads 0 as well: the 0.205 is
    gone because the records are gone, not because anyone read the laws (Fact
-   27). It is a fraction of the tasks that need review rather than of all 159,
+   27). It is a fraction of the tasks that need review rather than of all 172,
    because below `REVIEW_TIER` the author's own reading *is* the review and
    counting those would report the bank as unreviewed for following its own
    rule.

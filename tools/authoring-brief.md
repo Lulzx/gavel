@@ -115,9 +115,11 @@ These are the defects that survive every stage, so they are on you:
        uv run python -m tools.screens general  manifest.scratch.<YOURTAG>.json <task-id>
        uv run python -m tools.screens positions <task-id>
 
-   A flag is triage, not a defect, and a clean run is not a proof — but two of
-   the three genuine tier-4 holes the bank has paid for would have been caught
-   here, and the third by the same reading one dimension over.
+   A flag is triage, not a defect, and a clean run is not a proof — but all
+   three of the tier-4 holes this bank was paying full reward for on 2026-09-19
+   would have been flagged by `anchors` (the premise-only pair by A, the two
+   tier-1 wrappers by B), and `general` catches the fourth shape, a law set that
+   reaches a target only at closed arguments.
 
 ## Distinctness: the hard constraint
 
