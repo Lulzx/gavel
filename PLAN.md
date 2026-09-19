@@ -1416,6 +1416,19 @@ waiting room.
    shape as the forgeries Fact 27 removed one level down. Closing it would mean
    refusing a republish of the 31 tier-3 tasks that already carry no record, so
    it is recorded instead of changed.
+   **What that costs was measured on 2026-09-19 and is not implied by the
+   sentence above: it makes CI red.** `ci.yml`'s *in sync* step is
+   `uv run python -m tools.publish` followed by
+   `git diff --exit-code -- manifest.json`, and on an otherwise clean checkout
+   of this branch that pair exits 1 — the bare publish adds `t3-swap-sum-pair`
+   to a manifest that deliberately omits it, and the diff is the seven lines it
+   adds. So the hold Fact 43 describes and the repository's own CI are in
+   direct contradiction, and the contradiction is a property of the checked-in
+   tree rather than of any local state: a fresh clone reproduces it. Nothing in
+   the reward path is affected, which is why it is recorded here instead of
+   repaired, but "recorded instead of changed" is the wrong thing to read as
+   *harmless* — a red build is how the next person finds out.
+
 3. **Published throughput benchmark. Published 2026-09-19, and the blocker was
    the metric rather than the machine.** `tools/soak.py` reports p50/p95/p99 and
    verdicts/min/core from a real run, and M3.5's ten-thousand-episode soak
