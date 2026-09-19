@@ -1,0 +1,25 @@
+{
+  "task_id": "t4-inorder-transport",
+  "tier": 4,
+  "laws": [
+    "inorder_tip",
+    "inorder_bin",
+    "inorder_len",
+    "inorder_all_le",
+    "inorder_all_ge",
+    "inorder_sorted"
+  ],
+  "policy_targets": [
+    "inorder",
+    "all_le_put",
+    "all_ge_put",
+    "bst"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "fa9a74f8c6cf2ab68a9cbeea11e3aa2a8802a13550477d1f58c35cf12456b1d6",
+    "prelude": "5104e2e47b22310917aa58cb2ab98d2e177970a9a166aae11f559b0f2dbaadc4"
+  },
+  "bend_version": "2.0.5"
+}
