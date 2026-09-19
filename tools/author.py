@@ -54,16 +54,19 @@ from gavel.env import Action, GavelEnv  # noqa: E402
 from gavel.tasks import (LAWS_FILE, PRELUDE_FILE, PROOF_FILE,  # noqa: E402
                          SOLUTION_FILE, Manifest, load_task)
 from gavel.toolchain import DEFAULT_VERSION, Toolchain  # noqa: E402
-from gavel.validate import DEFAULT_BUDGET_MS, validate_task  # noqa: E402
+from gavel.validate import (DEFAULT_BUDGET_MS, REVIEW_TIER,  # noqa: E402
+                            review_state, validate_task)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = REPO_ROOT / "manifest.json"
 
 REVIEWED_KEY = "reviewed"
-REVIEW_TIER = 3
-"""Below this an author's own reading is the review; at and above it the laws
-can pin more than a person can check by eye, which is where a named reviewer is
-worth the interruption."""
+"""``REVIEW_TIER`` and the state it gates live in ``gavel.validate``, because
+the check that a record is still about the shipped laws is run by validation as
+well as by this checkpoint, and two copies of "is this review stale" is two
+answers to the same question. Below the tier an author's own reading is the
+review; at and above it the laws can pin more than a person can check by eye,
+which is where a named reviewer is worth the interruption."""
 
 FILES = (LAWS_FILE, PRELUDE_FILE, SOLUTION_FILE)
 
@@ -122,16 +125,15 @@ def required_files(root: Path, repo: Path = REPO_ROOT) -> list[str]:
 
 
 def review_is_stale(meta: dict[str, Any]) -> bool:
-    """A review covers the immutable files as they were when it was made.
+    """Anything that is not an approval of the laws as shipped.
 
-    ``hashes`` is what ``tools/publish.py`` derived from LAWS.bend and
-    prelude.bend, so comparing it to the reviewed copy is comparing the review
-    to the laws rather than to the directory.
+    A thin wrapper over ``gavel.validate.review_state``: the checkpoint blocks
+    on ``unreviewed`` and ``stale`` alike, and a record covering a *different*
+    revision is not an approval of this one. Kept as a name because "stale" is
+    what the checkpoint's message says, and the distinction matters to the
+    validator rather than here -- it reports the two separately.
     """
-    review = meta.get(REVIEWED_KEY)
-    if not isinstance(review, dict) or not review.get("by"):
-        return True
-    return review.get("hashes") != meta.get("hashes")
+    return review_state(meta, int(meta["tier"])) != "approved"
 
 
 # --- stages -----------------------------------------------------------------------

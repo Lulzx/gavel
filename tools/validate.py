@@ -24,7 +24,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from gavel.tasks import load_manifest  # noqa: E402
 from gavel.toolchain import DEFAULT_VERSION, Toolchain, ToolchainError  # noqa: E402
-from gavel.validate import DEFAULT_BUDGET_MS, validate_task  # noqa: E402
+from gavel.validate import (DEFAULT_BUDGET_MS, REVIEW_TIER,  # noqa: E402
+                            validate_task)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -89,6 +90,18 @@ def main(argv: list[str] | None = None) -> int:
     print(f"\n{len(reports) - len(failed)}/{len(reports)} valid, "
           f"{len(unchecked)} with unchecked invariants, "
           f"{sum(len(r.checked) for r in reports)} checker runs")
+    # Said out loud rather than left to be reconstructed from the warnings: a
+    # bank whose review records are forged and stale must not have to be read
+    # closely to find that out, and the two are different defects -- an absent
+    # record is honest, a record about other laws is not.
+    stale = [r.task_id for r in reports if r.review == "stale"]
+    unreviewed = [r.task_id for r in reports if r.review == "unreviewed"]
+    if stale:
+        print(f"{len(stale)} recorded against laws that no longer ship: "
+              f"{', '.join(stale)}")
+    if unreviewed:
+        print(f"{len(unreviewed)} at tier {REVIEW_TIER}+ with no review record: "
+              f"{', '.join(unreviewed)}")
     return 1 if failed else 0
 
 

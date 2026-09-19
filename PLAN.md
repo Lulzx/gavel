@@ -103,7 +103,9 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     I committed these twice before reading them — once in `e83557d` for `t3-zip-sum` and `t3-sum-replicate`, once in `28d9ebb` for the batch — which is its own lesson about the difference between reading a diff and reading what a diff asserts. The hashes and the law counts I checked; the name I did not.
 
-    This is the same defect as `"valid": true` in the manifest (`fb878db`), and the same rule applies: **a field that records a human judgement must not be writable by the machine that needs the judgement.** The fix is not in the checker — it is to stop treating the flag as evidence, and either to record review somewhere the pipeline cannot write, or to read the laws now and make the nine records true. Until one of those happens, M4's "human-reviewed laws for tier ≥ 3" is not satisfied, and the three tasks with no record are the only honest ones.
+    This is the same defect as `"valid": true` in the manifest (`fb878db`), and the same rule applies: **a field that records a human judgement must not be writable by the machine that needs the judgement.** The fix is not in the checker — it is to stop treating the flag as evidence, and either to record review somewhere the pipeline cannot write, or to read the laws now and make the eleven records true. Until one of those happens, M4's "human-reviewed laws for tier ≥ 3" is not satisfied, and the 28 tasks at that tier with no record are the only honest ones.
+
+    **Amended 2026-09-19: the field is read now, and only half of this fact moved.** The paragraph above is right that a checker cannot authenticate a name, and that half stands unchanged. What it was wrong about is the *staleness* it happened to name in passing: `review_is_stale` did its job and nothing called it, so a repair that edited `LAWS.bend` and republished — the bank's normal repair procedure — left a record attesting to laws that were no longer shipped, with no output anywhere saying so. Three tasks were in that state at once. `gavel/validate.py` now reports `none-needed` / `unreviewed` / `stale` / `approved`, the last two are warnings promoted by `--strict`, and `tools/validate.py` prints the task ids. The severity is argued in M4: failing on `stale` would refuse the three records that drifted and endorse the eight that still match and are just as forged.
 
 28. **The sweep Fact 22 prescribes was never run over the bank, and two of 81 tasks were paying full reward for a function nobody implemented.** Fact 22 names the decisive test — every argument-ignoring body against a `{==}`-only proof — and records that both authors ran it by hand for their batches. That is true of the batches authored *after* the fact was written and of nothing else. `t1-add-succ` and `t1-mul-two` predate it, were never swept, and were both exploitable.
 
@@ -1274,15 +1276,40 @@ laws that are no longer shipped. Two of the three are this session's own
 repairs (`t3-pad` from Fact 36, `t3-rev-rev` from Fact 39): editing
 `LAWS.bend` under a review record invalidates it, and
 nothing in the pipeline notices.
-The records are left in place rather than deleted so the defect stays visible,
-but they must not be counted as review, and the fix is not in the checker:
-either review is recorded somewhere the pipeline cannot write, or the laws are
-read and the records are made true. Until then this line stays in M4.
 
-The seven tasks added since (`t3-is-pal-rev`, `t3-merge-len`, `t3-rle-expand`,
-`t3-sum-to-double`, `t4-queue-rep`, `t3-neg-all-dual`, `t4-nth-maybe`) carry no
-record either, so the count stays at eleven while the bank grew by seven: the
-defect is bounded, not spreading.
+**It notices now, and the arithmetic above was short.** Read over the whole
+manifest rather than over the batch it was written from, **39 tasks are at tier
+3 or above and 28 of them carry no record at all** — 20 tier 3, the five tier 4
+and the three tier 5. The paragraph that stood here named the eight tier-4 and
+tier-5 tasks and the seven most recent additions, which is thirteen distinct
+tasks: two of the seven are themselves among the eight, so the earlier
+accounting double-counted them and left **fifteen older tier-3 tasks unnamed**.
+The forged-record count is still bounded at eleven, which is what that sentence
+was about, and the *unreviewed* count is much larger than the sentence implied.
+`gavel/validate.py` now reads the record and reports one of four states —
+`none-needed` below the tier, `unreviewed`, `stale`, `approved` — and
+`tools/validate.py` prints the stale and unreviewed task ids under its summary,
+so the two defects are lines in a build log rather than paragraphs in this file.
+
+**`stale` is a warning and not a problem, deliberately**, which is the one place
+the validator departs from "a problem is a defect, a warning is a missing
+measurement". A review record is not part of the reward function, and the check
+can see that a record is about *other laws* but cannot see who wrote one.
+Failing on `stale` would hard-fail three tasks while passing the eight records
+that match their laws and are just as forged — a validator that refuses the
+milder defect and endorses the worse one. `--strict` promotes both, which is the
+honest switch: it fails the moment review is a thing the bank actually has. The
+state is only reachable through a republish, too — `meta["hashes"]` is
+gate-enforced against the shipped laws, so a law edited without one fails the
+integrity check on every submission instead.
+
+The records are left in place rather than deleted so the defect stays visible,
+but they must not be counted as review, and **the half that is left is the one
+no check can do** — a record's provenance. A record written by `--reviewer` and
+a record written by a person are the same bytes, so the fix is what it was:
+either review is recorded somewhere the pipeline cannot write, or the laws are
+read and the records are made true. Until one of those happens this line stays
+in M4.
 
 ## 5. Risks
 

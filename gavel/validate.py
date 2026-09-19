@@ -11,6 +11,9 @@ and fails validation. A **warning** is something that could not be *measured*
 that a half-built pipeline reports "not yet known" instead of the much worse
 "fine", and ``--strict`` is what CI uses once "not yet known" is no longer an
 acceptable answer.
+
+The review check at the end of the file is the one warning about something
+*known* rather than unmeasured, and its docstring argues the case.
 """
 
 from __future__ import annotations
@@ -30,6 +33,11 @@ from .verdict import TIER_COMPLETE, TIER_NO_CHECK
 
 # V4: a reference slower than this makes an episode too expensive to sample.
 DEFAULT_BUDGET_MS = 2000
+
+# A tier at or above this needs a named reviewer rather than the author's own
+# reading: the laws can pin more than a person can check by eye. Below it the
+# author's reading is the review, and an absent record is not a gap.
+REVIEW_TIER = 3
 
 # V5: what a task's own immutable files may import.
 IMMUTABLE_IMPORTS = frozenset({
@@ -51,6 +59,7 @@ class TaskReport:
     mutant_tiers: list[int] = field(default_factory=list)
     mutant_strong: list[tuple[str, int]] = field(default_factory=list)
     zero_shot_solve_rate: float | None = None
+    review: str = "none-needed"
 
     @property
     def valid(self) -> bool:
@@ -61,6 +70,7 @@ class TaskReport:
             "task_id": self.task_id,
             "tier": self.tier,
             "valid": self.valid,
+            "review": self.review,
             "problems": list(self.problems),
             "warnings": list(self.warnings),
             "reference_ms": self.reference_ms,
@@ -97,6 +107,7 @@ def validate_task(task: Task, toolchain: Toolchain, *,
     _v3_degenerate(task, toolchain, config, report)
     _v5_immutable_files(task, report)
     _v4_latency(report, budget_ms)
+    _review_state(task, report)
 
     # Not an invariant so much as a missing measurement: M0's exit criterion is
     # stated as a solve rate, and a task nobody has calibrated is a task whose
@@ -108,6 +119,59 @@ def validate_task(task: Task, toolchain: Toolchain, *,
         report.problems.extend(report.warnings)
         report.warnings = []
     return report
+
+
+# --- review: a judgement the pipeline must not be able to write ----------------
+
+def review_state(meta: dict[str, Any], tier: int) -> str:
+    """What a task's review record actually attests to.
+
+    One of ``none-needed`` (below ``REVIEW_TIER``), ``unreviewed``,
+    ``approved``, or ``stale``.
+
+    A review is recorded against the hashes ``tools/publish.py`` derived from
+    ``LAWS.bend`` and ``prelude.bend``, so it covers the immutable files as they
+    were when it was made. Editing either one leaves the record in place and
+    pointing at laws that are no longer shipped -- which is the state this
+    function exists to name, because *nothing in the pipeline noticed it*.
+    Three tasks in the bank were in it at once: two of them repaired in the same
+    day their record was written, one of those by the session that then went on
+    to cite the record as evidence.
+
+    The comparison is to ``meta["hashes"]`` and not to ``Task.hash``: the former
+    is the pair of source hashes the review was taken over, the latter folds in
+    ``solution.bend`` as well and is a string, so it can only ever disagree.
+
+    ``stale`` is a warning and not a problem, which is the one place this check
+    departs from "a problem is a defect, a warning is a missing measurement".
+    Two reasons, and the second is the decisive one. A review record is not part
+    of the reward function, which is what ``problems`` are about. And the
+    validator can see that a record is *about other laws*; it cannot see who
+    wrote it. So failing on ``stale`` would hard-fail three tasks while passing
+    the eight records that match their laws and are just as forged -- a
+    validator that endorses the worse defect and refuses the milder one. The
+    check is worth having because nothing else noticed when a ``LAWS.bend``
+    edit invalidated a record, and it is worth having as a warning, whose
+    ``--strict`` promotion is the honest statement: it fails the moment review
+    is a thing the bank actually has.
+    """
+    review = meta.get("reviewed")
+    if not isinstance(review, dict) or not review.get("by"):
+        return "unreviewed" if tier >= REVIEW_TIER else "none-needed"
+    return "approved" if review.get("hashes") == meta.get("hashes") else "stale"
+
+
+def _review_state(task: Task, report: TaskReport) -> None:
+    report.review = review_state(task.meta, task.tier)
+    if report.review == "stale":
+        report.warnings.append(
+            f"review: {task.meta['reviewed'].get('by')!r} is recorded against "
+            f"hashes that no longer match {LAWS_FILE} or {PRELUDE_FILE}, so the "
+            f"record attests to laws this task does not ship")
+    elif report.review == "unreviewed":
+        report.warnings.append(
+            f"review: tier {task.tier} carries no review record -- the laws "
+            f"have not been read by a named reviewer")
 
 
 # --- posed: the task is a problem before it is a reward function ---------------
@@ -356,5 +420,5 @@ def validate_bank(tasks: list[Task], toolchain: Toolchain,
     return [validate_task(task, toolchain, **kwargs) for task in tasks]
 
 
-__all__ = ["DEFAULT_BUDGET_MS", "IMMUTABLE_IMPORTS", "TaskReport", "validate_bank",
-           "validate_task"]
+__all__ = ["DEFAULT_BUDGET_MS", "IMMUTABLE_IMPORTS", "REVIEW_TIER", "TaskReport",
+           "review_state", "validate_bank", "validate_task"]

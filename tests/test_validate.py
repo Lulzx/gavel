@@ -12,8 +12,8 @@ from dataclasses import replace
 import pytest
 
 from gavel.degenerate import _zero_of, corpus, laws_of, signatures, unmodelled
-from gavel.tasks import PROOF_FILE, SOLUTION_FILE
-from gavel.validate import validate_task
+from gavel.tasks import HASH_KEYS, LAWS_FILE, PROOF_FILE, SOLUTION_FILE
+from gavel.validate import review_state, validate_task
 from gavel.verdict import TIER_CHECKS, TIER_COMPLETE, TIER_NO_CHECK
 
 pytestmark = pytest.mark.checker
@@ -470,3 +470,85 @@ def test_a_comment_naming_the_prelude_is_not_a_citation(make_task, toolchain, ta
     report = validate_task(make_task(laws_src=laws, references=task.references),
                            toolchain)
     assert not any("S.nonexistent" in problem for problem in report.problems)
+
+
+# --- review: a judgement the pipeline must not be able to write ----------------
+#
+# The bank's M4 line says human-reviewed laws are "not satisfied, and the bank
+# says it is": eleven tier-3 tasks carry a record no human wrote, and three of
+# those records went stale when the same day's repairs edited LAWS.bend under
+# them. Nothing in the pipeline noticed the second half of that. These pin both
+# halves, including the severity -- a stale record is reported and the task
+# stays valid, because the validator cannot see who wrote a record and must not
+# refuse the stale ones while passing the forged-but-matching ones.
+
+def test_a_review_below_the_tier_needs_no_record(make_task):
+    """Tier 1 and 2 are reviewed by the author's own reading, so an absent
+    record there is the design rather than a gap."""
+    assert review_state(make_task(tier=2).meta, 2) == "none-needed"
+
+
+def test_a_review_at_the_tier_with_no_record_is_unreviewed(task, toolchain):
+    """The honest state, and the one the eight tier-4 and tier-5 tasks are in:
+    it must be reported, and it must not read as a defect.
+
+    Run on the real fixture task rather than a built one so that ``valid`` means
+    something: a fabricated task fails V2 for having no mutants, and the
+    assertion would pass for a reason that has nothing to do with review.
+    """
+    reviewless = replace(task, tier=3)
+    assert review_state(reviewless.meta, 3) == "unreviewed"
+    report = validate_task(reviewless, toolchain)
+    assert report.review == "unreviewed"
+    assert any("no review record" in warning for warning in report.warnings)
+    assert not any("review" in problem for problem in report.problems)
+
+
+def test_a_review_whose_hashes_match_is_approved(make_task):
+    """What the check actually witnesses: the record covers these laws. It says
+    nothing about who wrote it, which is why the flag is not evidence -- Fact 27
+    -- and why this test is named for the hashes rather than for the approval."""
+    hashes = {"laws": "aaa", "prelude": "bbb"}
+    task = make_task(tier=3, meta={"hashes": hashes,
+                                   "reviewed": {"by": "lulzx", "hashes": hashes}})
+    assert review_state(task.meta, 3) == "approved"
+
+
+def test_a_review_whose_hashes_have_moved_is_stale_and_still_valid(task, toolchain):
+    """``t3-pad``, ``t3-rev-rev`` and ``t3-zip-sum`` were in exactly this state.
+
+    Only the *recorded* side can drift, and that is what makes the state worth
+    naming: ``meta["hashes"]`` is gate-enforced against the shipped ``LAWS.bend``
+    and ``prelude.bend``, so a task whose immutable files were edited without a
+    republish fails the integrity check on every submission instead. Editing a
+    law and republishing, which is what the repair procedure does, moves
+    ``meta["hashes"]`` and leaves the record behind -- silently, until this check.
+
+    The severity is the other assertion that matters. The record attests to laws
+    the task does not ship, which is worth saying out loud -- and it is not a
+    defect in the reward function, which is what ``problems`` are about, so the
+    task stays valid and a green build does not become a claim about whether
+    anyone read the laws. A word used here and in ``tools/author.py``, which
+    blocks at the checkpoint on the same condition; two copies of "is this
+    review stale" would be two answers to one question.
+    """
+    recorded = dict(task.meta["hashes"])
+    recorded[HASH_KEYS[LAWS_FILE]] = "0" * 64
+    stale = replace(task, tier=3, meta={
+        **task.meta, "reviewed": {"by": "lulzx", "hashes": recorded}})
+    assert review_state(stale.meta, 3) == "stale"
+    report = validate_task(stale, toolchain)
+    assert report.review == "stale"
+    assert report.valid, report.problems
+    assert any("no longer match" in warning for warning in report.warnings)
+
+
+def test_the_review_check_reads_the_hashes_pair_not_the_task_hash(make_task):
+    """``Task.hash`` folds in ``solution.bend`` and is a string; the review was
+    taken over ``meta["hashes"]``, which is the pair of source hashes. Comparing
+    the wrong one can only ever disagree, so every task would read stale."""
+    hashes = {"laws": "aaa", "prelude": "bbb"}
+    task = make_task(tier=3, hash="not-a-pair",
+                     meta={"hashes": hashes,
+                           "reviewed": {"by": "lulzx", "hashes": hashes}})
+    assert review_state(task.meta, 3) == "approved"
