@@ -375,6 +375,23 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     **The lesson is narrower than "run more probes" and worth stating exactly.** The probes were already written and already in a log; what was missing was a reading of the log for tier 4 rather than for `status: ok`. The claim they falsified was not a guess — it was written into `LAWS.bend`, the prompt *and* Fact 34 as a measurement, and it was wrong in a way only a body can show. A property the wrong body satisfies is not a law.
 
+47. **Fact 46's lesson had not been applied to Fact 46's own instrument, and reading the *older* probe log the same way turned up two more tier-4 escapes — both at tier 1, both never repaired.** Fact 46 read `/tmp/sweep-results.json` (125 probes, 39 tasks, the probers' escape pass) for tier 4 and found the three `t5-opt-drop` bodies. A second log from the same instrument was sitting beside it, written three days earlier and read only for `status: ok`: `/tmp/probe/sweep/results.json`, 51 probes, produced by `prober-a`'s pass over the tier-1 and tier-2 tasks. Two of its entries read **tier 4 with an empty `failed` list**, and neither was ever picked up, because the reading that would have found them did not exist until Fact 46.
+
+    **Reproduced before anything was changed.** Re-measured 2026-09-19 against the current published bank — not against the bank of three days ago — `t1-mul-two__mul-wrong-above-two` and `t1-pred-succ__add-ignores-second` both read **tier 4, complete, reward 1.000, `failed` empty**, which is the reading the reference itself gets. The whole log was then re-run against today's bank as a single sweep: 89 new-body probes, 84 of which map to a task, over 105 task ids. The histogram is `tier 0: 2, tier 1: 4, tier 2: 15, tier 3: 61, tier 4: 2` — and the two at tier 4 are exactly these. Every escape Facts 34 and 46 repaired now reads 2 or 3 (`bst-double-count`, `t4-inorder-transport.all_le_false`, the three `t5-opt-drop` bodies), so those repairs held; the six tier-0/1 entries are instrument errors of the kind Fact 42 already records and are not evidence of anything.
+
+    **`t1-mul-two` — a law set that observes a function at one literal.** The laws are `mul_zero` (at `0n`), `mul_two` (at `2n`) and `add_zero`, and none of them observes `mul` at any other first argument. The escape is `mul` answering `b` at `1n` and `add(b, add(b, 0n))` at `2n` and above: it agrees at both literals the laws name, and `mul(3n, x)` is `2x`. The repair is **`mul_succ`**, `S.mul(1n+a, b) == S.add(b, S.mul(a, b))` — the step at an arbitrary first argument, which with the base at `0n` determines `mul` at every input. It is definitional for the reference (`1n+a` is constructor-headed, so `mul`'s match reduces on it) and the reference proves it `{==}`.
+
+    **`t1-pred-succ` — the same shape one argument over, and the first repair for it was not enough.** The laws are `pred_succ`, `pred_add_one` and `pred_zero`, and `pred_add_one` applies `add` at the second argument `1n` and nowhere else. The escape is `add(a, b) = 1n + a`, an `add` that never looks at `b`: at `b = 1n` it answers `1n + a`, which is a successor, and `pred` steps on it, so the law holds while `add(0n, 5n)` is `1n`. The repair is **`add_zero`** — the closed-value anchor, the same law `t1-mul-two` carries — and it catches that body. **It does not catch the next one, and a probe written after the repair is what showed it.** A body answering `a` at `0n`, `1n + a` at `1n` and `a + b + 1` from `2n` up agrees with everything the four laws observe and, measured before the second law existed, reads **tier 4, complete, reward 1.000, all four laws proven, `failed` empty**. One value plus one step is not the function. The second law is **`add_succ`**, `S.add(a, 1n+b) == 1n + S.add(a, b)` — `add`'s recursion in the argument nothing else steps, which together with `add_zero` fixes `add` at every input. Unlike every other law in the set it is *not* definitional, because the reference recurses on its first argument, so it is proved by induction on `a` at an arbitrary `b` — the shape `add_one_comm` already has, generalized off the `1n`.
+
+    **Both escapes are demonstrated on the law in isolation, and that is Fact 34's caveat again.** Against the reference proof the two bodies read **tier 2, not 3**, and the reason is the one already recorded: `Policy.add_one_comm`, `Policy.add_zero` and `Policy.add_succ` are stated over `S.add` and their steps manipulate the *reference body's* unfolding, so for a different `add` the proof falls as a whole and the `failed` list is every law rather than the offending one. A mutant reading is a statement about the law set under the reference proof; the hole is a statement about the law set under some proof. The absolute reading is therefore taken the way Fact 34 took `t4-bst-insert`'s — patch `meta["laws"]` and `hashes["laws"]` down to the single law, prove it with `{==}`, and read the checker's own line:
+    - `LAWS.add_zero` — `expected : 1n+x / observed : x`, on the body that ignores `b`.
+    - `LAWS.add_succ` — `expected : solution.add(a, 1n+b) / observed : 1n+solution.add(a, b)`, on the body that deviates above one; false at `a = 2n, b = 1n`, where the goal is `add(2n, 2n) == 1n + add(2n, 1n)` and the body answers `5n` against `4n`.
+    No proof can repair either statement, which is the whole of the demonstration. Three mutant files join the corpus: `mul-wrong-above-two.bend`, `add-ignores-the-second-argument.bend`, `add-deviates-above-one.bend`, each carrying its before-and-after reading in the header.
+
+    **Measured after.** `t1-mul-two` reads **20 mutants, 8 strong, no escape**, the reference proving all four laws at tier 4, per-law kills `add_zero 15, mul_succ 20, mul_two 19, mul_zero 16`; `t1-pred-succ` reads **18 mutants, 9 strong, no escape**, the reference proving all five at tier 4, per-law kills `add_succ 13, add_zero 13, pred_add_one 17, pred_succ 17, pred_zero 14`. Neither has a zero-kill law. Both tasks `tools/validate` clean with no problems, the manifest diff after republishing shows **exactly those two entries changed and the bank still at 159 tasks**, and the prompts, `LAWS.bend` and the mutants were corrected in place. The `t1-pred-succ` prompt had also never listed `L.pred_zero` among the proof defs it asks for, which is corrected with the rest.
+
+    **What the shape is, and it is not Fact 30's or Fact 34's.** The hole is not a branch no left-hand side reaches and not a target no law names — every law here is about a function that exists, and every law's body is reached. It is a **literal standing in for a universal**: `mul_two` is about `mul` at the single first argument `2n`, `pred_add_one` is about `add` at the single second argument `1n`, and a law that names one point leaves the function free at every other point. The standing note for this is "an endpoints-only set leaves the interior free", and this is that sentence one dimension down — here there are not even two endpoints, there is one point. The reason the corpus never found it is the reason Fact 43 found for the empty case and it is mechanical: `tools/mutate.py`'s rules rewrite a *step* of the reference, and a body that is wrong at a literal the law names is a body whose wrongness is invisible to the law, so no generated rule produces one and no measurement of the corpus can see the gap. The repair is always the step, because the step is the only law shape that reaches every point rather than one.
+
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
 ## 1. Deviations from SPEC.md
@@ -1621,6 +1638,36 @@ waiting room.
    bank-wide rate rather than as an anecdote: **43% of the generated corpus is
    not evidence of anything**, and only the 598 strong mutants carry weight.
    Every task holds at least two strong mutants.
+
+   **What the two instruments cover, stated plainly, because they do not cover
+   the same tasks and the record should not read as though they did.** The
+   corpus tier reading is exhaustive — all 159 tasks, all 1,686 mutants, no
+   sampling — and it is the weaker instrument, because every one of those bodies
+   was produced by a rule that rewrites a step of the reference and knows nothing
+   about the laws. The new-body probe is the stronger one and it is *not*
+   exhaustive, and it has no single census. What is machine-readable is three
+   logs, all written against the same instrument (the reference solution with one
+   substitution, the reference `PROOF.bend` unchanged, the reading is the tier):
+   `/tmp/probe/sweep/results.json` with its `res-t2.json`/`res-t45.json`/`made.json`
+   siblings, 51 + 26 + 15 probes, written against the tier-1 and tier-2 sets
+   before the tier-3 tasks existed; and `/tmp/sweep-results.json` with
+   `/tmp/sweep.log`, 125 probes over all 39 tasks at tier ≥ 3. `/tmp/sweep33.txt`
+   is a *corpus* reading of 33 tier-2 tasks rather than a body probe and belongs
+   with the tier reading above rather than with the probes. **Union: 91 of the
+   159 registered tasks have at least one independent body written against their
+   law set — 26 of 29 at tier 1, 26 of 91 at tier 2, and all 39 at tier ≥ 3.**
+   That is a lower bound rather than the count: the batches of Facts 42, 43, 44
+   and 45 were each verified against bodies written by hand for them, and those
+   bodies live in `/tmp/probe/*.bend` with the task in the file name only
+   sometimes, so no log maps them. **What is not in doubt is the shape of the
+   gap: the 65 tier-2 tasks and 3 tier-1 tasks those three logs do not reach have
+   no new-body reading recorded anywhere, and the corpus reading is all they
+   have.** Fact 47 is what that gap costs — the two escapes it records sat in
+   `/tmp/probe/sweep/results.json` for three days, unread. Re-running the logs
+   against the current bank is the cheapest way to close it, because the bodies
+   are already written and only the reading is new; Fact 47's re-run is that
+   reading for the 84 probes that map to a task, and it is where both escapes
+   came from.
 
 **Human-reviewed laws for tier ≥ 3 are still not satisfied, and the bank no
 longer says they are.** The second clause is the half that was closable and it

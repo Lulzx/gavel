@@ -22,6 +22,19 @@ law mul_two:
   for x: Nat
   {S.mul(2n, x) == x + x : Nat}
 
+# LAW: the recursion step, at an arbitrary first argument rather than at a
+# literal. `mul_zero` and `mul_two` observe `mul` at `0n` and at `2n` and
+# nowhere else, and a body can agree at both and be wrong everywhere above:
+# `mul(a, b)` answering `0n` at `0n`, `b` at `1n` and `add(b, add(b, 0n))` at
+# `2n` and above satisfies all three other laws and reads tier 4, reward 1.000.
+# This law gives `mul` its *step*, which together with the base at `0n`
+# determines it at every input; it is definitional for the reference, whose body
+# is this equation with `a` for `p`.
+law mul_succ:
+  for a: Nat
+  for b: Nat
+  {S.mul(1n+a, b) == S.add(b, S.mul(a, b)) : Nat}
+
 # LAW: adding zero on the right changes nothing. This is what pins `add`, which
 # no law mentioned on its own: `add(a, b) = a + a` makes `mul_two`'s goal
 # `x + x == x + x` and fails here, and `add(a, b) = a` passes here and fails

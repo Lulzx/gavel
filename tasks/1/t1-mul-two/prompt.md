@@ -1,4 +1,4 @@
-Implement `add` and `mul` on `Nat`, then prove the three laws about them.
+Implement `add` and `mul` on `Nat`, then prove the four laws about them.
 
 `add(a, b)` must return the sum of `a` and `b`, recursing on the first
 argument.
@@ -17,11 +17,21 @@ question about how `S.add` relates to Base's `+` rather than a computation.
 
 It does not, by itself, determine `mul` — and this is worth saying plainly,
 because the obvious reading is that it does. `mul(2n, x)` names its first
-argument as a literal, so `mul(a, b) = b + b` satisfies it. Two more laws close
+argument as a literal, so `mul(a, b) = b + b` satisfies it. Three more laws close
 that off, and each is one line:
 
     law mul_zero:  for x: Nat  {S.mul(0n, x) == 0n : Nat}
+    law mul_succ:  for a: Nat  for b: Nat
+      {S.mul(1n+a, b) == S.add(b, S.mul(a, b)) : Nat}
     law add_zero:  for x: Nat  {S.add(x, 0n) == x : Nat}
+
+`mul_succ` is the one that gives `mul` its *step*. The other two observe `mul`
+at `0n` and at `2n`, and a body can agree at both and be wrong at everything
+above: `mul` answering `b` at `1n` and `2n * b` from `2n` up satisfies
+`mul_zero`, `mul_two` and `add_zero` and is not this function. `mul_succ` at an
+arbitrary `a` rules that out, and with `mul_zero` it determines `mul` at every
+input. It is definitional for the implementation below — `1n+a` is headed by a
+constructor, so `mul`'s match reduces on it and the goal is the body itself.
 
 `mul_zero` is definitional: `mul` matches on its first argument and that
 argument is `0n`, so `{==}` is the whole proof. `add_zero` is the second lemma
@@ -43,4 +53,5 @@ being replaced sits. Note that `x` is named more than once in `L.mul_two`, and a
 binder is consumed on every use: re-bind it reusable first with `+x = x`.
 
 Write the implementations in `solution.bend` and the proof in `PROOF.bend`, as
-`def L.mul_two(x)`, `def L.mul_zero(x)` and `def L.add_zero(x)`.
+`def L.mul_two(x)`, `def L.mul_zero(x)`, `def L.mul_succ(a, b)` and
+`def L.add_zero(x)`.

@@ -38,6 +38,12 @@ def L.mul_two(x):
 def L.mul_zero(x):
   {==}
 
+# `1n+a` is headed by a constructor, so `mul`'s match reduces on it and the goal
+# is `mul`'s own step read back. No induction, and no use of `a` or `b` that
+# would need a sigil.
+def L.mul_succ(a, b):
+  {==}
+
 # The goal is exactly what `Policy.add_zero` proves, so the lemma is the proof.
 def L.add_zero(x):
   Policy.add_zero(x)

@@ -142,7 +142,7 @@
       "tier": 1,
       "path": "tasks/1/t1-mul-two",
       "reference": "references/t1-mul-two",
-      "hash": "afdf072b1427e90de960cc83a68258c310d36de4653b44a74e4fe012d8c92714"
+      "hash": "d98ae5aad08c4c8c9b1d9b82c840b8ae5609c0bbe077ffcdbd836b7000e01ea1"
     },
     {
       "task_id": "t1-mul-zero",
@@ -156,7 +156,7 @@
       "tier": 1,
       "path": "tasks/1/t1-pred-succ",
       "reference": "references/t1-pred-succ",
-      "hash": "077c427aa1de743f4a0d53d7bd1b76842950bd79e59e2cfefdc54ff8fef11eb5"
+      "hash": "a81ee5bd62ed1e0ae9fbd1a6dd7421f56fe0c0d3addab392c777217c942b8de2"
     },
     {
       "task_id": "t1-rev-append",

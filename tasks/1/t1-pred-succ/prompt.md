@@ -31,5 +31,39 @@ named `Policy.` and, unlike a law, it must carry its type:
 
 It is itself inductive in `x`, and its hypothesis is exactly its goal.
 
+The last three laws are anchors, and they are here because the two above do not
+pin the functions on their own. `pred_zero` names the case neither of them
+reaches: both apply `pred` to a successor, so a `pred` answering `1n` at `0n`
+satisfies them both.
+
+`add_zero` and `add_succ` together are what pin `add`, and neither is enough
+alone. `pred_add_one` applies `add` at the second argument `1n` and nowhere
+else, so an `add` that ignores `b` entirely answers `1n + x` there and is a
+successor, and `pred` steps on it — the law holds while `add(0n, 5n)` is `1n`.
+`add_zero` is the closed-value anchor that rejects that body. But one value is
+not the function: an `add` answering `a` at `0n`, `1n + a` at `1n` and `a + b +
+1` from `2n` up agrees with everything above, which is why `add_succ` states the
+step of the argument none of the others steps.
+
+    law pred_zero:  for x: Nat  {S.pred(0n) == 0n : Nat}
+    law add_zero:   for x: Nat  {S.add(x, 0n) == x : Nat}
+    law add_succ:   for a: Nat  for b: Nat
+      {S.add(a, 1n+b) == 1n + S.add(a, b) : Nat}
+
+`pred_zero` closes by unfolding. `add_zero` is inductive in `x` and needs the
+auxiliary lemma
+
+    def Policy.add_zero(x: Nat) -> {S.add(x, 0n) == x : Nat}:
+
+whose hypothesis is its goal, for the same reason `add_one_comm` is: Base's `+`
+does not reduce on a variable, so `x + 0n` is stuck and `S.add`'s
+first-argument recursion is what removes it.
+
+`add_succ` is the one law here that is neither definitional nor closed by
+reduction: `add` recurses on its *first* argument, so its second-argument step
+is an induction in `a` with `b` carried through — the same shape as
+`add_one_comm`, at an arbitrary `b` rather than at `1n`.
+
 Write the implementations in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.pred_succ(x)` and `def L.pred_add_one(x)`.
+`def L.pred_succ(x)`, `def L.pred_add_one(x)`, `def L.pred_zero(x)`,
+`def L.add_zero(x)` and `def L.add_succ(a, b)`.
