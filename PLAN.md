@@ -498,7 +498,11 @@ runs verdicts through a `concurrent.futures` process pool for throughput.
 - `tools/validate.py <task>`: V1–V5. Runs reference, runs every mutant against
   the reference proof (must fail), runs the degenerate library (empty, identity,
   constant, head) against the reference proof (must fail), lexes all files
-  through the gate, records `reference_check_ms`.
+  through the gate, records `reference_check_ms`. Also reports each task's
+  review state (`none-needed` / `unreviewed` / `stale` / `approved`) and, over
+  the tasks it was given, SPEC §12's four environment-quality metrics — see
+  M4.5. The metrics are in `--json` and the review state is in both; `--json`
+  emits the document and nothing else, so it can be parsed.
 - `tools/mutate.py`: rule-based mutants over the reference solution: swap
   match arms, drop a cons, off-by-one on `Nat` literals, replace recursive
   call argument with the parameter, swap operands.
@@ -1263,6 +1267,42 @@ waiting room.
    deliberately left standing rather than worked around: a harness that
    misrepresents itself to a third party to obtain a number is not a harness
    whose numbers mean anything.
+5. **SPEC §12's environment-quality metrics. Built 2026-09-19, and the first
+   thing they did was report the bank's honest state.** `SPEC.md` §12 asks for
+   four numbers "exported per bank release" — task count per tier, calibration
+   solve-rate distribution, mean mutants killed per law, and the fraction of
+   tasks with human-reviewed laws — and none of them existed, which the plan
+   had never recorded: §12's harness half is M3.2 and its bank half was in no
+   milestone at all. `gavel/validate.py::bank_metrics` computes all four from
+   the reports a validation run already produced, and `tools/validate.py`
+   prints them under its summary and exports them under `--json` alongside the
+   per-task records. `--json` also had to be fixed to be JSON: the summary
+   lines used to follow the document, so the mode existed for callers who could
+   not parse it. Two of the four report the bank as it is rather than as a
+   score: `reviewed_fraction` is **0.0 of the 39 tasks that need review**, which
+   is item 2 as a number, and calibration is **0 of 125 recorded**, which is
+   item 4's blocked state as a number. It is a fraction of the tasks that need
+   review rather than of all 125, because below `REVIEW_TIER` the author's own
+   reading *is* the review and counting those would report the bank as
+   unreviewed for following its own rule.
+
+   **The fourth arrived with a triage signal the bank did not have before.**
+   "Mean mutants killed per law" needed which laws caught which mutants, which
+   V2 already computes and threw away: the checker's fixed point names the laws
+   it could not prove, so a type-checking mutant's failed list *is* its kill
+   list, at no extra checker run. Seeded over every law in the bank rather than
+   over the laws that appear in some corpus, the minimum is not a summary — a
+   law at **0 kills** is one no mutant in its corpus ever fails, which is
+   invisible to V2, since V2 only requires that the corpus be non-empty, that
+   some mutant type-check it, and that none escape. Read on `t3-pad`, `min` is
+   0 and the law is `pad_nil`: nine of its seventeen mutants type-check and
+   none of them touches the `Nil{}` case, so the whole of that law's evidence
+   is eight mutants that fail to type-check and are therefore not evidence at
+   all. That is a *flag and not a hole* — Fact 41's rule applies unchanged, and
+   a repair must not be shipped for one on a static read — but it is the first
+   mechanical pointer the bank has ever had at the laws its corpus is not
+   holding. **The bank-wide reading of `min` has not been taken yet**: it needs
+   a full run under the new code, and the number goes here when it lands.
 
 **The review half of this is not satisfied and the bank currently says it is.**
 Eleven tasks at tier 3 or above carry `"reviewed": {"by": "lulzx"}` written by

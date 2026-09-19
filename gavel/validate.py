@@ -58,6 +58,7 @@ class TaskReport:
     checked: list[str] = field(default_factory=list)
     mutant_tiers: list[int] = field(default_factory=list)
     mutant_strong: list[tuple[str, int]] = field(default_factory=list)
+    mutant_kills: dict[str, int] = field(default_factory=dict)
     zero_shot_solve_rate: float | None = None
     review: str = "none-needed"
 
@@ -80,6 +81,7 @@ class TaskReport:
             "checked": list(self.checked),
             "mutant_tiers": list(self.mutant_tiers),
             "mutant_strong": [name for name, _ in self.mutant_strong],
+            "mutant_kills": dict(self.mutant_kills),
             "zero_shot_solve_rate": self.zero_shot_solve_rate,
         }
 
@@ -278,7 +280,7 @@ def _v2_mutants(task: Task, toolchain: Toolchain, config: CheckConfig,
     if not mutants:
         report.problems.append("V2: no mutants authored -- laws unguarded")
         return
-    escaped, strong = [], []
+    escaped, strong, kills = [], [], {}
     for path in mutants:
         source = path.read_text()
         against_proof, bare = mutant_verdicts(task, toolchain, source, config)
@@ -288,7 +290,15 @@ def _v2_mutants(task: Task, toolchain: Toolchain, config: CheckConfig,
             escaped.append(path.name)
         elif bare.tier > TIER_NO_CHECK:
             strong.append((path.name, against_proof.tier))
+            # Which laws caught it, read off the verdict V2 already paid for
+            # rather than from a per-law run: the checker's fixed point names
+            # every law it could not prove, so a type-checking mutant's failed
+            # list is its kill list. SPEC 12's "mean mutants killed per law" is
+            # the mean of this, and a law nothing kills is what it is for.
+            for law in against_proof.failed:
+                kills[law] = kills.get(law, 0) + 1
     report.mutant_strong = strong
+    report.mutant_kills = kills
     if escaped:
         report.problems.append(
             f"V2: {len(escaped)} mutant(s) still prove every law: {', '.join(escaped)}")
@@ -420,5 +430,72 @@ def validate_bank(tasks: list[Task], toolchain: Toolchain,
     return [validate_task(task, toolchain, **kwargs) for task in tasks]
 
 
+# --- SPEC 12's environment-quality metrics, over a bank release ----------------
+
+def bank_metrics(reports: list[TaskReport]) -> dict[str, Any]:
+    """The half of SPEC 12 that is about the bank rather than about a run.
+
+    These are not V1-V5 and could not be: no single task can fail them, which is
+    exactly why they went unbuilt. They are derived from the reports validation
+    already produced, so a bank report cannot disagree with the validation that
+    licensed it -- the same reason ``gavel/metrics.py`` derives a run's numbers
+    from its episode records.
+
+    ``mutants_killed_per_law`` and the calibration block are measurements.
+    ``reviewed_fraction`` is not, and is the one that matters to M4: it counts
+    records that match the laws they are recorded against, which is what
+    ``review_state`` can witness, and it cannot see who wrote one. So it is an
+    upper bound on review, and the only honest way to read it is as such -- it
+    is reported next to the counts it is a fraction of rather than alone.
+
+    A law's kill count is keyed by *task and law*, because ``add_plus`` in one
+    task and ``add_plus`` in another are two declarations and a mean over their
+    sum is a mean over neither. Every law in the bank is seeded at zero before
+    the corpus is read, so a law that **no mutant kills** reads 0 and is counted
+    in the denominator. Seeding from the corpora alone would drop it, which is
+    the same mistake as a corpus that misses it: ``min`` exists to surface that
+    law, and a missing key is a value the report would never show.
+    """
+    tiers: dict[int, int] = {}
+    review: dict[str, int] = {}
+    kills: dict[str, int] = {}
+    rated: list[float] = []
+    for report in reports:
+        tiers[report.tier] = tiers.get(report.tier, 0) + 1
+        review[report.review] = review.get(report.review, 0) + 1
+        for law in report.laws:
+            kills.setdefault(f"{report.task_id}/{law}", 0)
+        for law, count in report.mutant_kills.items():
+            key = f"{report.task_id}/{law}"
+            kills[key] = kills.get(key, 0) + count
+        if report.zero_shot_solve_rate is not None:
+            rated.append(report.zero_shot_solve_rate)
+
+    needs_review = sum(review.get(state, 0)
+                       for state in ("approved", "stale", "unreviewed"))
+    approved = review.get("approved", 0)
+    return {
+        "tasks": len(reports),
+        "tasks_by_tier": {str(tier): tiers[tier] for tier in sorted(tiers)},
+        "review": {
+            **{state: review.get(state, 0) for state in
+               ("approved", "stale", "unreviewed", "none-needed")},
+            "needs_review": needs_review,
+            "reviewed_fraction": (round(approved / needs_review, 4)
+                                  if needs_review else None),
+        },
+        "mutants_killed_per_law": {
+            "mean": round(sum(kills.values()) / len(kills), 2) if kills else None,
+            "min": min(kills.values()) if kills else None,
+            "laws": len(kills),
+        },
+        "calibration": {
+            "recorded": len(rated),
+            "missing": len(reports) - len(rated),
+            "mean_solve_rate": round(sum(rated) / len(rated), 4) if rated else None,
+        },
+    }
+
+
 __all__ = ["DEFAULT_BUDGET_MS", "IMMUTABLE_IMPORTS", "REVIEW_TIER", "TaskReport",
-           "review_state", "validate_bank", "validate_task"]
+           "bank_metrics", "review_state", "validate_bank", "validate_task"]

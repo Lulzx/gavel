@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from gavel.tasks import load_manifest  # noqa: E402
 from gavel.toolchain import DEFAULT_VERSION, Toolchain, ToolchainError  # noqa: E402
 from gavel.validate import (DEFAULT_BUDGET_MS, REVIEW_TIER,  # noqa: E402
-                            validate_task)
+                            bank_metrics, validate_task)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -72,12 +72,21 @@ def main(argv: list[str] | None = None) -> int:
     else:
         reports = [_validate(task) for task in tasks]
 
+    failed = [r for r in reports if not r.valid]
+
     if args.json:
+        # Nothing but the document. The summary lines below used to follow it,
+        # which made ``--json`` unparseable by exactly the callers it exists for
+        # -- and the bank block is SPEC 12's export, so a reader has to be able
+        # to load it. The exit code still reports validity.
         print(json.dumps({"toolchain_hash": toolchain.tree_hash,
                           "strict": args.strict,
                           "budget_ms": args.budget_ms,
+                          "bank": bank_metrics(reports),
                           "tasks": [r.to_json() for r in reports]}, indent=2))
-    elif not args.quiet:
+        return 1 if failed else 0
+
+    if not args.quiet:
         for report in reports:
             notes = report.problems or report.warnings
             status = "ok  " if report.valid else "FAIL"
@@ -85,7 +94,6 @@ def main(argv: list[str] | None = None) -> int:
                   f"{report.reference_ms:5d}ms  {len(report.checked):2d} check(s)  "
                   f"{'; '.join(notes) or 'V1-V5 pass'}")
 
-    failed = [r for r in reports if not r.valid]
     unchecked = [r for r in reports if r.warnings]
     print(f"\n{len(reports) - len(failed)}/{len(reports)} valid, "
           f"{len(unchecked)} with unchecked invariants, "
@@ -102,6 +110,19 @@ def main(argv: list[str] | None = None) -> int:
     if unreviewed:
         print(f"{len(unreviewed)} at tier {REVIEW_TIER}+ with no review record: "
               f"{', '.join(unreviewed)}")
+
+    # SPEC 12's environment-quality metrics, over whatever was validated -- the
+    # whole bank by default, and a subset when task ids are given, which is why
+    # the line says how many tasks it is about rather than assuming the bank.
+    bank = bank_metrics(reports)
+    tiers = " ".join(f"t{tier}:{count}"
+                     for tier, count in bank["tasks_by_tier"].items())
+    killed, review = bank["mutants_killed_per_law"], bank["review"]
+    print(f"bank: {bank['tasks']} tasks ({tiers}); "
+          f"reviewed {review['approved']}/{review['needs_review']} "
+          f"at tier {REVIEW_TIER}+; mutants killed per law "
+          f"mean {killed['mean']}, min {killed['min']}; "
+          f"calibration {bank['calibration']['recorded']}/{bank['tasks']}")
     return 1 if failed else 0
 
 

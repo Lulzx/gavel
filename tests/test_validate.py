@@ -13,7 +13,8 @@ import pytest
 
 from gavel.degenerate import _zero_of, corpus, laws_of, signatures, unmodelled
 from gavel.tasks import HASH_KEYS, LAWS_FILE, PROOF_FILE, SOLUTION_FILE
-from gavel.validate import review_state, validate_task
+from gavel.validate import (TaskReport, bank_metrics, review_state,
+                            validate_task)
 from gavel.verdict import TIER_CHECKS, TIER_COMPLETE, TIER_NO_CHECK
 
 pytestmark = pytest.mark.checker
@@ -192,15 +193,18 @@ def test_validating_in_parallel_gives_the_same_verdicts(capsys):
     def reports(jobs: int) -> dict:
         assert main([*ids, "--json", "--jobs", str(jobs)]) == 0
         out = capsys.readouterr().out
-        # The summary line is printed after the JSON, so decode the document
-        # rather than the whole stream.
-        blob, _ = json.JSONDecoder().raw_decode(out)
+        # Decoding the whole stream is the assertion, not a convenience: the
+        # summary lines used to follow the document, so ``--json`` existed for
+        # callers who could not parse it. SPEC 12's bank block is exported here
+        # and a reader has to be able to load it.
+        blob = json.loads(out)
         return {t["task_id"]: t for t in blob["tasks"]}
 
     serial, parallel = reports(1), reports(2)
     for task_id in ids:
         for field in ("valid", "tier", "laws", "hash", "problems", "warnings",
-                      "checked", "mutant_tiers", "mutant_strong"):
+                      "checked", "mutant_tiers", "mutant_strong", "mutant_kills",
+                      "review"):
             assert serial[task_id][field] == parallel[task_id][field], field
 
 
@@ -552,3 +556,68 @@ def test_the_review_check_reads_the_hashes_pair_not_the_task_hash(make_task):
                      meta={"hashes": hashes,
                            "reviewed": {"by": "lulzx", "hashes": hashes}})
     assert review_state(task.meta, 3) == "approved"
+
+
+# --- SPEC 12's environment-quality metrics, over a bank release ----------------
+
+def _report(task_id, tier, laws, *, kills=None, review="none-needed", rate=None):
+    """A TaskReport with only the fields the bank aggregate reads."""
+    return TaskReport(task_id=task_id, tier=tier, laws=tuple(laws), hash="",
+                      mutant_kills=dict(kills or {}), review=review,
+                      zero_shot_solve_rate=rate)
+
+
+def test_bank_metrics_counts_tasks_by_tier():
+    metrics = bank_metrics([_report("a", 1, ["l"]), _report("b", 1, ["l"]),
+                            _report("c", 4, ["l"])])
+    assert metrics["tasks"] == 3
+    assert metrics["tasks_by_tier"] == {"1": 2, "4": 1}
+
+
+def test_a_law_no_mutant_kills_is_counted_at_zero(make_task):
+    """The finding ``min`` exists for, and the bug this almost shipped with.
+
+    Seeding from the corpora alone drops a law no mutant fails, which is the
+    same information loss as a corpus that never touches it -- and it is the
+    *dangerous* end of the distribution, so dropping it raises the mean and
+    hides the law. Every law in the task is seeded, so the bank below reads
+    mean 1.5 and min 0 over two laws rather than mean 3 over one.
+    """
+    metrics = bank_metrics([_report("t", 3, ["probed", "untouched"],
+                                    kills={"probed": 3})])
+    assert metrics["mutants_killed_per_law"] == {"mean": 1.5, "min": 0, "laws": 2}
+
+
+def test_a_law_name_in_two_tasks_is_two_laws():
+    """``add_plus`` is declared by several tasks. A mean over their sum is a
+    mean over no declaration that exists, and the key says which one."""
+    metrics = bank_metrics([_report("t1", 1, ["add_plus"], kills={"add_plus": 4}),
+                            _report("t2", 3, ["add_plus"], kills={"add_plus": 6})])
+    assert metrics["mutants_killed_per_law"] == {"mean": 5.0, "min": 4, "laws": 2}
+
+
+def test_reviewed_fraction_is_a_fraction_of_the_tasks_that_need_review():
+    """Below ``REVIEW_TIER`` the author's reading *is* the review, so counting
+    those tasks in the denominator would report a bank as unreviewed for
+    following its own rule. The counts travel with the fraction so the
+    denominator is never guessed at."""
+    metrics = bank_metrics([
+        _report("a", 3, ["l"], review="approved"),
+        _report("b", 3, ["l"], review="stale"),
+        _report("c", 4, ["l"], review="unreviewed"),
+        _report("d", 1, ["l"], review="none-needed")])
+    assert metrics["review"] == {"approved": 1, "stale": 1, "unreviewed": 1,
+                                 "none-needed": 1, "needs_review": 3,
+                                 "reviewed_fraction": 0.3333}
+    assert bank_metrics([_report("d", 1, ["l"])])["review"]["reviewed_fraction"] is None
+
+
+def test_bank_metrics_does_not_invent_a_calibration_number():
+    """M4 item 4's blocked state, as a metric: zero recorded is reported as
+    zero recorded and a null mean, not as a solve rate of 0.0."""
+    metrics = bank_metrics([_report("a", 1, ["l"]), _report("b", 1, ["l"])])
+    assert metrics["calibration"] == {"recorded": 0, "missing": 2,
+                                      "mean_solve_rate": None}
+    assert bank_metrics([_report("a", 1, ["l"], rate=0.5),
+                         _report("b", 1, ["l"], rate=1.0)])["calibration"] == {
+        "recorded": 2, "missing": 0, "mean_solve_rate": 0.75}
