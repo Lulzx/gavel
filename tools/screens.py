@@ -1,4 +1,4 @@
-"""The three static screens this bank was audited with, kept in the repo.
+"""The four static screens this bank was audited with, kept in the repo.
 
 They were written as scratch scripts under /tmp during the 2026-09-19 audit and
 the /tmp copies were cleaned twice mid-session, taking the evidence with them.
@@ -7,15 +7,16 @@ hardcoded, so PLAN.md's readings can be reproduced.
 
     uv run python -m tools.screens positions [task-id ...]
     uv run python -m tools.screens general   [manifest.json] [task-id ...]
+    uv run python -m tools.screens anchors   [manifest.json] [task-id ...]
     uv run python -m tools.screens batch     [manifest.json] <task-id> ...
 
 `positions` reads the task directories directly, so it sees a task before it is
-registered. `general` and `batch` read `manifest.json` by default and take a
-manifest path as a first argument otherwise; `batch` will also fall back to the
-`manifest.scratch.*.json` files in the repo root, which are untracked and so
-absent from a fresh clone.
+registered. `general`, `anchors` and `batch` read `manifest.json` by default and
+take a manifest path as a first argument otherwise; `batch` will also fall back
+to the `manifest.scratch.*.json` files in the repo root, which are untracked and
+so absent from a fresh clone.
 
-None of the three runs the checker, so none of them can tell you whether a body
+None of the four runs the checker, so none of them can tell you whether a body
 escapes a law set. They flag *room* -- a law set that names a target at a point
 and leaves it free elsewhere. A flag is triage; a clean run is not a proof.
 """
@@ -269,7 +270,112 @@ def general(ids, manifest_path=None):
 
 
 # --------------------------------------------------------------------------
-# Screen 3: static checks for an unpublished batch
+# Screen 3: no absolute anchor (Fact 51)
+# --------------------------------------------------------------------------
+
+def split_eq(goal):
+    """(left, right) either side of the first top-level `==` in a goal block."""
+    depth = 0
+    for i, c in enumerate(goal):
+        if c in "({[":
+            depth += 1
+        elif c in ")}]":
+            depth -= 1
+        elif c == "=" and depth == 1 and goal[i:i + 2] == "==":
+            return goal[:i], goal[i + 2:]
+    return goal, ""
+
+
+def block_spans(src):
+    """[(start, end, is_premise)] for every top-level `{ ... }` block.
+
+    A block is a premise when the text since the previous block ends in a
+    binder, `for <name>:` -- the dialect's only way to state one.
+    """
+    out, depth, start, prev_end = [], 0, None, 0
+    for i, c in enumerate(src):
+        if c == "{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                premise = re.search(r"for\s+[+\-\w]+\s*:\s*$", src[prev_end:start]) is not None
+                out.append((start, i + 1, premise))
+                prev_end = i + 1
+    return out
+
+
+def anchors(ids, manifest_path=None):
+    """The two shapes Fact 51 closed, which neither earlier screen can see.
+
+    Screen 1 reads argument positions and screen 2 reads whether one law
+    reaches a target with every argument open. Both pass a target whose only
+    occurrence is inside a **premise**, because the premise does apply it with
+    every argument open -- and a submission that falsifies the premise makes
+    that law vacuous, so nothing constrains the target. Both also pass a
+    target every one of whose laws names it on **both sides**, because a
+    constant wrapper cancels. This screen flags both.
+
+    Flag A -- named only in a premise. The target occurs in a goal position in
+    no law; every occurrence sits in a `for e: {...}` binder.
+    Flag B -- no absolute anchor. The target occurs in a goal, but in every
+    such law it appears on both sides of the `==`.
+    Flag C -- named by no law at all.
+
+    Triage, not a proof: a clean run cannot see constraint that arrives through
+    a target's own definition (Fact 49's `t3-merge-len`), and a flag whose
+    reachable island is small is not a hole. Measure before repairing.
+    """
+    man = json.loads(Path(manifest_path).read_text() if manifest_path
+                     else (ROOT / "manifest.json").read_text())
+    rows = [t for t in man["tasks"] if not ids or t["task_id"] in ids]
+    flagged = 0
+    for t in rows:
+        tid = t["task_id"]
+        laws_src = (ROOT / t["path"] / "LAWS.bend").read_text()
+        stub = (ROOT / t["path"] / "solution.bend").read_text()
+        targets = [m.group(1) for m in re.finditer(r"^def\s+([A-Za-z_][\w]*)\s*\(", stub, re.M)]
+        if not targets:
+            continue
+        bodies = dict(laws_of(ROOT / t["path"] / "LAWS.bend"))
+        reports = {}
+        for x in targets:
+            call = re.compile(rf"\bS\.{re.escape(x)}\s*\(")
+            goal_hits, premise_hits, relat = [], [], []
+            for name, body in bodies.items():
+                for start, end, premise in block_spans(body):
+                    block = body[start:end]
+                    if not call.search(block):
+                        continue
+                    if premise:
+                        premise_hits.append(name)
+                        continue
+                    lhs, rhs = split_eq(block)
+                    goal_hits.append(name)
+                    # Relative means *both* sides. A target the law names only
+                    # on the right is determined by that law, not left free by
+                    # it: the law says `f(x) == target(...)`.
+                    if call.search(rhs) and call.search(lhs):
+                        relat.append(name)
+            if goal_hits and len(relat) == len(goal_hits):
+                reports[x] = ("B", f"every law naming it names it on both sides: {sorted(set(relat))}")
+            elif not goal_hits and premise_hits:
+                reports[x] = ("A", f"named only in a premise, by {sorted(set(premise_hits))}")
+            elif not goal_hits and not premise_hits:
+                reports[x] = ("C", "named by no law at all")
+        if reports:
+            flagged += 1
+            print(f"{tid}  (tier {t['tier']})")
+            for x, (code, why) in sorted(reports.items()):
+                print(f"      [{code}] {x}: {why}")
+    print(f"\ntasks scanned: {len(rows)}   flagged tasks: {flagged}")
+    return 0
+
+
+# --------------------------------------------------------------------------
+# Screen 4: static checks for an unpublished batch
 # --------------------------------------------------------------------------
 
 def batch(ids, manifest_path=None):
@@ -329,7 +435,7 @@ def batch(ids, manifest_path=None):
 
 
 def main(argv):
-    if not argv or argv[0] not in ("positions", "general", "batch"):
+    if not argv or argv[0] not in ("positions", "general", "anchors", "batch"):
         print(__doc__)
         return 2
     which, ids = argv[0], argv[1:]
@@ -339,7 +445,7 @@ def main(argv):
     if which == "batch" and not ids:
         print("batch needs at least one task id")
         return 2
-    return {"general": general, "batch": batch}[which](ids, manifest_path)
+    return {"general": general, "anchors": anchors, "batch": batch}[which](ids, manifest_path)
 
 
 if __name__ == "__main__":

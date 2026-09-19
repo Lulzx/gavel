@@ -11,7 +11,9 @@ import json
 
 import pytest
 
-from tools.screens import applications, general, is_closed, is_literal, split_args
+from tools.screens import (
+    anchors, applications, general, is_closed, is_literal, split_args,
+)
 
 
 @pytest.mark.parametrize("term", [
@@ -125,4 +127,87 @@ law chunks_cons:
     general([], str(manifest))
     out = capsys.readouterr().out
     assert "t-clean" not in out
+    assert "flagged tasks: 0" in out
+
+
+def test_anchors_flags_a_target_named_only_in_a_premise(tmp_path, capsys):
+    """`t4-inorder-transport`'s shape. `g` is reached with every argument free,
+    so `general` passes it -- but every occurrence sits in a `for e:` binder,
+    and a submission that falsifies the premise makes that law vacuous."""
+    manifest = _task(
+        tmp_path, "t-premise",
+        stub="def f(t: Nat) -> Nat:\n  ?TODO\n\ndef g(t: Nat) -> Bool:\n  ?TODO\n",
+        laws="""\
+law f_cond:
+  for +t: Nat
+  for e: {S.g(t) == True{} : Bool}
+  {S.f(t) == 0n : Nat}
+""",
+    )
+    assert anchors([], str(manifest)) == 0
+    out = capsys.readouterr().out
+    assert "[A] g: named only in a premise" in out
+    # `f` is named on a goal's left and its right is `0n`, so it is anchored.
+    assert "[A] f:" not in out and "[B] f:" not in out and "[C] f:" not in out
+
+
+def test_anchors_flags_a_target_no_law_anchors_absolutely(tmp_path, capsys):
+    """`t1-rev-append`'s shape. Every law naming `r` names it on both sides, so
+    a body that post-composes a constant cancels on both sides of each."""
+    manifest = _task(
+        tmp_path, "t-relative",
+        stub="def r(xs: List<Nat>) -> List<Nat>:\n  ?TODO\n",
+        laws="""\
+law r_step:
+  for xs: List<Nat>
+  {S.r(P.append(xs, xs)) == P.append(S.r(xs), S.r(xs)) : List<Nat>}
+""",
+    )
+    anchors([], str(manifest))
+    out = capsys.readouterr().out
+    assert "[B] r: every law naming it names it on both sides: ['r_step']" in out
+
+
+def test_anchors_passes_a_target_one_law_anchors_absolutely(tmp_path, capsys):
+    """The repair for that shape: one law whose right-hand side does not call
+    the target. Either half alone is not a recursion; the pair is."""
+    manifest = _task(
+        tmp_path, "t-anchored",
+        stub="def r(xs: List<Nat>) -> List<Nat>:\n  ?TODO\n",
+        laws="""\
+law r_nil:
+  {S.r(Nil{}) == Nil{} : List<Nat>}
+
+law r_step:
+  for xs: List<Nat>
+  {S.r(xs <> xs) == S.r(xs) : List<Nat>}
+""",
+    )
+    anchors([], str(manifest))
+    out = capsys.readouterr().out
+    assert "t-anchored" not in out
+    assert "flagged tasks: 0" in out
+
+
+def test_anchors_does_not_read_a_right_hand_call_as_both_sides(tmp_path, capsys):
+    """The regression, caught by running the screen over the bank rather than
+    by writing it: counting an occurrence on *either* side as "both sides"
+    flagged `t2-chunks-laws`'s `chunks_go`, which `chunks_cons` determines from
+    the right -- `S.chunks(x <> xs, 1n+n) == S.chunks_go(...)` pins `chunks_go`
+    at that instantiation. A target named only on the right is anchored by that
+    law, not left free by it, and the first version of this screen said
+    otherwise."""
+    manifest = _task(
+        tmp_path, "t-rhs",
+        stub="def c(xs: List<Nat>) -> Nat:\n  ?TODO\n\ndef c_go(xs: List<Nat>, x: Nat) -> Nat:\n  ?TODO\n",
+        laws="""\
+law c_cons:
+  for x: Nat
+  for xs: List<Nat>
+  {S.c(x <> xs) == S.c_go(xs, x) : Nat}
+""",
+    )
+    anchors([], str(manifest))
+    out = capsys.readouterr().out
+    assert "c_go" not in out
     assert "flagged tasks: 0" in out
