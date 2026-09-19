@@ -636,7 +636,7 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf`, `t4-queue-rep`; `t4-nth-maybe` is the same tier stated as a *domain* instead of an invariant |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 159 registered tasks, 29 are tier 1, 91
+**The bank's ceiling is tier 5.** Of the 172 registered tasks, 29 are tier 1, 104
 are tier 2, 31 are tier 3, 5 are tier 4 and 3 are tier 5. One more tier-3 task
 (`t3-swap-sum-pair`) is on disk and unregistered, held at the review checkpoint
 Fact 43 records. No tier is empty, so what M2's 200 and M4's 500 are short of is
@@ -1382,14 +1382,15 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 159, of which five are tier 4 and three are
+1. **500+ tasks including tier 5. 172, of which five are tier 4 and three are
    tier 5.** None of the five tiers is empty, so what is left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
-   the same shape of work has since produced 74 more (a 35-task batch from two
+   the same shape of work has since produced 87 more (a 35-task batch from two
    authoring agents, the third tier-5 task, the third and fourth tier-4 ones, the
    Bool-fold duality, the 17-task batch of Fact 42, Fact 43's three — one of
-   which is held at review — Fact 44's nine and Fact 45's six), so the remaining 341 are
-   volume and nothing else. The check that keeps it honest (a manifest entry must
+   which is held at review — Fact 44's nine, Fact 45's six, Fact 48's twelve and
+   Fact 50's one; the `t2-chunks-laws` repair moved no count, and Fact 49 is a
+   screen rather than a task), so the remaining 328 are volume and nothing else. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
    waiting room, and it is now written three times over — `t5-run-effect`,
