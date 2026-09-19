@@ -136,6 +136,16 @@ def _scan(task: Task, name: str, src: str, policy: GatePolicy) -> list[GateFindi
 
     imports = parse_imports(src)
     findings.extend(_imports(task, name, imports, policy))
+    if name == PROOF_FILE and _law_module(imports) is None:
+        # Measured 2026-09-20: an empty PROOF.bend checks -- there is nothing
+        # in it to fail -- and a full run that checks used to be read as every
+        # law proven. A proof that never imports the laws never opens them, so
+        # it can discharge nothing; refuse it here with its own finding, and
+        # check.py refuses to credit it again if this line is ever wrong.
+        findings.append(policy.finding(
+            "no-laws-import",
+            f"{PROOF_FILE} must import ./{LAWS_FILE}; a proof file that does "
+            f"not open the laws cannot prove them", name))
     findings.extend(_names(task, name, src, imports, policy))
     return findings
 
@@ -199,12 +209,23 @@ def _names(task: Task, name: str, src: str, imports: list[ImportSpec],
     return out
 
 
-def _law_module(imports: list[ImportSpec]) -> str:
-    """The namespace this file's import of LAWS.bend binds."""
+def _law_module(imports: list[ImportSpec]) -> str | None:
+    """The namespace this file's import of LAWS.bend binds, or None.
+
+    None is the whole point: a file that never imports the laws never opens
+    them, so no def in it can be a proof of one, whatever it is called. The
+    first reading of this function defaulted to ``"LAWS"``, which let a def
+    named ``LAWS.<law>`` in a file with no such import count as a proof.
+    """
     for imp in imports:
         if imp.path is not None and imp.path.endswith("/" + LAWS_FILE):
             return imp.module or "LAWS"
-    return "LAWS"
+    return None
+
+
+def imports_laws(src: str) -> bool:
+    """Whether a proof file opens the task's laws at all."""
+    return _law_module(parse_imports(src)) is not None
 
 
 def law_definitions(src: str, laws: tuple[str, ...] | list[str]) -> dict[str, "object"]:
@@ -213,6 +234,8 @@ def law_definitions(src: str, laws: tuple[str, ...] | list[str]) -> dict[str, "o
     aliases = alias_map(imports)
     law_module = _law_module(imports)
     found: dict[str, object] = {}
+    if law_module is None:
+        return found
     for chunk in split_top_level(src):
         if chunk.kind != "def":
             continue

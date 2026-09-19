@@ -454,6 +454,47 @@ def test_deriving_every_law_but_via_a_hole_earns_nothing(toolchain, two_law):
     assert verdict.reward == pytest.approx(0.1)
 
 
+# --- a proof that never opens the laws ---------------------------------------------
+
+EMPTY_PROOFS = ("", "import Base\n",
+                "import Base\n\ndef LAWS.add_plus(x, y):\n  {==}\n")
+"""Three files the checker accepts and that prove nothing: nothing in them
+fails, and nothing in them is a law. Before 2026-09-20 each read tier 4."""
+
+
+@pytest.mark.parametrize("proof", EMPTY_PROOFS)
+def test_a_proof_that_never_opens_the_laws_is_refused_at_the_gate(
+        toolchain, task, proof):
+    files = {SOLUTION_FILE: task.reference_solution, PROOF_FILE: proof}
+    verdict = check_submission(task, toolchain, files)
+    assert verdict.tier == TIER_REJECTED
+    assert verdict.reward == 0.0
+    assert "no-laws-import" in [f.code for f in verdict.gate.findings]
+    assert verdict.checks == ()
+
+
+@pytest.mark.parametrize("proof", EMPTY_PROOFS)
+def test_the_protocol_credits_nothing_to_such_a_proof_even_past_the_gate(
+        toolchain, task, proof, monkeypatch):
+    """The gate is the first refusal; this is the layer that holds if the gate
+    is ever wrong. With the gate waved through, a checking full run is not read
+    as the laws proven unless the file opened every one of them."""
+    from gavel import check as check_mod
+    from gavel.verdict import GateResult
+    monkeypatch.setattr(check_mod, "gate_check", lambda task, files: GateResult(ok=True))
+
+    files = {SOLUTION_FILE: task.reference_solution, PROOF_FILE: proof}
+    verdict = check_submission(task, toolchain, files)
+    assert verdict.tier == TIER_CHECKS, verdict
+    assert verdict.proven == ()
+    assert verdict.reward == pytest.approx(0.1)
+
+    files[SOLUTION_FILE] = task.stub_src
+    verdict = check_submission(task, toolchain, files)
+    assert verdict.tier == TIER_NO_CHECK, verdict
+    assert verdict.reward == 0.0
+
+
 # --- the mutant tripwire --------------------------------------------------------
 
 @pytest.fixture

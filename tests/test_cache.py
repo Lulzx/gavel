@@ -90,6 +90,20 @@ def test_the_limits_are_part_of_the_experiment(make_task, files):
         key_for(make_task(), files, limits=Limits(wall_ms=1_000))
 
 
+def test_the_protocol_settings_are_part_of_the_experiment(make_task, files):
+    """With attribution off a partial submission reads tier 2, and a lower run
+    cap can stop the fixed point short of a law it would have credited; a
+    verdict computed under either is not the default's verdict."""
+    task = make_task()
+    base = key_for(task, files)
+    assert base == verdict_key(task, FakeToolchain(), files, PLAIN, Limits(),
+                               attribute_partial=True, max_runs=64)
+    assert base != verdict_key(task, FakeToolchain(), files, PLAIN, Limits(),
+                               attribute_partial=False)
+    assert base != verdict_key(task, FakeToolchain(), files, PLAIN, Limits(),
+                               max_runs=8)
+
+
 def test_the_mutant_corpus_is_in_the_key(tmp_path, make_task, files):
     """The mutants live in references/, not in the task's own files, and a
     submission that reproduces one has its reward zeroed. Regenerate the corpus

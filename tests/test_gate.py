@@ -139,6 +139,25 @@ def test_policy_helpers_are_allowed(task, submission):
     assert codes(check(task, submission)) == []
 
 
+def test_a_proof_that_never_imports_the_laws_is_rejected(task, submission):
+    """Measured 2026-09-20: an empty PROOF.bend checks, and a full run that
+    checks was read as every law proven. A file that does not open the laws
+    cannot discharge them, so the absence of the import is its own finding."""
+    for proof in ("", "import Base\n",
+                  "import Base\nimport ./solution.bend as S\n"):
+        submission[PROOF_FILE] = proof
+        assert "no-laws-import" in codes(check(task, submission)), repr(proof)
+
+
+def test_a_law_proof_under_the_default_module_still_needs_the_import(task, submission):
+    # ``LAWS`` is what an unaliased import would bind; naming it without the
+    # import is a fresh def the checker would accept as anything.
+    submission[PROOF_FILE] = "import Base\n\ndef LAWS.add_plus(x, y):\n  {==}\n"
+    found = codes(check(task, submission))
+    assert "no-laws-import" in found
+    assert "name" in found
+
+
 def test_a_proof_for_an_undeclared_law_is_rejected(task, submission):
     submission[PROOF_FILE] = HEADER + "\ndef L.made_up(x):\n  {==}\n"
     assert "name" in codes(check(task, submission))

@@ -11,9 +11,8 @@ Gavel therefore:
 3. pins the bun version in `toolchain/bun.version`.
 4. calls `bun bend2/main.ts` directly, never the launcher.
 
-`gavel.toolchain.Toolchain.load` refuses to run if either pin has drifted. CI
-checks that the bun it installed matches the pinned one before running a
-single test.
+`gavel.toolchain.Toolchain.load` refuses to run if either pin has drifted, and
+the test suite checks the bun it runs under against the pin.
 
 Every verdict carries the toolchain hash and the bank hash, so a reward
 recorded in a trajectory can always be traced to the exact checker and the

@@ -604,6 +604,20 @@ beneath a key where `tree_level_sum` weights it by depth, and `lex_le` and
 
     **This is the last tier-2 round, and the reason is the tier table rather than the work.** The bank is now **29 / 171 / 31 / 5 / 3** across tiers 1–5: **239 tasks, 902 distinct law names, 413 distinct def names, 255 distinct policy targets**, the prescribed greps printing **908** and **415** because they also match the held `t3-swap-sum-pair`. **236 of the 239 sit at tiers 1–4**, so M2's 200 is met with 36 to spare, and what the bank is *short* of is tier 4 and 5 — the eight tasks where the interesting RL signal lives. **The binding constraint on those is not the authoring pipeline, which reaches them and stops, but the review checkpoint they stop at**, and that is a gate only a person can clear. So the answer is not another tier-2 round: it is the docket above, which is what makes the clearing cheap enough to actually happen.
 
+65. **An empty `PROOF.bend` earned reward 1.0, on every task in the bank, from the first commit of the check protocol until 2026-09-20.** Found by an outside reader of `fa11e67` and reproduced here in one command: `gavel check t1-add-plus --solution <the stub> --proof <an empty file>` read **tier 4, reward 1.000, one checker run, 39 ms**; so did a file holding only `import Base`, and so did one holding `import Base` and a `def LAWS.add_plus(x, y): {==}` with no import of the laws. The mechanism has three parts and each was a reading that had been true of every submission anyone had actually sent. The gate restricted *which* files a proof may import and never required that it import the laws. The checker checks an empty file, because nothing in it can fail. And `_run_protocol` read a full run that checks as *every law proven* — which it is, for a file that opened every law, and is not for one that opened none. The solution stub was never checked at all: `LAWS.bend` is what imports `solution.bend`, so a proof that skips the laws skips the implementation too, and the tier-4 verdict was issued for a function nobody had written against a theorem nobody had stated. This is a harness defect, not a checker one, and it is the exact shape Fact 33 already recorded one level up: a target no law names is unconstrained, and here the whole law set was unnamed by the file being checked. No test caught it because every test built its proof from `proof_header`, and the adversarial corpus's runner did the same for the file it was not asserting on.
+
+    **Fixed in two layers, the way the runner's stricter reading backs the gate's.** The gate now has a finding of its own, `no-laws-import`: `PROOF.bend` must import `./LAWS.bend`, under any alias, and a file that does not is tier 0 with that sentence as its feedback. Beneath it, `_law_module` returns `None` rather than defaulting to `"LAWS"` — the default was the third bypass, since it let `def LAWS.<law>` in a file with no such import count as a law's proof — so `law_definitions` finds nothing in such a file; and both of the protocol's one-run shortcuts now require that the file opened the laws *and*, for the full run, that it defined a proof for every one of them. With the gate monkeypatched to wave the file through, the three payloads read tier 2 against the reference solution and tier 1 against the stub, which is what they are. Three payloads joined `tests/adversarial/` (the corpus is 47), two gate tests and two protocol tests pin both layers, and the reference still reads tier 4 in one run. The same reader's second finding was true and is fixed with it: `CheckConfig.attribute_partial` and `max_runs` move a verdict — attribution off turns tier 3 into tier 2, and a low run cap stops the fixed point early — and neither was in the cache key. Both are, the schema is 4, and a test pins each.
+
+    **Two of the reader's other points are readings of the design rather than defects, and the spec now says what they say.** V2 measures that the *reference proof* fails on a mutant, which is proof incompatibility and not a semantic counterexample; the kill counts are attributions of that failure to laws, and the semantic claim — no proof exists — is only ever made where an author probed for one and found none. The spec's §5.5 and §7.4 said "fails at least one law" and now say what is measured. And the bubblewrap backend binds the whole root read-only, so a check can read host files; the boundary it enforces is writes, namespaces and the network, not the draft's "no filesystem outside the task directory", and §9 now records that rather than the draft's claim. Narrowing the mount to the runtime and the task directory is the right change and is not made here.
+
+    **The GitHub workflows were deleted the same day, at the user's instruction.** `ci.yml` had run the suite, the sandbox job, the bun-pin check and the publish-in-sync step; every "CI" in the facts above is a record of what that file did when it ran. What it checked is unchanged and is run by hand: `uv run pytest`, `tools.sandbox_check` inside the `Dockerfile` image, and a bare `tools.publish` followed by `git diff --exit-code -- manifest.json`.
+
+## 1. Departures from the spec
+
+Where a measurement in §0 forced the build off the 0.1 draft. `SPEC.md` 0.2
+records the as-built form of every row; this table stays as the log of why,
+and the section numbers it cites are the spec's, which did not move.
+
 | Spec | Plan | Reason |
 |---|---|---|
 | Success = nonzero exit is failure (§7.3) | Success = exit 0 ∧ stdout == `All terms check.` ∧ no `annotated as unsafe` line | Fact 1 |
@@ -619,39 +633,48 @@ beneath a key where `tree_level_sum` weights it by depth, and `lex_le` and
 
 ```
 gavel/
-  SPEC.md  PLAN.md  README.md
+  README.md                      # front page; docs/ holds the eight pages it indexes
+  docs/SPEC.md  docs/PLAN.md     # the as-built design, and this build log
   pyproject.toml                 # uv, python >= 3.12, no runtime deps beyond stdlib for the core
+  Dockerfile                     # the Linux image with bubblewrap; CI's sandbox job runs in it
   toolchain/
     2.0.5/                       # vendored bend2/ tree (main.ts, bend.ts, comp.ts, base.bend, effs/)
     2.0.5.sha256                 # tree hash; checked at harness start
     bun.version                  # pinned bun version string
     fetch.py                     # pulls a release tarball, verifies sha, vendors it
   gavel/
-    __init__.py
     toolchain.py                 # locate + verify pinned checker; build the argv
-    runner.py                    # run one check: tmp dir, env scrub, timeout, rlimits, parse output
-    lexer.py                     # tokenizer ported from bend.ts (parse_* rules), version-tagged
-    gate.py                      # static gate: forbidden constructs, namespace, size, integrity
-    laws.py                      # parse LAWS.bend: law names, proof-def names, dependency scan
-    verdict.py                   # dataclasses: GateFinding, CheckResult, Verdict
+    runner.py                    # one check: tmp dir, env scrub, rlimits, timeout, backend (plain | bwrap)
+    lexer.py                     # tokenizer ported from bend.ts, version-tagged
+    gate.py                      # static gate: file set, forbidden constructs, namespace, size, integrity
+    laws.py                      # parse LAWS.bend: law names, proof-def names
+    hashing.py                   # sha256 over files and trees; the bank hash
+    verdict.py                   # dataclasses: GateFinding, GateResult, CheckResult, Verdict
     reward.py                    # pure tier/reward function (spec §8)
-    tasks.py                     # Task, load by manifest, hashing, working-dir materialization
-    check.py                     # full run → solution run → per-law fixed point; returns Verdict
-    env.py                       # GavelEnv: reset / step / close, dense/sparse, multi-turn
-    cache.py                     # (toolchain_hash, task_hash, submission_hash) -> Verdict, sqlite
-    trajectory.py                # JSONL writer (spec §13.1)
-    metrics.py                   # counters + latency histograms, exported as JSON
-    server.py                    # JSON-lines over Unix socket / HTTP (M3)
-    cli.py                       # `gavel check`, `gavel validate`, `gavel run`, `gavel bench`
-  tasks/                         # public bank: tasks/<tier>/<id>/{prompt.md, LAWS.bend, prelude.bend, solution.bend, meta.json}
-  references/                    # hidden: references/<id>/{solution.bend, PROOF.bend, mutants/}
+    tasks.py                     # Task, Manifest, working-dir materialisation, observation
+    check.py                     # gate → full run → solution run → per-law fixed point; the tripwire
+    degenerate.py                # the argument-ignoring corpus V3 runs (spec §7.5)
+    validate.py                  # V1–V5, review state, environment-quality metrics
+    reviews.py                   # reader for reviews/<task>.json; there is no writer
+    env.py                       # GavelEnv: reset / step / close, dense/sparse, samplers
+    cache.py                     # verdict memo in sqlite, keyed on everything a verdict depends on
+    trajectory.py                # JSONL writer and reader, one record per episode (spec §13.1)
+    metrics.py                   # counters + latency percentiles, derived from the same records
+    policy.py                    # a model-backed policy for tools/calibrate.py; not in the reward path
+    server.py                    # JSON lines over a Unix socket / loopback HTTP
+    cli.py                       # gavel list | info | check | validate | bench | checker | serve
+  tasks/<tier>/<id>/             # public bank: prompt.md, LAWS.bend, prelude.bend, solution.bend, meta.json
+  tasks/<tier>/_abandoned/       # parked refusals, each with a NOTE.md; never in the manifest
+  references/<id>/               # hidden: solution.bend, PROOF.bend, mutants/
+  reviews/                       # a person's review records; absent until someone writes one
   manifest.json
-  tools/                         # authoring pipeline (offline)
-    validate.py  mutate.py  degenerate.py  calibrate.py  publish.py  migrate.py
-  tests/
-    test_lexer.py  test_gate.py  test_check.py  test_reward.py  test_env.py
-    adversarial/                 # gate corpus: one file per attack, expected finding
-    fixtures/                    # tiny tasks used by tests
+  tools/                         # authoring pipeline (offline, none of it in the reward path)
+    author.py                    # the stages in order: files, derive, screens, mutants, V1–V5, episode, review, publish
+    publish.py  validate.py  mutate.py  screens.py  docket.py  calibrate.py  migrate.py
+    soak.py  sandbox_check.py  authoring-brief.md
+  scratch/                       # untracked round manifests; scratch/archive/ for landed rounds
+  examples/client.ts             # a non-Python client of gavel serve
+  tests/                         # 453 tests; tests/adversarial/ is the gate corpus, one file per attack
 ```
 
 Python for the harness because the gym API is Python-native and every RL stack
@@ -815,7 +838,7 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf`, `t4-queue-rep`; `t4-nth-maybe` is the same tier stated as a *domain* instead of an invariant |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 225 registered tasks, 29 are tier 1, 157
+**The bank's ceiling is tier 5.** Of the 239 registered tasks, 29 are tier 1, 171
 are tier 2, 31 are tier 3, 5 are tier 4 and 3 are tier 5. One more tier-3 task
 (`t3-swap-sum-pair`) is on disk and unregistered, held at the review checkpoint
 Fact 43 records and marked by a `HOLD` file so that a bare publish skips it. No tier is empty, so what M2's 200 and M4's 500 are short of is
@@ -1124,6 +1147,13 @@ tier 0, before any law is consulted, which is a rejection that says nothing
 about the law the mutant was written to probe.
 
 ## 4. Milestones and work packages
+
+**Where they stand on 2026-09-20.** M0, M1 and M3 are done. M2 is done for
+the bank (236 tasks at tiers 1–4 against 200) and open for calibration, which
+has never been run. M4 has its benchmark and its tier 5, and owes three things
+no further code will close: a person reading 39 tier-3+ law sets, 261 more
+tasks, and a training run by something other than the soak's scripted policy.
+The per-item states below are as recorded when each item moved.
 
 ### M0 — Feasibility (target: 2 weeks)
 
@@ -2110,6 +2140,16 @@ test writes a review into a temporary repository rather than into this one.
 - **Checker soundness.** The guide says the Lean model lags the implementation. Mitigation: mutant tripwire, adversarial corpus, and success keyed on exact output, not exit code.
 - **Authoring throughput.** Hand-written proofs in a no-tactics language are slow. M0 deliberately keeps 20 tasks small; M2 relies on the agent loop.
 - **Fact 8 cost.** Per-law runs multiply latency on failed turns. Bounded by n² × 0.2 s with n ≤ 5, and the persistent worker in M3 shrinks the constant.
+
+**Where they stand.** Syntax churn: no release since 2.0.5 has been pinned
+against, so the bank has never been migrated for real; the tool exists and is
+tested. Checker soundness: the tripwire has fired zero times in ten thousand
+soaked episodes, and the two soundness-shaped incidents the build did find
+were both in laws, not in the checker (Fact 33's unnamed target, and the
+premise-only pair Fact 63 records). Authoring throughput:
+the long pole moved from writing proofs to reviewing laws, which is the shape
+M4 records. Fact 8 cost: bounded as predicted, and the persistent worker was
+never needed because the cost that binds is the check, not the startup.
 
 ## 6. First actions
 

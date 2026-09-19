@@ -30,7 +30,9 @@ only, which is why it is marked dev-only.
 
 ## Where the real thing is tested
 
-`Dockerfile` builds the Linux environment with bubblewrap present, and the CI
-`sandbox` job runs the adversarial corpus inside it. The first time that job
-actually ran it failed a test that had passed on the plain backend for its
-whole life, which is why the job exists.
+`Dockerfile` builds the Linux environment with bubblewrap present, and
+`tools/sandbox_check.py` proves a real check runs inside it. The first time the
+adversarial corpus ran under it, it failed a test that had passed on the plain
+backend for its whole life, which is why the check exists. The root is bound
+read-only, so the checker can read host files; the boundary is writes,
+processes and the network, not reads.

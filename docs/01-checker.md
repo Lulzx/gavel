@@ -37,6 +37,13 @@ Two things exit 0 without proving anything:
   prints a warning instead of the success line.
 - a file declaring `main`, whose output replaces the success line.
 
+A third thing checks without proving anything: a file that never imports
+the laws. Nothing in it can fail, and since `LAWS.bend` is what imports the
+solution, nothing in it checks the implementation either. An empty proof file
+read tier 4 until 2026-09-20. The gate now requires the import, and the
+protocol reads a checking full run as complete only if the file opened every
+law and defined a proof for each.
+
 So `ok` means: exit 0, stdout is exactly `All terms check.`, no unsafe
 warning, no timeout. The gate refuses both constructs before the checker runs,
 on the token stream rather than the text, so `"@unsafe"` inside a string is not

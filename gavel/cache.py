@@ -38,7 +38,7 @@ from .verdict import Verdict
 # Bumping this invalidates every row. It is part of the key rather than a
 # migration because the old rows are worthless: a verdict whose meaning changed
 # is not a verdict.
-SCHEMA = 3
+SCHEMA = 4
 
 
 @dataclass
@@ -100,15 +100,22 @@ def mutant_corpus(task: Task) -> str:
 
 
 def verdict_key(task: Task, toolchain: Toolchain, files: dict[str, str],
-                backend: Backend, limits: Limits) -> str:
+                backend: Backend, limits: Limits, *,
+                attribute_partial: bool = True, max_runs: int = 64) -> str:
     """Everything a verdict is a function of, and nothing else.
 
     ``limits`` is in the key on purpose: a run that was allowed 10 seconds and a
     run that was allowed 1 are different experiments, and the second one's
-    timeout is not the first one's verdict.
+    timeout is not the first one's verdict. ``attribute_partial`` and
+    ``max_runs`` are the two ``CheckConfig`` fields that move a verdict without
+    moving a limit: with attribution off a partial submission reads tier 2,
+    and a lower run cap can stop the fixed point short of a law it would have
+    credited. The defaults mirror ``CheckConfig``; ``check_submission`` passes
+    its own values explicitly.
     """
     return sha256_text(json.dumps({
         "schema": SCHEMA,
+        "protocol": [bool(attribute_partial), int(max_runs)],
         "task": task.task_id,
         "task_hash": task.hash,
         "mutants": mutant_corpus(task),

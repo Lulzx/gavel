@@ -22,7 +22,7 @@ from . import reward as reward_mod
 from . import runner
 from .cache import VerdictCache, verdict_key
 from .gate import check as gate_check
-from .gate import law_definitions
+from .gate import imports_laws, law_definitions
 from .laws import alias_map, parse_imports, split_top_level
 from .lexer import KIND_NAME, tokenize
 from .runner import DEFAULT_LIMITS, Backend, Limits, run_check, select_backend
@@ -80,7 +80,9 @@ def check_submission(task: Task, toolchain: Toolchain, files: dict[str, str],
     key = None
     if cache is not None:
         key = verdict_key(task, toolchain, files,
-                          select_backend(config.backend), config.limits)
+                          select_backend(config.backend), config.limits,
+                          attribute_partial=config.attribute_partial,
+                          max_runs=config.max_runs)
         hit = cache.get(key)
         if hit is not None:
             return replace(hit, cached=True)
@@ -151,16 +153,24 @@ def _run_protocol(task: Task, toolchain: Toolchain, files: dict[str, str],
     filled = law_definitions(proof_src, laws)
     filled_in_order = tuple(law for law in laws if law in filled)
 
+    # Both shortcuts below read the full run as a statement about the laws,
+    # which it only is if the file imported them. An empty PROOF.bend checks
+    # (there is nothing in it to fail) and proves nothing; it was measured
+    # reading tier 4 before this guard existed. The gate refuses such a file
+    # first; this is the layer that holds if the gate is ever wrong.
+    opens_laws = imports_laws(proof_src)
+
     full = runs.add(run_check(toolchain, workdir, PROOF_FILE, config.limits,
                               backend))
-    if full.ok:
+    if full.ok and opens_laws and len(filled) == n_laws:
         return (True, tuple(laws))
 
     # A run whose only complaint is that laws are still open proves two things
     # at once: nothing else is a hole (that would inflate the count), and every
     # def that is present checked. Declaration order makes that sound, so this
     # is the whole verdict in one run.
-    if full.todo_count is not None and full.todo_count == n_laws - len(filled_in_order):
+    if (opens_laws and full.todo_count is not None
+            and full.todo_count == n_laws - len(filled_in_order)):
         return (True, filled_in_order)
 
     solution_checks = _solution_checks(task, toolchain, workdir, runs, config,
@@ -278,12 +288,12 @@ def _cited_laws(text: str, aliases: dict[str, str], law_module: str,
     return found
 
 
-def _module_of(imports) -> str:
+def _module_of(imports) -> str | None:
     """The namespace this file's import of LAWS.bend binds, if it has one."""
     for imp in imports:
         if imp.path is not None and imp.path.endswith("/" + LAWS_FILE):
             return imp.module or "LAWS"
-    return "LAWS"
+    return None
 
 
 def _finish(task: Task, toolchain: Toolchain, files: dict[str, str], gate, checks,

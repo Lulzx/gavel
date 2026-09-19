@@ -186,6 +186,18 @@ CASES: dict[str, Case] = {
         "as unparsable rather than raising out of the check and losing the turn"),
     "an_unterminated_char_literal": Case(
         PROOF_FILE, REJECT, "the same rule for a character literal"),
+    # --- a proof that never opens the laws ---------------------------------------
+    "an_empty_proof": Case(
+        PROOF_FILE, REJECT,
+        "measured 2026-09-20: an empty file checks, since nothing in it can "
+        "fail, and a checking full run was read as every law proven; a proof "
+        "that does not import the laws opens none and can discharge none"),
+    "a_proof_that_imports_only_base": Case(
+        PROOF_FILE, REJECT, "the same file with the one import that is not the laws"),
+    "a_law_proof_named_without_the_laws_import": Case(
+        PROOF_FILE, REJECT,
+        "LAWS.<law> is what an unaliased import would bind; without the import "
+        "it is a fresh def the checker accepts at whatever type it is given"),
     # --- the file set ----------------------------------------------------------
     "the_laws_file_submitted_back": Case(
         LAWS_FILE, REJECT,
