@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-rightmost-value",
+  "tier": 2,
+  "laws": [
+    "rightmost_value_leaf",
+    "rightmost_value_node",
+    "rightmost_value_mirror"
+  ],
+  "policy_targets": [
+    "rightmost_value"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "386fae565c0e03ac77474f358214e26402c3e4405573c51d46d5e81f9c00e5be",
+    "prelude": "22af11996ac94ec619b60325653436d01b005d68eb62c3105c54bdfc731a0079"
+  },
+  "bend_version": "2.0.5"
+}

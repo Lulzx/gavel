@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-last-index-of",
+  "tier": 2,
+  "laws": [
+    "last_index_of_nil",
+    "last_index_of_step",
+    "last_index_of_miss",
+    "last_index_of_hit",
+    "last_index_of_last_wins"
+  ],
+  "policy_targets": [
+    "last_index_of"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "80ff7f7af7e762982c7079011c491cea9f32e2c70b8e3bdf01188a26b3d2b000",
+    "prelude": "73e523af4a19694e5f95a76e438887b86150a4df1edde5460a6ea59f245e63f5"
+  },
+  "bend_version": "2.0.5"
+}

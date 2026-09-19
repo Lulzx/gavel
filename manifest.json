@@ -642,6 +642,13 @@
       "hash": "8e3d46fa573394a8b46b9369872e67773da0520a088d5142759aa2b318ceb5da"
     },
     {
+      "task_id": "t2-internal-count",
+      "tier": 2,
+      "path": "tasks/2/t2-internal-count",
+      "reference": "references/t2-internal-count",
+      "hash": "128d93659a85c0c2f66e72f7520c882dde69c0e203f970b77133801b18d86ddb"
+    },
+    {
       "task_id": "t2-is-pow2",
       "tier": 2,
       "path": "tasks/2/t2-is-pow2",
@@ -663,11 +670,25 @@
       "hash": "a6d54214bc42fd810714cc5fb1614031095b0677e8a1865cf3ada3b7aa8db51e"
     },
     {
+      "task_id": "t2-last-index-of",
+      "tier": 2,
+      "path": "tasks/2/t2-last-index-of",
+      "reference": "references/t2-last-index-of",
+      "hash": "6280fe702a3aee5efaa04a589f1dd4a5cc6671b77fe3c9d7fc544531b4097d1c"
+    },
+    {
       "task_id": "t2-lcp-len-laws",
       "tier": 2,
       "path": "tasks/2/t2-lcp-len-laws",
       "reference": "references/t2-lcp-len-laws",
       "hash": "40d52fd705c7f26caca11af06cb14a650506fd07d1d4dd3abe16c902ed794375"
+    },
+    {
+      "task_id": "t2-leaf-count-at",
+      "tier": 2,
+      "path": "tasks/2/t2-leaf-count-at",
+      "reference": "references/t2-leaf-count-at",
+      "hash": "7f1a1024490806f0a0594f8c7540feff91a9190856f29761963c9e7a4fc6f4b9"
     },
     {
       "task_id": "t2-lex-le",
@@ -899,6 +920,13 @@
       "path": "tasks/2/t2-reverse-laws",
       "reference": "references/t2-reverse-laws",
       "hash": "79d31207d8ec925d7da3c4bd32a22e022a3fc64687181a39f2753e5c303a08a8"
+    },
+    {
+      "task_id": "t2-rightmost-value",
+      "tier": 2,
+      "path": "tasks/2/t2-rightmost-value",
+      "reference": "references/t2-rightmost-value",
+      "hash": "2ccfbea56def9d4461922572e126cedd3b7147bcf3f51719008e4d452ab36c39"
     },
     {
       "task_id": "t2-run-max-laws",
@@ -1228,6 +1256,13 @@
       "path": "tasks/2/t2-zip-with",
       "reference": "references/t2-zip-with",
       "hash": "9163f5f7bf20b4ffa283b92e7d45b840ea720e0541a195f7987839bb80565655"
+    },
+    {
+      "task_id": "t2-zip-with-const",
+      "tier": 2,
+      "path": "tasks/2/t2-zip-with-const",
+      "reference": "references/t2-zip-with-const",
+      "hash": "0d026b1d4ae776d0231e375aa66eba8ff99594627a8d2205d086161623e40ea2"
     },
     {
       "task_id": "t2-zip3-laws",

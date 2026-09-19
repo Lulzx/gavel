@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-leaf-count-at",
+  "tier": 2,
+  "laws": [
+    "leaf_count_at_leaf",
+    "leaf_count_at_leaf_deep",
+    "leaf_count_at_node_step",
+    "leaf_count_at_root",
+    "leaf_count_at_mirror"
+  ],
+  "policy_targets": [
+    "leaf_count_at"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "a7a8aed4994d5f59b7a1a9d63d7d7e76b23a261198584a645ba4c1a322eced06",
+    "prelude": "c4b601bd524fb7fba6c055451281ace04d28073ef26c6d0d874a0121c974db7f"
+  },
+  "bend_version": "2.0.5"
+}

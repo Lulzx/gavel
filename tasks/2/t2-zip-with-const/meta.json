@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-zip-with-const",
+  "tier": 2,
+  "laws": [
+    "zip_with_const_nil",
+    "zip_with_const_step",
+    "zip_with_const_fsts",
+    "zip_with_const_snds"
+  ],
+  "policy_targets": [
+    "zip_with_const"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "9e4298c20c9b54f39d423fc2c1b6d2df29dd870213789deea3818318843641de",
+    "prelude": "1f72ebdba0a37d77737d92a78b6dbb4c11c78dd3e7dc83ded158e8c976763975"
+  },
+  "bend_version": "2.0.5"
+}

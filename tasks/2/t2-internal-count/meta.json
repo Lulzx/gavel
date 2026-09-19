@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-internal-count",
+  "tier": 2,
+  "laws": [
+    "internal_count_leaf",
+    "internal_count_node",
+    "internal_count_inner"
+  ],
+  "policy_targets": [
+    "internal_count"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "172fe7860f1501a3a8e1daf7a6bcee0da94e8c85cecbc06d59d5f1b1f533df8f",
+    "prelude": "6ce4fa8d72669db5d34612c8b6e2284ab60f1b92e0ebc81fd946f9fbb916f911"
+  },
+  "bend_version": "2.0.5"
+}
