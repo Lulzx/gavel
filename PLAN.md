@@ -1589,6 +1589,26 @@ waiting room.
    at six killers between them and the bank's `min` back at 1 over 459
    declarations.
 
+   **The fourth reading is the whole bank at once, and it is the read the
+   earlier sweeps did not take: the kill count says which laws have evidence,
+   and the mutant *tiers* say whether any body reached the top.** Over the
+   159-task manifest, `tools/validate.py --json` records a tier for every mutant
+   it ran against the reference proof — **1,686 mutants, and not one at tier 4.**
+   The histogram is `tier 1: 722, tier 2: 366, tier 3: 598`; a tier-4 mutant
+   would be a body that proves every law and is the definition of an escape, and
+   there are none. That is a statement about the *corpus* and it is weaker than
+   the probers' instrument in one respect and stronger in another: weaker
+   because every one of those bodies was generated from the reference by a rule
+   with no knowledge of the laws, and stronger because it is exhaustive — every
+   task, every mutant, no sampling. It is the reading to take after every batch,
+   because it costs nothing beyond the validation already run and it would have
+   caught Facts 42 and 43's batches at the same moment the zero-kill counts
+   did. Note also that 722 of the 1,686 do not type-check (`tier 1`), which is
+   the instrument error both Fact 42 and Fact 43 record, now visible as a
+   bank-wide rate rather than as an anecdote: **43% of the generated corpus is
+   not evidence of anything**, and only the 598 strong mutants carry weight.
+   Every task holds at least two strong mutants.
+
 **Human-reviewed laws for tier ≥ 3 are still not satisfied, and the bank no
 longer says they are.** The second clause is the half that was closable and it
 is closed. Eleven tasks at tier 3 carried `"reviewed": {"by": "lulzx"}` written
