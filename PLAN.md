@@ -594,8 +594,15 @@ beneath a key where `tree_level_sum` weights it by depth, and `lex_le` and
 
     **And the cost of the bank's CI is now a measured number, which it was not before.** The failing pre-repair run's `The bank validates` step ran from **15:36 to 16:51 — 75 minutes** — for **215 tasks** under `--jobs 4` on a two-core runner, and its per-task timings read 624–890 ms on the tier-1 tasks alone, which is the 725 ms median Fact 61 recorded. The repair push `78f630f` and the push after it both read **success**, so the swap is confirmed on the machine that enforces the budget and not only on the box. What that leaves for M4 is arithmetic rather than a defect: 75 minutes per push at 215 tasks becomes more per push as the bank grows toward 500, against a budget that stays fixed at 2000 ms — so the run that keeps the bank honest is also the run that gets slower for every task added to it.
 
+63. **The two law-set shapes that were caught by reading are now caught by the pipeline, and the delta was not the tooling but that nothing ran it.** `tools.screens` has been able to see a target the law set does not constrain since the 2026-09-19 audit, and the bank's defence against shipping one was a numbered item in `tools/authoring-brief.md` asking an author to remember it — a checklist in a head, on a pipeline with eight stages that a green run reports one stage at a time. `tools/author.py` now runs `anchors` and `general` as a **`screens` stage** between `derive` and `mutants` (`ac0aebf`), and it **refuses** on the two flags where nothing constrains the target at all: **A**, every occurrence of which sits inside a `for e: {...}` premise, so the submission decides whether the premise is inhabitable and a body that falsifies it proves the law vacuously; and **C**, a target no law names. Both were measured paying full reward in this bank before they were closed — C is Fact 33, A is the `all_le_put`/`all_ge_put` pair in `t4-inorder-transport`. The placement is the point: the same defect found before the corpus exists costs a two-line law fix, and found afterwards costs the laws *and* every mutant written against them. Flag **B** and the `general` flags are recorded in the stage's detail and do not refuse, because a relative law is only escapable when a cancelling wrapper exists and whether one does depends on the type. Measured the same day: the stage **refuses 0 of the 225** registered tasks and records **7** as triage — so the class is closed for new work without invalidating a single task already in the bank. `anchors` and `general` keep their printed output exactly; their bodies were split into `anchor_reports`/`general_flags`, both taking a repo root, so the stage reads the same verdicts rather than a second implementation of them. `uv run pytest` went **439 → 443**.
 
-## 1. Deviations from SPEC.md
+    **The reading the gate is meant to feed is now assembled too, and it is the first reading of this bank that says the tier-3+ laws are clean.** `tools/docket.py` (`2fa30be`) joins the per-law mutant kill counts from `tools.validate`, the `anchors` and `general` flags from `tools.screens` and the reference duration into one block per task, with a SHORTLIST naming the tasks that have any finding, most first — the triage a person reading forty law sets needs and which was scattered across three tools. It applies no V4 budget, because latency is a property of the episode rather than of the laws and the concurrency that makes the command usable would inflate the number it was judging, and it **writes nothing**: a record appearing under `reviews/` while it ran would be Fact 27's forgery arriving through a side door, so that absence is the assertion `tests/test_docket.py` is built around. Over the **39 tasks at tier 3 or above**: **176 laws, no law with a zero-kill count (min 1), no `anchors` flag on any task, and two `general` flags** — `t4-bst-insert`'s `ins_at` and `t3-merge-len`'s `merge_go` — both the screen's documented false positive rather than a hole. `ins_at`'s three laws are one per constructor of its finite type, which is a definition written out and not an unpinned interior; `merge_go` is Fact 49's case, where the constraint arrives through the target's own definition and no reading of the law set alone can see it. Every one of the 39 carries at least four strong mutants. **What this does not do is move the checkpoint**: M4's "human-reviewed laws for tier ≥ 3" still reads **0 of 39** and should, because the half that remains is the half no screen can do — reading the laws for whether they *determine* the function rather than whether they name it, which is the question Facts 49 and 51 are both instances of.
+
+64. **Fourteen more tier-2 tasks out of fifteen assigned, and the fifteenth is the round's only finding: a rotation assigned on a wrong premise about the bank's own `t1-rotate`.** The fourteen are `t2-count-at-depth`, `t2-count-divisors`, `t2-count-peaks`, `t2-cross`, `t2-fib-list`, `t2-is-prime`, `t2-lcm`, `t2-lcp-list`, `t2-nat-log2`, `t2-nat-sqrt`, `t2-replicate-each`, `t2-sum-adjacent`, `t2-take-every-nth` and `t2-zip-longest`: **96 laws**, from 4 on `count_at_depth` to 11 on `zip_longest`, and the manifest goes **225 → 239** in a pure append — no entry removed, none modified. `t2-rotate-by` was assigned as `rotate_by(n, xs)`, a left rotation by `n` positions, **on the premise that `t1-rotate` rotates by one**. It does not: `t1-rotate`'s prompt reads "moves the first `n` elements of `xs` to the back", and its reference recurses on `rotate(p, append(t, h <> Nil{}))`, so the two are the same function at another tier, which the brief forbids. **Nothing was written for it** — no task directory, no reference, no manifest entry — and it is parked as a note under `tasks/2/_abandoned/t2-rotate-by/NOTE.md` rather than deleted, which is the convention for a refusal that a later worker would otherwise re-attempt. The single name listed under "good hunting grounds" that this round was assigned from was **`rotate_left`**, and the brief's own line already said it is `rotate` (`t1-rotate`); the premise came in over that line rather than out of the brief.
+
+    **Verified before publishing, in the order the plan requires, and this is the first round the new stage screened.** The static half first: `tools.screens batch` reads **14/14 clean** — no stub ships its reference (every target carries `?TODO`, checked per def), no task's function set collides with a registered task's, no corpus is thin (8–28 mutants each) — and every task's `prelude.bend` is byte-identical to its reference's. Each task was then closed out by **re-running `tools.author` against the real manifest** rather than trusting the author's scratch one, so every stage ran against the bank; all fourteen passed, including `screens`, which reads "clean: every target has a law of its own with an absolute anchor" on each. Then `tools.validate` **serially** over the fourteen: **exit 0, 14/14 valid, 391 checker runs, mean 2.35 kills per law and min 1**, so no law here is one no mutant kills, and the reference latency is **70–78 ms** against a 2000 ms budget. A static docket over the whole bank reads **7 findings of 239** — the same seven as before the round, so none of the fourteen added one, which is the gate and the reading agreeing on the same task set.
+
+    **This is the last tier-2 round, and the reason is the tier table rather than the work.** The bank is now **29 / 171 / 31 / 5 / 3** across tiers 1–5: **239 tasks, 902 distinct law names, 413 distinct def names, 255 distinct policy targets**, the prescribed greps printing **908** and **415** because they also match the held `t3-swap-sum-pair`. **236 of the 239 sit at tiers 1–4**, so M2's 200 is met with 36 to spare, and what the bank is *short* of is tier 4 and 5 — the eight tasks where the interesting RL signal lives. **The binding constraint on those is not the authoring pipeline, which reaches them and stops, but the review checkpoint they stop at**, and that is a gate only a person can clear. So the answer is not another tier-2 round: it is the docket above, which is what makes the clearing cheap enough to actually happen.
 
 | Spec | Plan | Reason |
 |---|---|---|
@@ -1636,7 +1643,7 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 225, of which 222 are at tiers 1–4, five are
+1. **500+ tasks including tier 5. 239, of which 236 are at tiers 1–4, five are
    tier 4 and three are tier 5.** None of the five tiers is empty, so what is
    left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
@@ -1647,9 +1654,11 @@ waiting room.
    Fact 50's one, Fact 54's seven, Fact 55's ten, Fact 57's six, Fact 59's
    ten and Fact 60's ten; the `t2-chunks-laws` repair moved no count, Fact 51's
    three repairs moved no count, and Facts 49, 52 and 53 are a screen, a screen
-   and a brief rather than tasks), and Fact 62 adds the round of ten that closed
-   the gap to 225, so the remaining 275 are volume and nothing
-   else. The check that keeps it honest (a manifest entry must
+   and a brief rather than tasks), Fact 62 adds the round of ten that closed
+   the gap to 225, and Fact 64 the fourteen that took it to 239, so the
+   remaining 261 are volume and nothing
+   else — except that the tier this item is short of is not the tier the volume
+   is coming from. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
    waiting room, and it is now written three times over — `t5-run-effect`,
@@ -1710,6 +1719,22 @@ waiting room.
    tests in `tests/test_publish.py` pin the skip and the refusal — the skip by
    seeding a manifest that already contains the held task, because a hold that
    expires once the task is in the bank is not a hold either.
+
+   **What is left of this item is a person reading 39 law sets, and the reading
+   is now assembled and is short.** `tools/docket.py` (Fact 63) prints one block
+   per tier-3+ task — the laws, their kill counts, both static screens, the
+   corpus reading — with a SHORTLIST of the tasks that have any finding. Over
+   the 39: **no law with a zero-kill count, no `anchors` flag, two `general`
+   flags and both the screen's documented false positive.** So the derivable
+   half of the review is closed and its answer is that nothing there is a
+   defect, which is a finding in its own right and the first reading of this
+   bank that says so. **The checkpoint is not moved by it and is not claimed
+   to be**: it still reads **0 of 39**, and `tools/docket.py` writes nothing,
+   because the half that is left — reading the laws for whether they determine
+   the function rather than whether they name it — is the half no screen does.
+   What the docket changes is the *cost* of that half, from opening forty
+   directories to reading one command's output, which is what this item was
+   actually blocked on rather than on the absence of a reviewer.
 
 3. **Published throughput benchmark. Published 2026-09-19, and the blocker was
    the metric rather than the machine.** `tools/soak.py` reports p50/p95/p99 and
@@ -1792,7 +1817,7 @@ waiting room.
    per-task records. `--json` also had to be fixed to be JSON: the summary
    lines used to follow the document, so the mode existed for callers who could
    not parse it. Two of the four report the bank as it is rather than as a
-   score: calibration is **0 of 225 recorded**, which is item 4's blocked state
+   score: calibration is **0 of 239 recorded**, which is item 4's blocked state
    as a number, and the review fraction is **0 of the 39 tasks that need
    review** — which is *not* the same as thirty-nine tasks having been reviewed,
    and the paragraph here has been wrong in two different directions before

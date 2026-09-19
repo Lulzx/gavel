@@ -62,8 +62,8 @@ where `<YOURTAG>` is the tag in your assignment. Exit code 0 means every stage
 passed. Iterate until it does.
 
 Scratch manifests live under `scratch/`, which is gitignored, and not at the
-repository root. Fifty-four of them had accumulated there by 2026-09-19 — one
-per worker per round, against a workflow whose unit is a round — and the cost of
+repository root. Fifty-six had accumulated there by 2026-09-19 — one per worker
+per round, against a workflow whose unit is a round — and the cost of
 that is not aesthetic: a stale root manifest beside the real `manifest.json` is
 how the wrong file gets published. Rounds that have been collapsed into
 `manifest.json` move to `scratch/archive/`, and `tools.screens batch` searches
@@ -144,16 +144,16 @@ These are the defects that survive every stage, so they are on you:
 
 ## Distinctness: the hard constraint
 
-The bank already has **225 registered tasks** (plus one tier-3 task held at the
+The bank already has **239 registered tasks** (plus one tier-3 task held at the
 review checkpoint — it carries a `HOLD` file, which is what keeps it out of the
-bank — and three directories parked under `tasks/2/_abandoned/`), **801
-distinct law names** across **383 distinct def names** and **231 distinct policy
+bank — and four directories parked under `tasks/2/_abandoned/`), **902
+distinct law names** across **413 distinct def names** and **255 distinct policy
 targets**. A new task must be a new *function*, not the same function at another
 tier, and its law names must not collide with an existing one.
 
 Those three counts are over the *registered* bank. The grep below reads
 `tasks/*/*/LAWS.bend`, which also matches a task held on disk but not published,
-so it prints **807** law names and **385** def names for the same tree — the 6
+so it prints **908** law names and **415** def names for the same tree — the 6
 and the 2 are `t3-swap-sum-pair`'s. Quote the registered figures; if a grep
 disagrees, find the task that accounts for the difference before changing the
 count.
@@ -187,8 +187,12 @@ guess. `append`, `len`, `map`, `rev`, `sum`, `take`, `drop`, `zip`, `filter`,
 `replace_at`, `indices_of`, `argmax`, `argmax_go`, `distinct`, `distinct_go`,
 `nth_from_end`, `internal_count`, `rightmost_value`, `zip_with_const`,
 `last_index_of`, `leaf_count_at`, `replace_first`, `gap_go`, `max_gap`,
-`take_last`, `cum_max`, `run_lengths`, `run_lengths_go` are all taken. If the function you
-want is on that list, pick another one.
+`take_last`, `cum_max`, `run_lengths`, `run_lengths_go`, `count_at_depth`,
+`count_divisors`, `cd_go`, `count_peaks`, `peaks_go`, `cross`, `row`,
+`fib_list`, `fib_go`, `is_prime`, `no_divisor`, `lcm`, `lcm_go`, `lcp_list`,
+`nat_log2`, `log2_go`, `nat_sqrt`, `replicate_each`, `sum_adjacent`,
+`take_every_nth`, `every_nth_go`, `zip_longest`, `zl_pad_left`, `zl_pad_right`
+are all taken. If the function you want is on that list, pick another one.
 
 Good hunting grounds that the list above does not cover — **but check the
 candidate's *function*, not its name, and read the prompt of any existing task
