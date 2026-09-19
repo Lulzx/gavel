@@ -2,8 +2,8 @@ import Base
 
 # The successor case answers the number itself rather than its predecessor, so
 # `pred` is the identity. `pred_succ` asks for `x` where the body leaves `1n+x`.
-# Measured: `proof_tier=3 bare_tier=2`, proven ['add_one'], first failure at
-# `LAWS.pred_succ`.
+# Measured: `proof_tier=3 bare_tier=2`, proven ['add_one', 'pred_zero'],
+# first failure at `LAWS.pred_succ`.
 def pred(n: Nat) -> Nat:
   match n:
     case 0n:

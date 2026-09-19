@@ -3,8 +3,8 @@ import Base
 # The successor case takes the predecessor of the predecessor instead of
 # answering it, so `pred` counts down by two and `pred(1n)` is `0n`. The law
 # asks for `x` at a variable `x` and the body leaves `pred(x)`.
-# Measured: `proof_tier=3 bare_tier=2`, proven ['add_one'], first failure at
-# `LAWS.pred_succ`.
+# Measured: `proof_tier=3 bare_tier=2`, proven ['add_one', 'pred_zero'],
+# first failure at `LAWS.pred_succ`.
 def pred(n: Nat) -> Nat:
   match n:
     case 0n:

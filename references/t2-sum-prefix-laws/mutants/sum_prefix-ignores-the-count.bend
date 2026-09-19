@@ -7,8 +7,8 @@ import ./prelude.bend as P
 # count. It is refused: with a variable `xs`, `P.len(xs)` is stuck, so the
 # length law cannot be unfolded onto this body's second case and the two sides
 # never meet. No hole here.
-# Measured: `proof_tier=3 bare_tier=2`, proven ['sum_prefix_zero'], first
-# failure at `LAWS.sum_prefix_len`.
+# Measured: `proof_tier=3 bare_tier=2`, proven ['sum_prefix_zero',
+# 'sum_prefix_nil'], first failure at `LAWS.sum_prefix_len`.
 def sum_prefix(n: Nat, xs: List<Nat>) -> Nat:
   match n:
     case 0n:

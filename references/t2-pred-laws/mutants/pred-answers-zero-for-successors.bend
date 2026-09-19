@@ -2,8 +2,8 @@ import Base
 
 # Every successor is answered with zero: the `1n+` is dropped from the answer
 # as well as from the recursion. `pred_succ` asks for `x` at a variable `x`.
-# Measured: `proof_tier=3 bare_tier=2`, proven ['add_one'], first failure at
-# `LAWS.pred_succ`.
+# Measured: `proof_tier=3 bare_tier=2`, proven ['add_one', 'pred_zero'],
+# first failure at `LAWS.pred_succ`.
 def pred(n: Nat) -> Nat:
   match n:
     case 0n:
