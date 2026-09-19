@@ -1172,12 +1172,12 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 124, of which four are tier 4 and three are
+1. **500+ tasks including tier 5. 125, of which five are tier 4 and three are
    tier 5.** None of the five tiers is empty, so what is left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
    the same shape of work has since produced 39 more (a 35-task batch from two
    authoring agents, the third tier-5 task, the third and fourth tier-4 ones, and
-   the Bool-fold duality), so the remaining 376 are volume
+   the Bool-fold duality), so the remaining 375 are volume
    and nothing else. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
@@ -1207,8 +1207,13 @@ waiting room.
 **The review half of this is not satisfied and the bank currently says it is.**
 Eleven tasks at tier 3 or above carry `"reviewed": {"by": "lulzx"}` written by
 the authoring agent through `--reviewer`, and no human has read them — Fact 27.
-All eleven are tier 3; the four tier-4 tasks carry no record, which is the
-honest state and not a fix.
+All eleven are tier 3; the eight tasks at tier 4 and 5 carry no record, which is
+the honest state and not a fix. **Two of the eleven are now stale as well as
+forged** — re-checked 2026-09-19, `t3-pad` and `t3-zip-sum` have law files whose
+hash no longer matches the hash in the review record, so the record attests to
+laws that are no longer shipped. `t3-pad`'s is this session's own repair
+(Fact 36): editing `LAWS.bend` under a review record invalidates it, and
+nothing in the pipeline notices.
 The records are left in place rather than deleted so the defect stays visible,
 but they must not be counted as review, and the fix is not in the checker:
 either review is recorded somewhere the pipeline cannot write, or the laws are
