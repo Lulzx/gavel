@@ -285,6 +285,13 @@
       "hash": "cf4ee4caf960bf9a4500c5b4f3525b2f86f97ec1ad4972c31253aa7d2c7d35a7"
     },
     {
+      "task_id": "t2-assoc-delete-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-assoc-delete-laws",
+      "reference": "references/t2-assoc-delete-laws",
+      "hash": "b952d955aacabb1c2bfe9a0028c71c0da77209006d41aab9174d71535d719a9c"
+    },
+    {
       "task_id": "t2-assoc-lookup",
       "tier": 2,
       "path": "tasks/2/t2-assoc-lookup",
@@ -383,6 +390,13 @@
       "hash": "7b4d6df696dd31eabec35e19c49f6a1e5ed6a8cca0d198b8c988d90266e75dbe"
     },
     {
+      "task_id": "t2-count-runs-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-count-runs-laws",
+      "reference": "references/t2-count-runs-laws",
+      "hash": "03f98713ad1caaf5d859bc69f6db58488399378eb821b2ac76cf340bda181d21"
+    },
+    {
       "task_id": "t2-count-up-down",
       "tier": 2,
       "path": "tasks/2/t2-count-up-down",
@@ -423,6 +437,13 @@
       "path": "tasks/2/t2-delete-at",
       "reference": "references/t2-delete-at",
       "hash": "145ae811c061f709388adde58e93296c00d7bdd532af0af5062c66c3bc9c555a"
+    },
+    {
+      "task_id": "t2-delete-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-delete-laws",
+      "reference": "references/t2-delete-laws",
+      "hash": "b85a18be88907d41b0c9e23374cacd2c131468d67e86917d2d4fb345eadedede"
     },
     {
       "task_id": "t2-divmod3-laws",
@@ -556,6 +577,13 @@
       "path": "tasks/2/t2-insert-at",
       "reference": "references/t2-insert-at",
       "hash": "bd6728e3dc2b5ca2d914b09c1a5f658f9402397f9ff43779608d826a8b9631a8"
+    },
+    {
+      "task_id": "t2-intercalate",
+      "tier": 2,
+      "path": "tasks/2/t2-intercalate",
+      "reference": "references/t2-intercalate",
+      "hash": "8e3d46fa573394a8b46b9369872e67773da0520a088d5142759aa2b318ceb5da"
     },
     {
       "task_id": "t2-is-prefix",
@@ -703,6 +731,13 @@
       "path": "tasks/2/t2-partition-below",
       "reference": "references/t2-partition-below",
       "hash": "635bc08bc4caad7ccf807a0bcc903d19fcc4393d93ada4fd37d70fa51bf5b6f9"
+    },
+    {
+      "task_id": "t2-positions-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-positions-laws",
+      "reference": "references/t2-positions-laws",
+      "hash": "f2c5b60e864919b650e8cf9599d98a700c913a3e62780e14fd73251ae934bf6e"
     },
     {
       "task_id": "t2-pow-laws",
@@ -983,6 +1018,13 @@
       "path": "tasks/2/t2-tree-leaf-count-laws",
       "reference": "references/t2-tree-leaf-count-laws",
       "hash": "ff1b481e08c8592d6454db88263b73b76ca2eaee64b9dfbf49289b99acca833c"
+    },
+    {
+      "task_id": "t2-tree-level-sum",
+      "tier": 2,
+      "path": "tasks/2/t2-tree-level-sum",
+      "reference": "references/t2-tree-level-sum",
+      "hash": "c49fa4d1e986d91b18c4b3b359af087813b5daf0a69a4b9a4141fb21946e387a"
     },
     {
       "task_id": "t2-tree-map",

@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-tree-level-sum",
+  "tier": 2,
+  "laws": [
+    "tree_level_sum_leaf",
+    "tree_level_sum_leaf_deep",
+    "tree_level_sum_node_step",
+    "tree_level_sum_root"
+  ],
+  "policy_targets": [
+    "tree_level_sum"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7b4031ce8dba24a8d3e379de1b5f9aa4337ff6163dc1503b419e8312d1a30940",
+    "prelude": "f046ffd0bfa4132fe6c29e0eb1eb0fe830442409b2355ecf86035db9c721e0de"
+  },
+  "bend_version": "2.0.5"
+}

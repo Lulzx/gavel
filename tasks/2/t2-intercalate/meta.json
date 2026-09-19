@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-intercalate",
+  "tier": 2,
+  "laws": [
+    "intercalate_nil",
+    "intercalate_single",
+    "intercalate_cons",
+    "intercalate_nil_sep"
+  ],
+  "policy_targets": [
+    "intercalate"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "5d7a4dbada3631942272bb80e9b899d578f326d3416cb3771ea0b86051ef5d84",
+    "prelude": "72c43b2806caf431bdedf0a40795c59c2d6157bb6aec04aaa01e31fd6485b114"
+  },
+  "bend_version": "2.0.5"
+}

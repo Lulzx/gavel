@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-count-runs-laws",
+  "tier": 2,
+  "laws": [
+    "count_runs_nil",
+    "count_runs_single",
+    "count_runs_same",
+    "count_runs_diff"
+  ],
+  "policy_targets": [
+    "count_runs"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7f9e8604c1ca2cec291bd6ed5be2ddf8b37a7a3842b447a841f91f8b8f8bda21",
+    "prelude": "bd7ed82379253b000a0056ebdeaf8715df2b981b4a9604cb3637a05872494523"
+  },
+  "bend_version": "2.0.5"
+}

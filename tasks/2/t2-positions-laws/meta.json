@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-positions-laws",
+  "tier": 2,
+  "laws": [
+    "positions_nil",
+    "positions_step",
+    "positions_hit",
+    "positions_miss"
+  ],
+  "policy_targets": [
+    "positions"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "399bbad7158b38ee6ce7472e4a58969c8fa0f504def8a7609698841d6e54e0ee",
+    "prelude": "2784bb887e7a070790b6c1618b09492f646c4cc11f357a976394dbb0f3e37049"
+  },
+  "bend_version": "2.0.5"
+}
