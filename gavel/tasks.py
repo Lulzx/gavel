@@ -251,6 +251,31 @@ def load_task(root: Path, entry: dict[str, Any], bank_root: Path) -> Task:
     )
 
 
+# ``gavel/``'s parent, which is the repository. A manifest entry's ``path`` and
+# ``reference`` are relative to this rather than to the manifest, because that
+# is what the tools that write them emit -- ``tools/publish.py`` builds both
+# with ``root.relative_to(repo)`` -- so a manifest that has been moved out of
+# the repository root still names the same tasks. Resolving against the
+# manifest instead was correct only while every manifest sat at the root, and
+# said so nowhere; when the authoring manifests moved into ``scratch/`` the
+# whole CLI stopped being able to read them.
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+def _entry_base(bank_root: Path, entry: dict[str, Any]) -> Path:
+    """The directory ``entry["path"]`` is relative to.
+
+    The repository root, except where the manifest is at the root of a
+    *different* tree -- a checkout copied into a temporary directory by a test,
+    which is the case that made the manifest's own directory the right answer
+    to reach for first. The two agree whenever the manifest sits in the
+    repository it describes, which is every manifest this repository ships.
+    """
+    if (bank_root / entry["path"]).is_dir():
+        return bank_root
+    return REPO_ROOT
+
+
 def load_manifest(path: Path | str) -> Manifest:
     path = Path(path)
     if not path.is_file():
@@ -263,8 +288,9 @@ def load_manifest(path: Path | str) -> Manifest:
         # for why this is not a claim about validity.
         if entry.get("quarantined"):
             continue
-        root = (bank_root / entry["path"]).resolve()
-        task = load_task(root, entry, bank_root)
+        base = _entry_base(bank_root, entry)
+        root = (base / entry["path"]).resolve()
+        task = load_task(root, entry, base)
         manifest.tasks[task.task_id] = task
     return manifest
 

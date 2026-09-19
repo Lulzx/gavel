@@ -92,3 +92,55 @@ def test_a_quarantined_task_is_loaded_out_of_the_bank(manifest, repo, tmp_path):
     loaded = load_manifest(path)
     assert kept in loaded.tasks
     assert held not in loaded.tasks
+
+
+def test_a_manifest_outside_the_repo_root_still_names_its_tasks(manifest, tmp_path):
+    """The authoring manifests live in ``scratch/``, so the CLI has to read them
+    from there.
+
+    An entry's ``path`` is repository-root-relative -- that is what
+    ``tools/publish.py`` writes, with ``root.relative_to(repo)`` -- so moving
+    the manifest does not change what it names. Resolving it against the
+    manifest's own directory instead was correct only for as long as every
+    manifest sat in the repository root, and said so nowhere; when the
+    authoring manifests moved into ``scratch/``, every task they listed became
+    unreadable. This is that regression.
+    """
+    import json
+
+    from gavel.tasks import load_manifest
+
+    scratch = tmp_path / "scratch"
+    scratch.mkdir()
+    path = scratch / "worker.json"
+    path.write_text(json.dumps(manifest.bank))
+
+    loaded = load_manifest(path)
+    assert set(loaded.tasks) == set(manifest.tasks)
+    for task_id, task in loaded.tasks.items():
+        assert task.root == manifest.tasks[task_id].root
+        assert task.references == manifest.tasks[task_id].references
+
+
+def test_a_manifest_at_the_root_of_its_own_tree_resolves_against_it(manifest,
+                                                                    repo,
+                                                                    tmp_path):
+    """The other case, which the fix above must not have traded away: a checkout
+    copied somewhere else, whose manifest is at *its* root rather than this
+    one's. There the two candidate bases agree, and the manifest wins because
+    it is tried first -- which is what keeps a test's scratch copy from
+    resolving back into the real bank."""
+    import json
+    import shutil
+
+    from gavel.tasks import load_manifest
+
+    entry = manifest.bank["tasks"][0]
+    task_id = entry["task_id"]
+    shutil.copytree(repo / entry["path"], tmp_path / entry["path"])
+    shutil.copytree(repo / entry["reference"], tmp_path / entry["reference"])
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps({"version": 1, "tasks": [entry]}))
+
+    loaded = load_manifest(path)
+    assert loaded.get(task_id).root == (tmp_path / entry["path"]).resolve()
