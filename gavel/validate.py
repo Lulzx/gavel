@@ -129,7 +129,13 @@ def review_state(meta: dict[str, Any], tier: int) -> str:
     """What a task's review record actually attests to.
 
     One of ``none-needed`` (below ``REVIEW_TIER``), ``unreviewed``,
-    ``approved``, or ``stale``.
+    ``current``, or ``stale``.
+
+    ``current`` and not ``approved``: all this function witnesses is that a
+    record exists and attests to the laws the task ships. It cannot witness who
+    wrote one, and the pipeline *can* write one, so naming the state after the
+    judgement would put the same word on a forged record and a genuine one --
+    which is the defect Fact 27 is about, one layer up.
 
     A review is recorded against the hashes ``tools/publish.py`` derived from
     ``LAWS.bend`` and ``prelude.bend``, so it covers the immutable files as they
@@ -160,7 +166,7 @@ def review_state(meta: dict[str, Any], tier: int) -> str:
     review = meta.get("reviewed")
     if not isinstance(review, dict) or not review.get("by"):
         return "unreviewed" if tier >= REVIEW_TIER else "none-needed"
-    return "approved" if review.get("hashes") == meta.get("hashes") else "stale"
+    return "current" if review.get("hashes") == meta.get("hashes") else "stale"
 
 
 def _review_state(task: Task, report: TaskReport) -> None:
@@ -442,11 +448,16 @@ def bank_metrics(reports: list[TaskReport]) -> dict[str, Any]:
     from its episode records.
 
     ``mutants_killed_per_law`` and the calibration block are measurements.
-    ``reviewed_fraction`` is not, and is the one that matters to M4: it counts
+    ``recorded_fraction`` is not, and is the one that matters to M4. It counts
     records that match the laws they are recorded against, which is what
-    ``review_state`` can witness, and it cannot see who wrote one. So it is an
-    upper bound on review, and the only honest way to read it is as such -- it
-    is reported next to the counts it is a fraction of rather than alone.
+    ``review_state`` can witness -- and it cannot see who wrote one. Measured on
+    the bank it reads 8 of 39, every one of those eight a record the authoring
+    agent wrote for itself; the human-reviewed figure is **0 of 39**. So the
+    fraction is an upper bound that the bank's own history shows is entirely
+    reachable without review, and it is reported next to the raw counts rather
+    than alone so that a reader gets the four states and not just the quotient.
+    It is named for what it measures: a record, not the judgement a record is
+    supposed to be evidence of.
 
     A law's kill count is keyed by *task and law*, because ``add_plus`` in one
     task and ``add_plus`` in another are two declarations and a mean over their
@@ -472,16 +483,16 @@ def bank_metrics(reports: list[TaskReport]) -> dict[str, Any]:
             rated.append(report.zero_shot_solve_rate)
 
     needs_review = sum(review.get(state, 0)
-                       for state in ("approved", "stale", "unreviewed"))
-    approved = review.get("approved", 0)
+                       for state in ("current", "stale", "unreviewed"))
+    current = review.get("current", 0)
     return {
         "tasks": len(reports),
         "tasks_by_tier": {str(tier): tiers[tier] for tier in sorted(tiers)},
         "review": {
             **{state: review.get(state, 0) for state in
-               ("approved", "stale", "unreviewed", "none-needed")},
+               ("current", "stale", "unreviewed", "none-needed")},
             "needs_review": needs_review,
-            "reviewed_fraction": (round(approved / needs_review, 4)
+            "recorded_fraction": (round(current / needs_review, 4)
                                   if needs_review else None),
         },
         "mutants_killed_per_law": {

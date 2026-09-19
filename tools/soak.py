@@ -32,6 +32,7 @@ import argparse
 import json
 import queue
 import random
+import resource
 import sys
 import threading
 import time
@@ -271,23 +272,60 @@ class Soak:
 
 # --- reporting -----------------------------------------------------------------
 
-def throughput(metrics: Metrics, elapsed_s: float, jobs: int) -> dict[str, float]:
+def child_cpu_s() -> float:
+    """CPU seconds this process's reaped children have consumed so far.
+
+    ``RUSAGE_CHILDREN`` is cumulative and process-wide, so the useful reading is
+    a delta around the run rather than a per-check one. That is also what makes
+    it the one throughput number a contended host cannot corrupt: wall clock
+    measures how long the verdict waited, which includes every other process on
+    the box, while this measures the work the verdict did. The only children a
+    soak spawns are checker processes, so the delta is the checker's.
+    """
+    usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+    return usage.ru_utime + usage.ru_stime
+
+
+def throughput(metrics: Metrics, elapsed_s: float, jobs: int,
+               cpu_s: float | None = None) -> dict[str, float]:
     """Verdicts per minute, and per minute per core.
 
     "Core" is the worker thread count, which is the honest denominator for a
     run whose workers are blocked on a subprocess: the interesting number is
     how much of what was paid for was used.
+
+    ``cpu_s`` adds the reading that survives a busy machine -- verdicts per
+    minute of *checker CPU* -- so a host that cannot be quieted still yields a
+    publishable rate, and the two numbers disagreeing is itself the measurement
+    of how contended the host was.
+
+    ``cpu_amplification`` is checker CPU per CPU-second of worker budget. Above
+    1 is normal and is not an error: the checker is `bun`, so one verdict forks
+    and threads on its own, and a run of 8 workers can spend 9 cores' worth of
+    CPU. It is the number that says how much of the wall clock a worker was
+    actually working through, and it is the reason ``verdicts_per_cpu_min`` is
+    lower than ``verdicts_per_min_per_core * 60``.
     """
     minutes = elapsed_s / 60.0 if elapsed_s > 0 else 0.0
     cores = max(1, jobs)
     per_min = metrics.turns / minutes if minutes else 0.0
-    return {
+    report = {
         "verdicts_per_min": round(per_min, 1),
         "verdicts_per_min_per_core": round(per_min / cores, 1),
         "episodes_per_min": round(metrics.episodes / minutes, 1) if minutes else 0.0,
         "elapsed_s": round(elapsed_s, 2),
         "jobs": cores,
     }
+    if cpu_s is not None:
+        cpu_minutes = cpu_s / 60.0
+        report["checker_cpu_s"] = round(cpu_s, 2)
+        report["ms_per_verdict_cpu"] = (
+            round(cpu_s * 1000 / metrics.turns, 1) if metrics.turns else 0.0)
+        report["verdicts_per_cpu_min"] = (
+            round(metrics.turns / cpu_minutes, 1) if cpu_minutes > 0 else 0.0)
+        report["cpu_amplification"] = (
+            round(cpu_s / (elapsed_s * cores), 3) if elapsed_s > 0 else 0.0)
+    return report
 
 
 def audit(trajectory: Trajectory, live: Metrics,
@@ -325,7 +363,7 @@ def _disagreements(live: dict, logged: dict) -> list[str]:
 
 
 def build_report(soak: Soak, metrics: Metrics, elapsed_s: float,
-                 run_id: str, logged: dict) -> dict:
+                 run_id: str, logged: dict, cpu_s: float | None = None) -> dict:
     blob = metrics.to_json()
     return {
         "incidents_by_family": logged["incidents_by_family"],
@@ -343,7 +381,7 @@ def build_report(soak: Soak, metrics: Metrics, elapsed_s: float,
         "max_turns": soak.max_turns,
         "tasks": len(soak.manifest),
         "episodes_requested": soak.episodes,
-        "throughput": throughput(metrics, elapsed_s, soak.jobs),
+        "throughput": throughput(metrics, elapsed_s, soak.jobs, cpu_s),
         "cache": soak.cache.to_json() if soak.cache is not None else {"enabled": False},
         "cache_distribution": soak.cache.distribution() if soak.cache else {},
         **blob,
@@ -372,6 +410,14 @@ def summarise(report: dict) -> str:
         f"  over {report['throughput']['elapsed_s']:.0f}s"
         f" on {report['throughput']['jobs']} jobs",
     ]
+    cpu = report["throughput"].get("checker_cpu_s")
+    if cpu is not None:
+        lines.append(
+            f"cpu        {report['throughput']['ms_per_verdict_cpu']:.0f}"
+            f"ms/verdict checker CPU"
+            f"  ({report['throughput']['verdicts_per_cpu_min']:.0f} verdicts per"
+            f" CPU-min)  amplification"
+            f" {report['throughput']['cpu_amplification']:.2f}x")
     latency = report.get("latency_ms") or {}
     if latency:
         lines.append("latency    " + "  ".join(f"{k} {v:.0f}ms"
@@ -449,6 +495,7 @@ def main(argv: list[str] | None = None) -> int:
         backend=args.backend, cache=cache, trajectory=trajectory)
 
     started = time.monotonic()
+    started_cpu = child_cpu_s()
 
     def progress(count: int) -> None:
         if not args.progress_every or count % args.progress_every:
@@ -469,7 +516,8 @@ def main(argv: list[str] | None = None) -> int:
 
     elapsed = time.monotonic() - started
     logged = audit(trajectory, metrics, soak.families)
-    report = build_report(soak, metrics, elapsed, trajectory.run_id, logged)
+    report = build_report(soak, metrics, elapsed, trajectory.run_id, logged,
+                          cpu_s=child_cpu_s() - started_cpu)
     print(summarise(report))
 
     if out is not None:

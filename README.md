@@ -80,7 +80,7 @@ against the hashes of `LAWS.bend` and `prelude.bend`, so editing either reopens
 the checkpoint.
 
 Validation reports the same record independently: a tier ≥ 3 task reads
-`unreviewed`, `stale` or `approved`, and `tools/validate.py` prints the stale
+`unreviewed`, `stale` or `current`, and `tools/validate.py` prints the stale
 and unreviewed task ids under its summary. Both are warnings, so they promote
 under `--strict` rather than reddening the bank now — `stale` is about the
 evidence attached to a task and not about the reward function. What neither

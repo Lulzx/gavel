@@ -119,8 +119,9 @@ def main(argv: list[str] | None = None) -> int:
                      for tier, count in bank["tasks_by_tier"].items())
     killed, review = bank["mutants_killed_per_law"], bank["review"]
     print(f"bank: {bank['tasks']} tasks ({tiers}); "
-          f"reviewed {review['approved']}/{review['needs_review']} "
-          f"at tier {REVIEW_TIER}+; mutants killed per law "
+          f"records {review['current']}/{review['needs_review']} "
+          f"at tier {REVIEW_TIER}+ (a record is not a review); "
+          f"mutants killed per law "
           f"mean {killed['mean']}, min {killed['min']}; "
           f"calibration {bank['calibration']['recorded']}/{bank['tasks']}")
     return 1 if failed else 0

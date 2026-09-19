@@ -508,14 +508,18 @@ def test_a_review_at_the_tier_with_no_record_is_unreviewed(task, toolchain):
     assert not any("review" in problem for problem in report.problems)
 
 
-def test_a_review_whose_hashes_match_is_approved(make_task):
+def test_a_review_whose_hashes_match_is_current(make_task):
     """What the check actually witnesses: the record covers these laws. It says
     nothing about who wrote it, which is why the flag is not evidence -- Fact 27
-    -- and why this test is named for the hashes rather than for the approval."""
+    -- and why the state is ``current`` rather than ``approved``.
+
+    On the shipped bank every record in this state is one the authoring agent
+    wrote for itself, so the name is the whole of the difference between a
+    metric that reads 8 of 39 and a claim that eight tasks were reviewed."""
     hashes = {"laws": "aaa", "prelude": "bbb"}
     task = make_task(tier=3, meta={"hashes": hashes,
                                    "reviewed": {"by": "lulzx", "hashes": hashes}})
-    assert review_state(task.meta, 3) == "approved"
+    assert review_state(task.meta, 3) == "current"
 
 
 def test_a_review_whose_hashes_have_moved_is_stale_and_still_valid(task, toolchain):
@@ -555,7 +559,7 @@ def test_the_review_check_reads_the_hashes_pair_not_the_task_hash(make_task):
     task = make_task(tier=3, hash="not-a-pair",
                      meta={"hashes": hashes,
                            "reviewed": {"by": "lulzx", "hashes": hashes}})
-    assert review_state(task.meta, 3) == "approved"
+    assert review_state(task.meta, 3) == "current"
 
 
 # --- SPEC 12's environment-quality metrics, over a bank release ----------------
@@ -596,20 +600,21 @@ def test_a_law_name_in_two_tasks_is_two_laws():
     assert metrics["mutants_killed_per_law"] == {"mean": 5.0, "min": 4, "laws": 2}
 
 
-def test_reviewed_fraction_is_a_fraction_of_the_tasks_that_need_review():
+def test_recorded_fraction_is_a_fraction_of_the_tasks_that_need_review():
     """Below ``REVIEW_TIER`` the author's reading *is* the review, so counting
     those tasks in the denominator would report a bank as unreviewed for
     following its own rule. The counts travel with the fraction so the
-    denominator is never guessed at."""
+    denominator is never guessed at -- and they name the four states, so a
+    reader is not asked to take a quotient as a statement about review."""
     metrics = bank_metrics([
-        _report("a", 3, ["l"], review="approved"),
+        _report("a", 3, ["l"], review="current"),
         _report("b", 3, ["l"], review="stale"),
         _report("c", 4, ["l"], review="unreviewed"),
         _report("d", 1, ["l"], review="none-needed")])
-    assert metrics["review"] == {"approved": 1, "stale": 1, "unreviewed": 1,
+    assert metrics["review"] == {"current": 1, "stale": 1, "unreviewed": 1,
                                  "none-needed": 1, "needs_review": 3,
-                                 "reviewed_fraction": 0.3333}
-    assert bank_metrics([_report("d", 1, ["l"])])["review"]["reviewed_fraction"] is None
+                                 "recorded_fraction": 0.3333}
+    assert bank_metrics([_report("d", 1, ["l"])])["review"]["recorded_fraction"] is None
 
 
 def test_bank_metrics_does_not_invent_a_calibration_number():

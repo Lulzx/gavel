@@ -125,6 +125,40 @@ def test_throughput_survives_a_run_that_took_no_time():
     assert got["jobs"] == 1
 
 
+def test_the_cpu_reading_is_absent_unless_it_was_measured():
+    """``throughput`` is called without a CPU delta from tests and from any
+    caller that only wants the wall-clock rates; a ``None`` must not become a
+    zero that reads like a measurement."""
+    got = throughput(Metrics(episodes=1, turns=1), 60.0, 1)
+    assert "checker_cpu_s" not in got
+    assert "verdicts_per_cpu_min" not in got
+
+
+def test_cpu_throughput_survives_a_contended_host():
+    """The point of the reading: a run that took four wall-clock minutes while
+    being starved still reports the same rate as one that took one, because
+    what it divides by is the checker's own CPU rather than the wait."""
+    metrics = Metrics(episodes=100, turns=600)
+    starved = throughput(metrics, 240.0, 4, cpu_s=60.0)
+    quiet = throughput(metrics, 60.0, 1, cpu_s=60.0)
+    assert starved["verdicts_per_cpu_min"] == quiet["verdicts_per_cpu_min"] == 600.0
+    assert starved["verdicts_per_min"] == 150.0
+    assert starved["verdicts_per_min_per_core"] == 37.5
+    assert starved["ms_per_verdict_cpu"] == 100.0
+    # Four jobs busy for four minutes is sixteen core-minutes, of which the
+    # checker was given one -- which is what a worker blocked on a contended
+    # host says about itself.
+    assert starved["cpu_amplification"] == 0.062
+
+
+def test_cpu_throughput_on_a_run_that_consumed_no_cpu():
+    """A fully cached soak makes no checker process and so spends no CPU; the
+    rate is undefined rather than infinite."""
+    got = throughput(Metrics(episodes=10, turns=10), 5.0, 2, cpu_s=0.0)
+    assert got["verdicts_per_cpu_min"] == 0.0
+    assert got["ms_per_verdict_cpu"] == 0.0
+
+
 # --- the log is checked against the run ----------------------------------------
 
 class _Log:

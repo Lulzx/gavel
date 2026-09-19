@@ -105,7 +105,7 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     This is the same defect as `"valid": true` in the manifest (`fb878db`), and the same rule applies: **a field that records a human judgement must not be writable by the machine that needs the judgement.** The fix is not in the checker — it is to stop treating the flag as evidence, and either to record review somewhere the pipeline cannot write, or to read the laws now and make the eleven records true. Until one of those happens, M4's "human-reviewed laws for tier ≥ 3" is not satisfied, and the 28 tasks at that tier with no record are the only honest ones.
 
-    **Amended 2026-09-19: the field is read now, and only half of this fact moved.** The paragraph above is right that a checker cannot authenticate a name, and that half stands unchanged. What it was wrong about is the *staleness* it happened to name in passing: `review_is_stale` did its job and nothing called it, so a repair that edited `LAWS.bend` and republished — the bank's normal repair procedure — left a record attesting to laws that were no longer shipped, with no output anywhere saying so. Three tasks were in that state at once. `gavel/validate.py` now reports `none-needed` / `unreviewed` / `stale` / `approved`, the last two are warnings promoted by `--strict`, and `tools/validate.py` prints the task ids. The severity is argued in M4: failing on `stale` would refuse the three records that drifted and endorse the eight that still match and are just as forged.
+    **Amended 2026-09-19: the field is read now, and only half of this fact moved.** The paragraph above is right that a checker cannot authenticate a name, and that half stands unchanged. What it was wrong about is the *staleness* it happened to name in passing: `review_is_stale` did its job and nothing called it, so a repair that edited `LAWS.bend` and republished — the bank's normal repair procedure — left a record attesting to laws that were no longer shipped, with no output anywhere saying so. Three tasks were in that state at once. `gavel/validate.py` now reports `none-needed` / `unreviewed` / `stale` / `current`, the last two are warnings promoted by `--strict`, and `tools/validate.py` prints the task ids. The severity is argued in M4: failing on `stale` would refuse the three records that drifted and endorse the eight that still match and are just as forged.
 
 28. **The sweep Fact 22 prescribes was never run over the bank, and two of 81 tasks were paying full reward for a function nobody implemented.** Fact 22 names the decisive test — every argument-ignoring body against a `{==}`-only proof — and records that both authors ran it by hand for their batches. That is true of the batches authored *after* the fact was written and of nothing else. `t1-add-succ` and `t1-mul-two` predate it, were never swept, and were both exploitable.
 
@@ -499,7 +499,7 @@ runs verdicts through a `concurrent.futures` process pool for throughput.
   the reference proof (must fail), runs the degenerate library (empty, identity,
   constant, head) against the reference proof (must fail), lexes all files
   through the gate, records `reference_check_ms`. Also reports each task's
-  review state (`none-needed` / `unreviewed` / `stale` / `approved`) and, over
+  review state (`none-needed` / `unreviewed` / `stale` / `current`) and, over
   the tasks it was given, SPEC §12's four environment-quality metrics — see
   M4.5. The metrics are in `--json` and the review state is in both; `--json`
   emits the document and nothing else, so it can be parsed.
@@ -987,7 +987,7 @@ and the resulting verdicts say `dev_only: true`.
    **The census is closed, measured 2026-09-19.** All 124 registered tasks carry
    at least one hand-authored mutant file, and **every one of them is at or
    above the four-file floor** — the first time both have been true. The
-   classifier reads **1,347 mutant files** across the bank, all of them in git
+   classifier reads **1,359 mutant files** across the bank, all of them in git
    as of the Fact 41 repair — the 14 the concurrent task above was holding in
    the working tree when this paragraph was first written have since landed in
    `db21d89` — and the day's repairs are what moved the number:
@@ -998,7 +998,14 @@ and the resulting verdicts say `dev_only: true`.
    from Fact 36, both of which hold bodies that read 1.000 before their
    repairs, `append-rotates-the-front.bend` from Fact 38,
    `rev-maps-the-elements.bend` and `insert-drops-the-tail.bend` from Fact 39,
-   and `bst-tip-ignores-the-accumulator.bend` from Fact 41.
+   and `bst-tip-ignores-the-accumulator.bend` from Fact 41. The last of them is
+   M4.5's `pad-zero-case-prepends.bend`, which is the one file here that a
+   *number* asked for rather than a hole: no mutant in `t3-pad`'s corpus failed
+   `pad_nil`, and the kill-count reading named the law. **Eleven more are M4.5's
+   bank-wide reading**, one per law the metric found at zero kills across ten
+   tasks — the sweep is in M4 item 5, and it is the same number doing the same
+   thing at scale: `pad_nil` was the first law the metric named, not the only
+   one.
    Fact 36's
    third instance adds none, for the reason recorded there. Fact 34's third instance
    deliberately adds none, for the reason recorded there, and **Fact 35 adds none
@@ -1195,7 +1202,12 @@ looks.
    **Half done: the numbers are published, the backend is not built.**
    `tools/soak.py` reports p50/p95/p99 and verdicts/min/core from a real run,
    but every check is still a fresh `bun bend2/main.ts`, so what those numbers
-   measure is the process-per-check design rather than a check. Fact 24 is the
+   measure is the process-per-check design rather than a check. It has since
+   gained the reading that survives a loaded host — checker CPU per verdict,
+   from `RUSAGE_CHILDREN` around the run, and the amplification against the
+   worker budget — which is M4 item 3's published number and the reason the
+   backend being unbuilt is now a design statement rather than a blocked one.
+   Fact 24 is the
    bound on what a worker could win, measured rather than argued: a file
    containing `import Base` and nothing else costs what the bank's heaviest
    reference proof costs, so the whole per-check time *is* the constant a
@@ -1254,19 +1266,69 @@ waiting room.
    of the two a law about a *transformation* is.
 2. **Human-reviewed laws for tier ≥ 3. Not satisfied, and the bank says it
    is** -- see below.
-3. **Published throughput benchmark. Blocked on a quiet machine, not on the
-   harness.** `tools/soak.py` reports p50/p95/p99 and verdicts/min/core from a
-   real run, and M3.5's ten-thousand-episode soak produced all of them. They
-   were taken with eight jobs running while the session built and tested on the
-   same box, both runs since have been on a machine at load 100 or more, and a
-   contended latency percentile is not a published one. The measurement is one
-   command away; what it needs is an idle host.
-4. **External training run. Blocked on a model.** Nothing in this repository
-   conjures the policy, and the calibration path that would record a
-   `zero_shot_solve_rate` answers 403 (Cloudflare 1010) from here. That block is
-   deliberately left standing rather than worked around: a harness that
-   misrepresents itself to a third party to obtain a number is not a harness
-   whose numbers mean anything.
+3. **Published throughput benchmark. Published 2026-09-19, and the blocker was
+   the metric rather than the machine.** `tools/soak.py` reports p50/p95/p99 and
+   verdicts/min/core from a real run, and M3.5's ten-thousand-episode soak
+   produced all of them — taken with eight jobs running while the session built
+   and tested on the same box. Both runs since have been on a machine at load
+   100 or more, and a contended latency percentile is not a published one, which
+   is where this item had been sitting: the plan was waiting for a quiet host
+   that this box has not been.
+
+   **Waiting was the wrong move, and the fix is a metric that does not depend on
+   the wait.** Wall clock measures how long a verdict *waited*, which includes
+   every other process on the box; the checker's own CPU measures the work it
+   *did*, which does not. `child_cpu_s()` reads `RUSAGE_CHILDREN` around the run
+   and `throughput()` divides by it, so a contended host still yields a
+   publishable rate. Measured over 3,000 episodes and **10,012 verdicts, every
+   one a fresh checker run** (0 cache hits of 10,012 lookups, so the number is
+   the checker's and not the cache's), `--policy noisy --jobs 8`, seed 0:
+
+   - **907 ms of checker CPU per verdict, 66 verdicts per CPU-minute.** This is
+     the load-independent reading and the one to quote.
+   - **1.12× CPU amplification** — checker CPU per CPU-second of worker budget.
+     Above 1 because the checker is `bun`: one verdict forks and threads on its
+     own, so eight workers can spend nine cores' worth of CPU. It is why 66 per
+     CPU-minute sits below 74 per core-minute rather than above it.
+   - **595 verdicts/min (74/core) over 1,010s**, latency p50 242ms / p90 310ms /
+     p95 325ms / p99 365ms over 8,904 fresh checks. These are the contended
+     numbers — the box was at load ~14 throughout, with a system daemon at 88%
+     of a core that is not this session's to kill — and the session records them
+     as such rather than as a quiet-host benchmark. The two readings are
+     consistent rather than merely both present, which is the check worth
+     stating: 1.12× of the eight-worker budget is 9.0 cores of checker CPU, and
+     66 verdicts per CPU-minute × 9.0 ≈ 595 per minute, the wall-clock rate. A
+     host that had starved the run would have shown a wall-clock rate well under
+     that product, and the amplification is what would have said so.
+   - 1,508 of 3,000 episodes reached tier 4 (50.3%), mean reward 0.610, 0
+     incidents. The solve rate is the script's and not a model's — it is M3.5's
+     stand-in policy — so it is a statement about the harness reaching its own
+     reward, which is what makes the throughput numbers above trustworthy.
+4. **External training run. Blocked on a model, and the harness half is now
+   demonstrated rather than assumed.** Nothing in this repository conjures the
+   policy, and the calibration path that would record a `zero_shot_solve_rate`
+   still answers 403 from here — re-run 2026-09-19 and unchanged:
+   `HTTP 403: error code: 1010`, with `api_calls 1`, `input_tokens 0` and
+   `output_tokens 0`, which is the shape of a request that never reached the
+   gateway's own routing. That block is deliberately left standing rather than
+   worked around: a harness that misrepresents itself to a third party to obtain
+   a number is not a harness whose numbers mean anything.
+
+   **What can be closed without a model is the half that is not the model, and
+   it is closed.** `tools/calibrate.py --echo` runs the whole path with a policy
+   that replays the stub instead of spending: reset, submission, gate, checker,
+   reward, and the curve. Measured over four tasks at `k=2`: 8 attempts, a
+   per-task curve, `"errors": []`, every attempt at tier 1, floor 0.0. That is
+   not a solve rate and the report says so itself — `"model": "echo"` — which is
+   what makes it safe to run: the number cannot be mistaken for a model's, and
+   `--write-meta` was **not** used. Recording a 0.0 the echo produced as a task's
+   `zero_shot_solve_rate` would put a field that answers a question the machine
+   cannot answer into the manifest, which is the defect Fact 27 is about.
+
+   So the item stands as: the observation, the reward, the recording and the
+   curve are all exercised end-to-end and are not what is missing. What is
+   missing is an endpoint that will answer a non-browser client, and that is one
+   configuration value rather than any part of this repository.
 5. **SPEC §12's environment-quality metrics. Built 2026-09-19, and the first
    thing they did was report the bank's honest state.** `SPEC.md` §12 asks for
    four numbers "exported per bank release" — task count per tier, calibration
@@ -1279,12 +1341,22 @@ waiting room.
    per-task records. `--json` also had to be fixed to be JSON: the summary
    lines used to follow the document, so the mode existed for callers who could
    not parse it. Two of the four report the bank as it is rather than as a
-   score: `reviewed_fraction` is **0.0 of the 39 tasks that need review**, which
-   is item 2 as a number, and calibration is **0 of 125 recorded**, which is
-   item 4's blocked state as a number. It is a fraction of the tasks that need
-   review rather than of all 125, because below `REVIEW_TIER` the author's own
-   reading *is* the review and counting those would report the bank as
-   unreviewed for following its own rule.
+   score: calibration is **0 of 125 recorded**, which is item 4's blocked state
+   as a number, and the review fraction is **8 of the 39 tasks that need
+   review** — which is *not* the same as eight tasks having been reviewed, and
+   the first version of this paragraph said it was. That version read "0.0 of
+   the 39", which was worse than wrong in a useful direction: the measured
+   number is 0.2051, because the check counts records whose hashes match the
+   shipped laws and every one of those eight is a record the authoring agent
+   wrote for itself. **The human-reviewed figure is 0 of 39.** A metric named
+   `reviewed_fraction` that reads 0.205 off a bank with no reviewed task is the
+   same defect as `"valid": true` in the manifest, one layer up — a number
+   answering a question the machine is not able to answer — so the field was
+   renamed to `recorded_fraction` and the state `approved` to `current`, which
+   is all the check can witness. It is a fraction of the tasks that need review
+   rather than of all 125, because below `REVIEW_TIER` the author's own reading
+   *is* the review and counting those would report the bank as unreviewed for
+   following its own rule.
 
    **The fourth arrived with a triage signal the bank did not have before.**
    "Mean mutants killed per law" needed which laws caught which mutants, which
@@ -1301,8 +1373,66 @@ waiting room.
    all. That is a *flag and not a hole* — Fact 41's rule applies unchanged, and
    a repair must not be shipped for one on a static read — but it is the first
    mechanical pointer the bank has ever had at the laws its corpus is not
-   holding. **The bank-wide reading of `min` has not been taken yet**: it needs
-   a full run under the new code, and the number goes here when it lands.
+   holding.
+
+   **It was actionable on the first law it named, and the fix was a file rather
+   than a law.** `pad_zero_case_prepends.bend` is the reference with the `n =
+   0n` arm answering `x <> xs` instead of `xs`, which is the one case no
+   generated rule lands on — every rule in `tools/mutate.py` rewrites a step, a
+   count, an operand or a recursion argument, and the zero arm is reached by
+   matching on `n` before the list is looked at at all. Measured: **tier 3,
+   three laws unproven** — `pad_nil` (`expected x <> xs`, `observed xs`),
+   `pad_len`, and `pad_single`, which the `1n` arm reaches through the zero arm
+   below it — and tier 2 bare, so it reaches the laws rather than failing to
+   type-check first. `t3-pad` now reads min 1: every law in it is failed by at
+   least one mutant that type-checks. This is the shape the metric is for — a
+   law whose *evidence* was absent while the law itself was load-bearing, which
+   is the opposite of a hole and is invisible to every check the bank had.
+
+   **The bank-wide reading was `mean 5.1, min 0`, over 376 laws in 125 tasks,
+   and is now `mean 5.16, min 1` over the same 376 laws** — the two numbers are
+   the before and the after of the sweep below, taken by the same command over
+   the whole manifest, both with `125/125 valid`. `min` is the one that moved,
+   which is the point: the mean could not have told the difference between a
+   bank where every law carries evidence and one where eleven carry none.
+   `t3-pad` was the first law named and not the only one: **11 laws across 10
+   tasks** sat at zero kills, and the sweep that found them is the metric's real
+   product. `min 0` is the number that matters — a mean of 5.1 is compatible
+   with a law nothing fails, and the min is the only reading that names it. The
+   ten, with the mutant written for each, are `t1-len-map`/`len_cons`
+   (`len-cons-counts-one.bend`), `t1-sum-append`/`append_nil_left`
+   (`append-nil-answers-nil.bend`), `t2-all-even-laws`/`all_even_nil`,
+   `t2-all-mult5-laws`/`all_mult5_nil` and `t2-all-one-laws`/`all_one_nil` (the
+   `*-nil-answers-false.bend` triple), `t2-at-laws`/`at_nil`
+   (`at-nil-answers-the-count.bend`), `t3-is-pal-rev`/`is_pal_nil`
+   (`is_pal-nil-answers-false.bend`), `t3-zip-sum`/`zip_sum_nil_left` and
+   `zip_sum_nil_right` (`zip_sum-nil-left-answers-the-right.bend`,
+   `zip_sum-nil-right-answers-the-left.bend`), `t4-queue-rep`/`pop_empty`
+   (`pop-empty-answers-one-element.bend`) and `t5-compile-word`/`exec_nil`
+   (`exec-nil-answers-nil.bend`). Eleven files — `pad-zero-case-prepends.bend`
+   is the twelfth of the day and is already counted above — which moves the
+   census from 1,348 to **1,359**.
+
+   **Every one of the eleven is the same shape, and the shape is the finding.**
+   Ten of the eleven are the **empty case**: `append(Nil{}, ys) == ys`,
+   `all_even(Nil{}) == True{}`, `at(Nil{}, n) == 0n`, `pop(P.Q{Nil{}, Nil{}}) ==
+   P.Q{Nil{}, Nil{}}`, `exec(Nil{}, w) == w`. The eleventh, `len_cons`, is the
+   case where a law's own left-hand side is a cons before the function looks at
+   it, so the `Nil{}` arm is off the path in exactly the same way. The reason is
+   mechanical and it is in `tools/mutate.py`: every generated rule rewrites a
+   *step* — a count, an operand, a recursion argument, a connective — and an
+   empty case is an answer rather than a step, reached by a match that has
+   already stopped. `t3-zip-sum`'s corpus says so out loud in two of its own
+   mutant headers: "both nil laws hold definitionally". True of those bodies,
+   and the reason the two laws were carrying no evidence at all.
+
+   **What the sweep does not claim.** Zero kills is a flag and not a hole
+   (Fact 41's rule, unchanged), and the reverse does not hold either: a law at
+   zero kills is not automatically weak — `pop_empty` needed a body that puts an
+   element into the empty queue, because carrying the back through or reversing
+   it agrees with the reference *at* `Nil{}`. The reading says the corpus is not
+   holding the law, which is a statement about the evidence and not about the
+   law, and the repair is a file for the same reason `pad_nil`'s was.
 
 **The review half of this is not satisfied and the bank currently says it is.**
 Eleven tasks at tier 3 or above carry `"reviewed": {"by": "lulzx"}` written by
@@ -1327,7 +1457,7 @@ accounting double-counted them and left **fifteen older tier-3 tasks unnamed**.
 The forged-record count is still bounded at eleven, which is what that sentence
 was about, and the *unreviewed* count is much larger than the sentence implied.
 `gavel/validate.py` now reads the record and reports one of four states —
-`none-needed` below the tier, `unreviewed`, `stale`, `approved` — and
+`none-needed` below the tier, `unreviewed`, `stale`, `current` — and
 `tools/validate.py` prints the stale and unreviewed task ids under its summary,
 so the two defects are lines in a build log rather than paragraphs in this file.
 

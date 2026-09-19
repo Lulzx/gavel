@@ -133,7 +133,7 @@ def review_is_stale(meta: dict[str, Any]) -> bool:
     what the checkpoint's message says, and the distinction matters to the
     validator rather than here -- it reports the two separately.
     """
-    return review_state(meta, int(meta["tier"])) != "approved"
+    return review_state(meta, int(meta["tier"])) != "current"
 
 
 # --- stages -----------------------------------------------------------------------
