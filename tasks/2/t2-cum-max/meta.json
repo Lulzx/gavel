@@ -1,0 +1,24 @@
+{
+  "task_id": "t2-cum-max",
+  "tier": 2,
+  "laws": [
+    "max_all_nil",
+    "max_all_cons",
+    "cum_max_nil",
+    "cum_max_single",
+    "cum_max_cons",
+    "cum_max_len",
+    "cum_max_three"
+  ],
+  "policy_targets": [
+    "max_all",
+    "cum_max"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "768ae3cffc4b4201ee69e7e28f1ebd98204d5b70cbd4ab196391ff540278662a",
+    "prelude": "1319b414008ffd8cf26d2959ba6f4ee6f0b46212bcdcd21f6ba3086dff5dc983"
+  },
+  "bend_version": "2.0.5"
+}

@@ -123,16 +123,16 @@ These are the defects that survive every stage, so they are on you:
 
 ## Distinctness: the hard constraint
 
-The bank already has **215 registered tasks** (plus one tier-3 task held at the
+The bank already has **225 registered tasks** (plus one tier-3 task held at the
 review checkpoint — it carries a `HOLD` file, which is what keeps it out of the
-bank — and three directories parked under `tasks/2/_abandoned/`), **745
-distinct law names** across **364 distinct def names** and **219 distinct policy
+bank — and three directories parked under `tasks/2/_abandoned/`), **801
+distinct law names** across **383 distinct def names** and **231 distinct policy
 targets**. A new task must be a new *function*, not the same function at another
 tier, and its law names must not collide with an existing one.
 
 Those three counts are over the *registered* bank. The grep below reads
 `tasks/*/*/LAWS.bend`, which also matches a task held on disk but not published,
-so it prints **751** law names and **366** def names for the same tree — the 6
+so it prints **807** law names and **385** def names for the same tree — the 6
 and the 2 are `t3-swap-sum-pair`'s. Quote the registered figures; if a grep
 disagrees, find the task that accounts for the difference before changing the
 count.
@@ -147,7 +147,7 @@ And grep for the specific function you intend to introduce:
     grep -rn 'def <name>' tasks/*/*/prelude.bend tasks/*/*/solution.bend \
                           references/*/solution.bend
 
-The full list of taken def names is 364 entries long, so grep rather than
+The full list of taken def names is 383 entries long, so grep rather than
 guess. `append`, `len`, `map`, `rev`, `sum`, `take`, `drop`, `zip`, `filter`,
 `is_sorted`, `replicate`, `snoc`, `max`, `min`, `pow2`, `insert`, `merge`,
 `mirror`, `inorder`, `flatten`, `nth`, `pad`, `absdiff`, `sub`, `mul`,
@@ -164,7 +164,9 @@ guess. `append`, `len`, `map`, `rev`, `sum`, `take`, `drop`, `zip`, `filter`,
 `digit_sum`, `is_pow2`, `tree_depth_sum`, `same_shape`, `lex_le`, `path_sum`,
 `max_prefix_sum`, `max_prefix_sum_go`, `run_starts`, `run_starts_go`,
 `replace_at`, `indices_of`, `argmax`, `argmax_go`, `distinct`, `distinct_go`,
-`nth_from_end` are all taken. If the function you
+`nth_from_end`, `internal_count`, `rightmost_value`, `zip_with_const`,
+`last_index_of`, `leaf_count_at`, `replace_first`, `gap_go`, `max_gap`,
+`take_last`, `cum_max`, `run_lengths`, `run_lengths_go` are all taken. If the function you
 want is on that list, pick another one.
 
 Good hunting grounds that the list above does not cover — **but check the
@@ -200,11 +202,16 @@ Beyond names: mutual recursion between two small functions, and any two-function
 *interaction law* (a law whose two sides use two different functions the policy
 must both implement) that is not already in the bank.
 
-**Check the target set as well as the law names.** The 219 policy targets in
+**Check the target set as well as the law names.** The 231 policy targets in
 the bank are the names a task *asks a policy to implement*; two tasks asking
 for the same function at the same tier is the collision, and the verifier
 reads `meta.json`, not the preludes, to find it. A prelude helper name like
 `len` or `max` legitimately repeats across tasks — do not let that stop you.
+Twenty-one target *names* are shared by more than one task already (`add` by
+ten, `len` by seven, `append` and `mul` by six, `max_all` by two), so a target
+name repeating is evidence of a collision to check, not a verdict: read the
+other task's prompt before refusing. **What makes a task distinct is the
+law set it ships, not the name of its target.**
 
 ## The base-case rule, which is the one that keeps costing us
 

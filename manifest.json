@@ -439,6 +439,13 @@
       "hash": "153afe10f0e6c5caf015aece4501b12b43a41c0b15e36dfd91d116c607e76239"
     },
     {
+      "task_id": "t2-cum-max",
+      "tier": 2,
+      "path": "tasks/2/t2-cum-max",
+      "reference": "references/t2-cum-max",
+      "hash": "444b171ff589b9154f21b944473ab6b514b0fe76f548fd058c1585bd0dcde135"
+    },
+    {
       "task_id": "t2-dec2-all-laws",
       "tier": 2,
       "path": "tasks/2/t2-dec2-all-laws",
@@ -740,6 +747,13 @@
       "hash": "b8d1767bb9e8cd9bae6a38fb034cad2b60413458819a94f133810846f1cfc150"
     },
     {
+      "task_id": "t2-max-gap",
+      "tier": 2,
+      "path": "tasks/2/t2-max-gap",
+      "reference": "references/t2-max-gap",
+      "hash": "4ee7cd04d839c05e5c31cc18a505f2e864559ec77259d384df1f510566659d1b"
+    },
+    {
       "task_id": "t2-max-laws",
       "tier": 2,
       "path": "tasks/2/t2-max-laws",
@@ -901,6 +915,13 @@
       "hash": "b7feca32ccd47695943a2ccbd5cb0b097c12863b2befd29a8a6cbddcd98d752b"
     },
     {
+      "task_id": "t2-replace-first",
+      "tier": 2,
+      "path": "tasks/2/t2-replace-first",
+      "reference": "references/t2-replace-first",
+      "hash": "81b5a16b141a5760b73bbc931a15320458dfdf679f137cc7134d713b173a7561"
+    },
+    {
       "task_id": "t2-replicate-len",
       "tier": 2,
       "path": "tasks/2/t2-replicate-len",
@@ -927,6 +948,13 @@
       "path": "tasks/2/t2-rightmost-value",
       "reference": "references/t2-rightmost-value",
       "hash": "2ccfbea56def9d4461922572e126cedd3b7147bcf3f51719008e4d452ab36c39"
+    },
+    {
+      "task_id": "t2-run-lengths",
+      "tier": 2,
+      "path": "tasks/2/t2-run-lengths",
+      "reference": "references/t2-run-lengths",
+      "hash": "0ff9dc9907c2ea34400041352166f39f6add96962e891ecef3c5cac0d89b6936"
     },
     {
       "task_id": "t2-run-max-laws",
@@ -1144,6 +1172,13 @@
       "path": "tasks/2/t2-swap-adjacent-laws",
       "reference": "references/t2-swap-adjacent-laws",
       "hash": "11ea7de3169fb02520b36ff70514fe72c4d1d4fe8c8fdac8257b44c92a6f08aa"
+    },
+    {
+      "task_id": "t2-take-last",
+      "tier": 2,
+      "path": "tasks/2/t2-take-last",
+      "reference": "references/t2-take-last",
+      "hash": "4457b5d591c46bed7fba3ef8371e3dfad693fd0dfdd8b745934966a71931101c"
     },
     {
       "task_id": "t2-take-laws",

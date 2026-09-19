@@ -1,0 +1,24 @@
+{
+  "task_id": "t2-max-gap",
+  "tier": 2,
+  "laws": [
+    "max_gap_nil",
+    "max_gap_single",
+    "max_gap_cons",
+    "gap_go_nil",
+    "gap_go_cons",
+    "gap_go_same",
+    "max_gap_three"
+  ],
+  "policy_targets": [
+    "gap_go",
+    "max_gap"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "f62c64acc8255bb75a70a11c3828dac1159aa8f7b550836c9111e32f9a1e497c",
+    "prelude": "173c5f090c5a6636f23c08eff8470d5e9a022c7253fe249431924f5eb69ab824"
+  },
+  "bend_version": "2.0.5"
+}

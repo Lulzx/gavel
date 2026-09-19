@@ -1,0 +1,23 @@
+{
+  "task_id": "t2-take-last",
+  "tier": 2,
+  "laws": [
+    "take_last_nil",
+    "take_last_step",
+    "take_last_single",
+    "take_last_zero",
+    "take_last_long",
+    "take_last_three",
+    "take_last_all"
+  ],
+  "policy_targets": [
+    "take_last"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "a596e0e5da7c22c0c9de2df267b7b4ea255bf74d258986d16d86eb4c3d64f59a",
+    "prelude": "5ff6aae84f789654f9d0af398d4915675721677abfa33070720824b84be69c04"
+  },
+  "bend_version": "2.0.5"
+}

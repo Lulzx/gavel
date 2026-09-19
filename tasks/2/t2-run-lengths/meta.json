@@ -1,0 +1,26 @@
+{
+  "task_id": "t2-run-lengths",
+  "tier": 2,
+  "laws": [
+    "run_lengths_nil",
+    "run_lengths_single",
+    "run_lengths_step",
+    "run_lengths_go_last_in_run",
+    "run_lengths_go_last_alone",
+    "run_lengths_go_grow",
+    "run_lengths_go_fresh",
+    "run_lengths_go_same",
+    "run_lengths_three"
+  ],
+  "policy_targets": [
+    "run_lengths",
+    "run_lengths_go"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "a1d84b372214992233aa487d34109c672a17951e4a5d423a59c803d3e031dc8b",
+    "prelude": "3bfb7ac092bff58f1fc99aaa9421dc4b37b83de7b7a85a4c8e1744374859a0dd"
+  },
+  "bend_version": "2.0.5"
+}

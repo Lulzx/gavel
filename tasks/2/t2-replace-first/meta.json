@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-replace-first",
+  "tier": 2,
+  "laws": [
+    "replace_first_nil",
+    "replace_first_hit",
+    "replace_first_miss",
+    "replace_first_len",
+    "replace_first_three",
+    "replace_first_absent"
+  ],
+  "policy_targets": [
+    "replace_first"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ef8c2f20f78f48026515f332dcded99e6a32014da6601c7e9a10cfaebf1326f2",
+    "prelude": "3c0fcfa63962292acea9a937e42520124adad00a5f7dd657a85a88bf15bdbe5b"
+  },
+  "bend_version": "2.0.5"
+}
