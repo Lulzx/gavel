@@ -1501,10 +1501,10 @@ waiting room.
    authoring agents, the third tier-5 task, the third and fourth tier-4 ones, the
    Bool-fold duality, the 17-task batch of Fact 42, Fact 43's three — one of
    which is held at review — Fact 44's nine, Fact 45's six, Fact 48's twelve,
-   Fact 50's one, Fact 54's seven, Fact 55's ten and Fact 57's six; the
-   `t2-chunks-laws` repair moved no count, Fact 51's three repairs moved no count,
-   and Facts 49, 52 and 53 are a screen, a screen and a brief rather than tasks),
-   so the remaining 305 are volume and nothing else. The check that keeps it honest (a manifest entry must
+   Fact 50's one, Fact 54's seven, Fact 55's ten, Fact 57's six and Fact 59's
+   ten; the `t2-chunks-laws` repair moved no count, Fact 51's three repairs moved
+   no count, and Facts 49, 52 and 53 are a screen, a screen and a brief rather
+   than tasks), so the remaining 295 are volume and nothing else. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
    waiting room, and it is now written three times over — `t5-run-effect`,
