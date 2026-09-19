@@ -1,0 +1,19 @@
+{
+  "task_id": "t1-rotate",
+  "tier": 1,
+  "laws": [
+    "rotate_zero",
+    "rotate_succ",
+    "rotate_nil"
+  ],
+  "policy_targets": [
+    "rotate"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "2219d392ba8addb415c2d9681bcc153e73b8ec8b3d78afc6567492b43c651468",
+    "prelude": "9d58104ee8913e5153d7d488a65c424f2a096f081461dd60377472d702118bb2"
+  },
+  "bend_version": "2.0.5"
+}

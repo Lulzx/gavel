@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-indexed",
+  "tier": 2,
+  "laws": [
+    "indexed_zero",
+    "indexed_cons",
+    "indexed_len",
+    "indexed_elems"
+  ],
+  "policy_targets": [
+    "indexed_go",
+    "indexed"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7708bdc6724f6967462b8b8073bb2c2048b044bbc1cf518276ade11dfbabe14d",
+    "prelude": "0092395954d1614cf8b58b691bebabf9d941ffaf73c08ae9b71bb192db7540e8"
+  },
+  "bend_version": "2.0.5"
+}

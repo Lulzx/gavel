@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-sum-odd-even-laws",
+  "tier": 2,
+  "laws": [
+    "sum_odd_zero",
+    "sum_odd_succ",
+    "sum_even_zero",
+    "sum_even_succ",
+    "sum_odd_sum_even"
+  ],
+  "policy_targets": [
+    "sum_odd",
+    "sum_even"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "d41798768366665bde27cc06863bae49546d2abefbc09c4fde6fdc2a2b18be36",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

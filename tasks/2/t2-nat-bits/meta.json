@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-nat-bits",
+  "tier": 2,
+  "laws": [
+    "nat_bits_zero",
+    "nat_bits_succ",
+    "nat_bits_len"
+  ],
+  "policy_targets": [
+    "nat_bits"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "8ce174032af6a0f9112c0bf69fc83d1e234dfa6ec931fd508032071088a875cc",
+    "prelude": "d0a2232f0009424b6db4d57eb36cb21ea6e1b53ef459dc5b23c6229a605a76e8"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,19 @@
+{
+  "task_id": "t1-clamp-laws",
+  "tier": 1,
+  "laws": [
+    "clamp_below",
+    "clamp_above",
+    "clamp_inside"
+  ],
+  "policy_targets": [
+    "clamp"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "9834440cec71a70e7b2c6e4a420204bf8e4aad3687fff219339aa0edd843706e",
+    "prelude": "a8bb1288a71926540a4712c54cb6b9f80adb834d84a3a070813aea971e290ec8"
+  },
+  "bend_version": "2.0.5"
+}

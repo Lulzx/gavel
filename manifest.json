@@ -40,6 +40,13 @@
       "hash": "c62398e3e4b2c699a123439f88e024965cf38f304ec03a58a2039d5df427f408"
     },
     {
+      "task_id": "t1-clamp-laws",
+      "tier": 1,
+      "path": "tasks/1/t1-clamp-laws",
+      "reference": "references/t1-clamp-laws",
+      "hash": "087cea477841aa5263365b54629d18af552aec134cf38dba52900e75e0b63adc"
+    },
+    {
       "task_id": "t1-concat-append",
       "tier": 1,
       "path": "tasks/1/t1-concat-append",
@@ -164,6 +171,13 @@
       "path": "tasks/1/t1-rev-snoc",
       "reference": "references/t1-rev-snoc",
       "hash": "e6db19b3e305d98bdde181c0b3b4b38860473f2025e90853433b8b3be52b8719"
+    },
+    {
+      "task_id": "t1-rotate",
+      "tier": 1,
+      "path": "tasks/1/t1-rotate",
+      "reference": "references/t1-rotate",
+      "hash": "0bb4127d3e7f3659e81c5bb0b940d728227bb1edee146593a6bef5d365a9e7c2"
     },
     {
       "task_id": "t1-sub-cancel",
@@ -432,11 +446,25 @@
       "hash": "4625385079be2ecba3657c3bcb69be344003ac24c392b31357a053d6aa1503f4"
     },
     {
+      "task_id": "t2-indexed",
+      "tier": 2,
+      "path": "tasks/2/t2-indexed",
+      "reference": "references/t2-indexed",
+      "hash": "8ced41e0317b3a0c4379f6802d6766c82a96a07ad5eaa6854dadccfc51843a11"
+    },
+    {
       "task_id": "t2-init-laws",
       "tier": 2,
       "path": "tasks/2/t2-init-laws",
       "reference": "references/t2-init-laws",
       "hash": "b7dd9ce5631f92a42a0ca8661fec5dc1288a6bc2e58d4253a2b1576eb6d4580d"
+    },
+    {
+      "task_id": "t2-list-tree-build",
+      "tier": 2,
+      "path": "tasks/2/t2-list-tree-build",
+      "reference": "references/t2-list-tree-build",
+      "hash": "e4b91520db18cb3b5a2a3b8e71de5e59bc34668c709ede8e344045bfdb0b8fa0"
     },
     {
       "task_id": "t2-longest-row",
@@ -521,6 +549,13 @@
       "path": "tasks/2/t2-mul-laws",
       "reference": "references/t2-mul-laws",
       "hash": "6951196ec6af6e4847a8a71e766ce63bcd059ed8ad3f1a17f2a7e4fbfbe1a276"
+    },
+    {
+      "task_id": "t2-nat-bits",
+      "tier": 2,
+      "path": "tasks/2/t2-nat-bits",
+      "reference": "references/t2-nat-bits",
+      "hash": "c4c0454ccb6872a78a3c059e18ad19d7d934c29ca93024c69924af10e22a498c"
     },
     {
       "task_id": "t2-pairs-laws",
@@ -717,6 +752,13 @@
       "path": "tasks/2/t2-sum-nonzero-laws",
       "reference": "references/t2-sum-nonzero-laws",
       "hash": "19e75d76b4056b704546b0aaf3662f55af7db0b80ae900b7bd42b90a87e53e59"
+    },
+    {
+      "task_id": "t2-sum-odd-even-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-sum-odd-even-laws",
+      "reference": "references/t2-sum-odd-even-laws",
+      "hash": "bac1eefa7d2b15396295ff35c13ecbb1b19da0828b6e1200c6719a38e42ecd9b"
     },
     {
       "task_id": "t2-sum-pow2-laws",

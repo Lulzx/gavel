@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-list-tree-build",
+  "tier": 2,
+  "laws": [
+    "build_nil",
+    "build_cons",
+    "build_leaves",
+    "build_right_spine",
+    "build_last"
+  ],
+  "policy_targets": [
+    "build"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "c1ec83aed7e0a0483e4a66e33c134c74dc51d227fbe52db341f4338c59b0bb63",
+    "prelude": "0a11dc3745a6d0e9d51eb61ba75f68112a25e135bb39f180a70a833ae1bdabdb"
+  },
+  "bend_version": "2.0.5"
+}

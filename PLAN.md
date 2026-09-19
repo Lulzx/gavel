@@ -352,7 +352,15 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     **Corpus size is not the metric and this batch says so twice over.** `t2-divmod3-laws` has six mutants, two of them strong, and all five of its laws are killed exactly once; `t2-tree-map` and `t2-tree-snoc` have four mutants each, all strong, and all six of their laws are killed two or three times. Those three are the thinnest corpora in the batch and the ones with the least slack per law — `mean 4.35, min 1` is the bank number and `min 1` is not a defect, it is a law with exactly the evidence it needs. The generated corpora are sized by the rewrite rules a body admits, not by the number of laws, so a small corpus over a small law set can be complete while a large one over a wide surface is not.
 
-    **The bank now reads `153/153 valid over 3,348 checker runs`, `mean 4.35, min 1`, over 499 law declarations in 153 tasks, calibration `0 of 153`.** The mean fell again, 4.53 to 4.35, for the reason Fact 43 gives: the batch's ground-LHS laws mostly have exactly one killer each, and one is the honest count. 150 of the 153 are at tiers 1–4 and short of the 200 by 50; the three at tier 5 are the recorded above-tier work. **The `t3-pad` record was also corrected here** (Fact 36): its documented hole body needs `case 1n++k:`, because the `k` it binds is used twice, and the earlier record wrote the plain `+k` spelling that does not compile — re-measured 2026-09-19 against a copy of the task with `pad_nil_step` removed, the `++` body reads tier 4 complete over the four remaining laws, and the `+` body reads tier 1. A hole a reader cannot reproduce is a record defect, so the spelling is in `t3-pad`'s `LAWS.bend` now too.
+    **The bank read `153/153 valid over 3,348 checker runs`, `mean 4.35, min 1`, over 499 law declarations in 153 tasks, calibration `0 of 153`.** The mean fell again, 4.53 to 4.35, for the reason Fact 43 gives: the batch's ground-LHS laws mostly have exactly one killer each, and one is the honest count. 150 of the 153 were at tiers 1–4 and short of the 200 by 50; the three at tier 5 are the recorded above-tier work. **The `t3-pad` record was also corrected here** (Fact 36): its documented hole body needs `case 1n++k:`, because the `k` it binds is used twice, and the earlier record wrote the plain `+k` spelling that does not compile — re-measured 2026-09-19 against a copy of the task with `pad_nil_step` removed, the `++` body reads tier 4 complete over the four remaining laws, and the `+` body reads tier 1. A hole a reader cannot reproduce is a record defect, so the spelling is in `t3-pad`'s `LAWS.bend` now too.
+
+45. **Six more tasks from the same four agents, and the base-case rule held a second time — which is the reading that makes it a rule rather than a coincidence.** `t1-rotate` (3 laws), `t2-nat-bits` (3), `t2-sum-odd-even-laws` (5), `t1-clamp-laws` (3), `t2-indexed` (4) and `t2-list-tree-build` (5): **23 laws, 46 mutants, 28 strong.** All four agents were idle when the round closed, so this is the round's whole output and not a partial reading. Verified the same way as Fact 44 — `/tmp/probe/verify-batch.py` over all six — and clean on every axis: no policy target or law name collides with the bank, no stub ships its reference, no mutant escapes, **no law has a zero-kill count.**
+
+    **Two consecutive batches with no zero-kill law is the first real evidence that the brief's rule works.** Fact 42 and Fact 43 produced 32 between them because the rule did not exist; Facts 44 and 45 produced none across 15 tasks and 63 laws, and the reads that would have been the failures — `rotate_nil`, `rotate_zero`, `nat_bits_zero`, `sum_even_zero`, `sum_odd_zero`, `clamp_*`, `indexed_zero`, `build_nil` — are exactly the ground left-hand sides the rule names. The count moved the way it should: **`min 1` at 153 tasks and `min 1` again at 159.** What the rule buys is not a bigger corpus, and `t2-list-tree-build` is the clean case — five laws, four mutants, every law killed exactly twice, so the corpus is smaller than the law set and still complete per law. Corpus size and coverage are different quantities, and the per-law count is the one that names coverage.
+
+    **One law pair in this round is worth recording as a design, not a defect.** `t2-list-tree-build`'s `build_leaves` and `build_right_spine` have the *same* right-hand side, `1n + P.len(bs)`, and the law file says so in the comment rather than hiding it: a right-leaning comb satisfies the leaf count, and the spine measure is what rejects it, so the two laws differ in the left and share a right honestly. That is Fact 30's relative-property argument applied *inside* one task to make the pair jointly absolute, which is the same move §3.9 calls an anchor — and it is the reason a reader who greps for a duplicate RHS finds one here on purpose.
+
+    **The bank now reads `159/159 valid over 3,461 checker runs`, `mean 4.25, min 1`, over 522 law declarations in 159 tasks, calibration `0 of 159`.** The mean fell for the third reading running (4.53 → 4.35 → 4.25) and for the same reason each time: a ground-LHS law with exactly one killer pulls it down, and one is the honest count.
 
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
@@ -569,7 +577,7 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf`, `t4-queue-rep`; `t4-nth-maybe` is the same tier stated as a *domain* instead of an invariant |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 153 registered tasks, 27 are tier 1, 87
+**The bank's ceiling is tier 5.** Of the 159 registered tasks, 29 are tier 1, 91
 are tier 2, 31 are tier 3, 5 are tier 4 and 3 are tier 5. One more tier-3 task
 (`t3-swap-sum-pair`) is on disk and unregistered, held at the review checkpoint
 Fact 43 records. No tier is empty, so what M2's 200 and M4's 500 are short of is
@@ -588,7 +596,7 @@ bank, and each one validated on its own. But a policy that solves one of them
 has learnt nearly all of the others, so they are closer to twenty lessons on one
 template than to twenty lessons, and that is a fact about the bank's *effective*
 size. It is recorded here rather than left inside the count, because the count
-is what M2 is measured by and the difference between 153 tasks and 127 distinct
+is what M2 is measured by and the difference between 159 tasks and 133 distinct
 problems is exactly the kind of gap that reads as progress in a total and
 disappears in a curriculum. The 17-task batch of Fact 42 carries the same
 discount on the same basis, and its ten templates are listed there rather than
@@ -599,7 +607,10 @@ bank, and `intersperse`, `cmp`, `count_below`, `dedup`, `divmod3`, `extremes`,
 `fib_pair`/`sum_fib` and the two tree functions are all first appearances. The
 distinct-problem count moves 118 → 127 and the task count 144 → 153, so the
 batch is worth its full nine, which is the opposite of what the two families
-above are worth and worth saying plainly for that reason.
+above are worth and worth saying plainly for that reason. **Fact 45's six add
+none either** — `rotate`, `nat_bits`, `sum_odd`/`sum_even`, `clamp`, `indexed`
+and `build` are first appearances on the same screen — so the count moves
+127 → 133 and the task count 153 → 159.
 
 One task in the batch is the same function as a committed one at another tier,
 and the distinctness rule that would have parked it is deliberately not applied.
@@ -899,13 +910,13 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 153 tasks (27 tier 1, 87 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
+   progress** — 159 tasks (29 tier 1, 91 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
    validated together rather than per task, because a task is sound only against
    a corpus that shares the degenerate generator with it. The whole bank was
-   measured locally on 2026-09-19 as **153/153 valid over 3,348 checker runs**,
+   measured locally on 2026-09-19 as **159/159 valid over 3,461 checker runs**,
    with no problems, no task holding a law with a zero-kill count, and no task
    free of warnings: the missing calibration
-   measurement on all 153, and on the 39 tasks at or above `REVIEW_TIER` a
+   measurement on all 159, and on the 39 tasks at or above `REVIEW_TIER` a
    review warning as well — all 39 with no record, because the 11 records that
    used to sit in `meta.json` were forgeries and were deleted rather than
    migrated (Fact 27). The calibration warning is the one `--strict` promotes,
@@ -915,16 +926,16 @@ and the resulting verdicts say `dev_only: true`.
    This measurement is the one M4.3 used to argue *against* waiting for a quiet
    box: V4 reads wall-clock latency, so a bank measured while an authoring agent
    is checking it is a bank measured under contention — but the contention makes
-   a *latency* number about the box, and it does not change whether 153 of 153
+   a *latency* number about the box, and it does not change whether 159 of 159
    validate. The 122-task reading that stood here was taken the same way, and
-   the 142-, 144- and 153-task ones were taken harder: the load average was 14–17
-   throughout because of a ChatGPT/Codex process outside this repository, and
-   every task still read `[ok]` at a reference latency of 81–152 ms. The
-   153-task reading was taken at `--jobs 8` and its per-task `reference_ms`
+   the 142-, 144-, 153- and 159-task ones were taken harder: the load average was
+   14–17 throughout because of a ChatGPT/Codex process outside this repository,
+   and every task still read `[ok]` at a reference latency of 81–152 ms. The
+   later readings were taken at `--jobs 8` and their per-task `reference_ms`
    spread runs 74–352 ms, which is a number about eight checkers sharing the box
    and not about a task; the serial reading is the one to quote.
-   The 150 tasks at tiers 1–4 are
-   short of the 200 by 50, and 27 of the 153 are the two families §3.9 records:
+   The 156 tasks at tiers 1–4 are
+   short of the 200 by 44, and 27 of the 159 are the two families §3.9 records:
    the count and the number of distinct problems are not the same number, and
    only one of the two is what a curriculum buys.
 
@@ -1312,13 +1323,13 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 153, of which five are tier 4 and three are
+1. **500+ tasks including tier 5. 159, of which five are tier 4 and three are
    tier 5.** None of the five tiers is empty, so what is left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
-   the same shape of work has since produced 68 more (a 35-task batch from two
+   the same shape of work has since produced 74 more (a 35-task batch from two
    authoring agents, the third tier-5 task, the third and fourth tier-4 ones, the
    Bool-fold duality, the 17-task batch of Fact 42, Fact 43's three — one of
-   which is held at review — and Fact 44's nine), so the remaining 347 are
+   which is held at review — Fact 44's nine and Fact 45's six), so the remaining 341 are
    volume and nothing else. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
@@ -1427,7 +1438,7 @@ waiting room.
    per-task records. `--json` also had to be fixed to be JSON: the summary
    lines used to follow the document, so the mode existed for callers who could
    not parse it. Two of the four report the bank as it is rather than as a
-   score: calibration is **0 of 153 recorded**, which is item 4's blocked state
+   score: calibration is **0 of 159 recorded**, which is item 4's blocked state
    as a number, and the review fraction is **0 of the 39 tasks that need
    review** — which is *not* the same as thirty-nine tasks having been reviewed,
    and the paragraph here has been wrong in two different directions before
@@ -1444,7 +1455,7 @@ waiting room.
    which is all the check can witness. The eleven forged records were then
    deleted rather than migrated, so the field now reads 0 as well: the 0.205 is
    gone because the records are gone, not because anyone read the laws (Fact
-   27). It is a fraction of the tasks that need review rather than of all 153,
+   27). It is a fraction of the tasks that need review rather than of all 159,
    because below `REVIEW_TIER` the author's own reading *is* the review and
    counting those would report the bank as unreviewed for following its own
    rule.
@@ -1482,14 +1493,15 @@ waiting room.
 
    **The bank-wide reading was `mean 5.1, min 0`, over 376 laws in 125 tasks,
    then `mean 4.53, min 1` over 459 law declarations in 144 tasks, and is now
-   `mean 4.35, min 1` over 499 law declarations in 153 tasks** — the
+   `mean 4.25, min 1` over 522 law declarations in 159 tasks** — the
    first pair of numbers is the before and the after of the sweep below, and the
-   later pairs are the reading two days later, after more batches added 123
+   later pairs are the reading two days later, after more batches added 146
    registered law declarations and the two sweeps that gave 32 of them their
    first mutant. It moved
-   twice in the same direction, and both later times it moved *down*: 26 laws in
-   Fact 42's batch and 6 in Fact 43's had no killer at all, and Fact 44's 40 are
-   mostly ground-LHS laws with exactly one killer each, and a law with
+   three times in the same direction, and every later time it moved *down*: 26
+   laws in
+   Fact 42's batch and 6 in Fact 43's had no killer at all, and Facts 44's 40 and
+   45's 23 are mostly ground-LHS laws with exactly one killer each, and a law with
    exactly one killer pulls the mean down rather than up. `min` is the number
    that matters — a mean is compatible with a law nothing fails, and the min is
    the only reading that names it — and it is 1 at every reading, which is the
