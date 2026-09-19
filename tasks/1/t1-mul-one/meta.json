@@ -13,6 +13,7 @@
     "induction"
   ],
   "laws": [
+    "add_plus",
     "mul_one",
     "mul_succ",
     "mul_zero"
@@ -24,7 +25,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "35df9dc7cc755e86a006bef0840dca0140a34ef63be7e9eb31e0f6995ecc49d2",
+    "laws": "4f78f6c213b91a959e58c7ac02f81182860d11957e3f4289e5ce9755215037ab",
     "prelude": "90209e424d9384ffc550c1d54ba1b0f2f64c3a09ac89b56ffe60004b97c4afd0"
   },
   "bend_version": "2.0.5"

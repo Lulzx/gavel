@@ -44,7 +44,7 @@
       "tier": 1,
       "path": "tasks/1/t1-double",
       "reference": "references/t1-double",
-      "hash": "74446a34da25b79c92327f6be5669e94b33d79a12ab4cd64dc36d015861bcffd"
+      "hash": "1403fc504e8ffe152844f868116843694a589b32f16cb35c73714a5cdaae8a16"
     },
     {
       "task_id": "t1-even-flip",
@@ -86,7 +86,7 @@
       "tier": 1,
       "path": "tasks/1/t1-mul-one",
       "reference": "references/t1-mul-one",
-      "hash": "0b88e52d165d511c298f2155bb22fe93f26cfda9b21f6144827d16e963a75d2a"
+      "hash": "a979f90bb34de5b5f3f10d57d723704e94845797902e6f2e92331b7ece619013"
     },
     {
       "task_id": "t1-mul-two",
@@ -387,7 +387,7 @@
       "tier": 2,
       "path": "tasks/2/t2-mul-laws",
       "reference": "references/t2-mul-laws",
-      "hash": "95597465fef16a0ce87912d0befb22d983870c85178397efba9aa1b0f1798660"
+      "hash": "6951196ec6af6e4847a8a71e766ce63bcd059ed8ad3f1a17f2a7e4fbfbe1a276"
     },
     {
       "task_id": "t2-pow-laws",
@@ -520,7 +520,7 @@
       "tier": 2,
       "path": "tasks/2/t2-sum-laws",
       "reference": "references/t2-sum-laws",
-      "hash": "5a1c31140343bbe45dd143870aa32025f4aa1be31a6b96cad905392a28a425d2"
+      "hash": "7cd2cbeb171740ddd7e9d1790683bc64d6d99bd2c8b14051571ce05523888fe3"
     },
     {
       "task_id": "t2-sum-mod3-laws",

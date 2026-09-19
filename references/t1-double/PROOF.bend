@@ -3,6 +3,20 @@ import ./prelude.bend as P
 import ./solution.bend as S
 import ./LAWS.bend as L
 
+# `add` on the left of a `+` is Base's addition on the right. Free in `y`, so
+# the induction in `x` passes it through unchanged.
+def Policy.add_plus(x: Nat, y: Nat) -> {S.add(x, y) == x + y : Nat}:
+  match x:
+    case 0n:
+      {==}
+    case 1n+p:
+      %Policy.add_plus(p, y) : {1n + S.add(p, y) == 1n + _ : Nat}
+      {==}
+
+def L.add_plus(x, y):
+  %Policy.add_plus(x, y) : {S.add(x, y) == _ : Nat}
+  {==}
+
 # `add_succ_rev` is the successor law for `add`, oriented so that a goal
 # carrying `1n + add(x, y)` can step to `add(x, 1n+y)`. Free in `y`, so the
 # induction in `x` passes it through unchanged.

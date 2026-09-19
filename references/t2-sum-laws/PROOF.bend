@@ -41,3 +41,12 @@ def L.sum_append(xs, ys):
 def L.sum_single(h):
   %Policy.add_zero(h) : {h + 0n == _ : Nat}
   {==}
+
+# `append` matches its first argument, so the cons step is the body's own
+# right-hand side read back.
+def L.append_cons(h, t, ys):
+  {==}
+
+# The `Nil{}` case of the same match: the body answers `ys` there.
+def L.append_nil_left(ys):
+  {==}

@@ -2,6 +2,17 @@ import Base
 import ./prelude.bend as P
 import ./solution.bend as S
 
+# LAW: `add` is Base's addition. The three laws below reach `add` only through
+# `mul_succ`'s right-hand side, and only at the pairs `(y, mul(x, y))`, so an
+# `add` agreeing with `+` there and nowhere else is untouched by them. Written
+# the other way round, `x + y` is Base's addition and `S.add` is the policy's,
+# so this law is what makes the stub's first obligation an obligation. Same
+# shape as `t1-mul-zero` (Fact 33) and `t1-double`.
+law add_plus:
+  for x: Nat
+  for y: Nat
+  {S.add(x, y) == x + y : Nat}
+
 # LAW: multiplying by one on the right changes nothing.
 law mul_one:
   for x: Nat

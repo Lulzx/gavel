@@ -1,4 +1,4 @@
-Implement `add` and `mul` on `Nat`, then prove the three laws about `mul`.
+Implement `add` and `mul` on `Nat`, then prove the four laws about them.
 
 `add(a, b)` must return the sum of `a` and `b`, recursing on the first
 argument.
@@ -7,6 +7,14 @@ argument.
 argument and build the step out of `add`: `0n` is the base case and the step is
 `add(b, mul(p, b))`. That step names `b` twice, and a binder is consumed on
 every use, so `b` is declared reusable with `+b`.
+
+The first law, `add_plus`, is `add` against Base's `+`, and it is what makes
+`add` an obligation at all. The three `mul` laws below reach `add` only through
+`mul_succ`'s right-hand side, and only at the pairs `(y, mul(x, y))`, so an
+`add` that agrees with `+` there and nowhere else is untouched by them. Written
+the other way round, `x + y` is Base's addition and `S.add` is the policy's. It
+is inductive in `x` and its step closes by reduction, so it is a helper lemma
+(`Policy.add_plus`, the same text `t1-mul-zero` uses) plus one citation.
 
 The law `mul_one` says that multiplying by one on the right changes nothing. It
 is inductive in `x`.
@@ -26,4 +34,5 @@ multiplication. `mul_zero` is the missing point: `mul(0n, y)` is `0n` at every
 argument. It closes by reduction, so `{==}` is its proof too.
 
 Write the implementations in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.mul_one(x)`, `def L.mul_succ(x, y)` and `def L.mul_zero(y)`.
+`def L.add_plus(x, y)`, `def L.mul_one(x)`, `def L.mul_succ(x, y)` and
+`def L.mul_zero(y)`.

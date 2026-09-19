@@ -14,6 +14,7 @@
     "helper-lemma"
   ],
   "laws": [
+    "add_plus",
     "double_eq_add",
     "double_succ"
   ],
@@ -24,7 +25,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "02ed1f4e78c2dd0a191366545737ed1a3a85d724ee3a91aceb5cb42c6a7d83ef",
+    "laws": "a30fb9e899c0335b7810bb3a0cf34d31a8b940a4c45abe41fd4d7ca81f9816e5",
     "prelude": "90209e424d9384ffc550c1d54ba1b0f2f64c3a09ac89b56ffe60004b97c4afd0"
   },
   "bend_version": "2.0.5"

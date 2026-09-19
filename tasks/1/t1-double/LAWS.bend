@@ -2,6 +2,18 @@ import Base
 import ./prelude.bend as P
 import ./solution.bend as S
 
+# LAW: `add` is Base's addition. `double_eq_add` names `add` only on the
+# diagonal `add(x, x)`, so a pair -- a `double` that is doubling and an `add`
+# that is anything agreeing with `+` where both arguments are equal -- leaves
+# the off-diagonal free. Written the other way round, `x + y` is Base's
+# addition and `S.add` is the policy's, so this law is what makes the stub's
+# first obligation an obligation. The same shape was closed in `t1-mul-zero`
+# (Fact 33) and this is its second instance.
+law add_plus:
+  for x: Nat
+  for y: Nat
+  {S.add(x, y) == x + y : Nat}
+
 # LAW: doubling is adding a number to itself.
 law double_eq_add:
   for x: Nat

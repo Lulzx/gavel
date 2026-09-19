@@ -3,7 +3,9 @@
   "tier": 2,
   "laws": [
     "sum_append",
-    "sum_single"
+    "sum_single",
+    "append_cons",
+    "append_nil_left"
   ],
   "policy_targets": [
     "append",
@@ -12,7 +14,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "22a3f563f6a22e71513142eae046def8074031e1ef6fc702f37a1a5dd6bb20da",
+    "laws": "8bd00a2e58eb06945a873efc13f3b5ad34df9790e900a0a045fe4cb2357d0a0f",
     "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
   },
   "bend_version": "2.0.5"
