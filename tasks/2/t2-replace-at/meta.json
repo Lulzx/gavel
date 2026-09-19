@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-replace-at",
+  "tier": 2,
+  "laws": [
+    "replace_at_nil",
+    "replace_at_zero",
+    "replace_at_succ",
+    "replace_at_idem"
+  ],
+  "policy_targets": [
+    "replace_at"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "4de7eaf3d8d4fa3a7f1966aa1d376a9c027d1dee354dce87c316d77d1b4b57e4",
+    "prelude": "cac1f47fd2a2f3b11e45de1f8e598a90f608b947e215569947dedff013585a80"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,23 @@
+{
+  "task_id": "t2-run-starts",
+  "tier": 2,
+  "laws": [
+    "run_starts_nil",
+    "run_starts_single",
+    "run_starts_go_nil",
+    "run_starts_go_cons",
+    "run_starts_go_same",
+    "run_starts_three"
+  ],
+  "policy_targets": [
+    "run_starts",
+    "run_starts_go"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "0567ae2dd78389a1b77fab7c74b813b2d4373e6174dab75f7dd47dc6ab334969",
+    "prelude": "df3acf050bed8e16f36ff115616b0b6dc1e3a8e863d6d82521348f4c373d08ad"
+  },
+  "bend_version": "2.0.5"
+}

@@ -507,6 +507,73 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     **Published, and this time the whole bank was re-measured rather than the batch.** `tools.publish` over the ten named directories takes the manifest **195 → 205**, a pure append — nothing removed, no existing entry's fields changed — and `meta["hashes"]` is fresh on all 205 (**0 stale**), the four-line check Fact 58 ran. The bank then reads **205/205 valid over 4,451 checker runs**, **735 laws at mean 3.86 kills and min 1**, **2,193 mutants of which 1,191 are strong**, **no law with a zero-kill count and no mutant at tier 4** — the same shape the 195-task reading had, moved by exactly the batch (689 → 735 laws, 2,088 → 2,193 mutants, mean 3.92 → 3.86). The reference latency is **70–191 ms, median 78**, but like Fact 57's bank-wide figure that one was taken under contention — `pytest` ran against the same tree for the first three and a half minutes of it — so it is a number about the box and not the one to quote. The brief's census is refreshed to what the registered bank now holds: **205 tasks, 689 distinct law names, 340 distinct def names, 205 distinct policy targets**, with the prescribed greps printing **695** and **342** because `tasks/*/*/LAWS.bend` also matches the held `t3-swap-sum-pair` (6 laws, 2 defs), and the eleven new target names are added to the brief's list of taken functions. `uv run pytest` is **439 passed**. M2 item 2's 200-task exit is met at **202 of 205 at tiers 1–4** (29 tier 1, 137 tier 2, 31 tier 3, 5 tier 4, and the 3 tier-5 tasks outside the count), against the 192 the previous reading carried.
 
+**Ten more tier-2 tasks, and the round was opened by reading functions rather
+than names.** Two agents authored five each: `same_shape`, `lex_le`, `path_sum`,
+`max_prefix_sum`/`max_prefix_sum_go`, `run_starts`/`run_starts_go` from one, and
+`replace_at`, `indices_of`, `argmax`/`argmax_go`, `distinct`/`distinct_go`,
+`nth_from_end` from the other. The reconnaissance came first, because a name that
+greps clean can still be a function the bank has: nineteen near-neighbour prompts
+were read before any task was written (`init`, `delete_at`, `insert_at`,
+`split_at`, `index_of`, `dedup`, `extremes`, `merge`, `chunk_two`, `zip3`,
+`tree_level_sum` and the rest) and several candidates were dropped on what they
+turned out to be. What survived is distinct as a *function* and not only as a
+string — `distinct` removes **all** duplicates where the bank's `dedup` removes
+adjacent ones and says so in its own prompt, `indices_of` returns every position
+where `index_of` returns the first, `path_sum` weights a tree by the leaves
+beneath a key where `tree_level_sum` weights it by depth, and `lex_le` and
+`same_shape` are the bank's first two-list and two-tree Booleans.
+
+**Verified independently, and against the agents' own reports rather than from
+them.** All ten: `tools.author` reaches `publish` — which is the *episode* stage,
+so the reference is tier 4 at reward 1.000 through `GavelEnv` and not only
+through the checker; `valid` is true with `problems` empty; the four screens are
+clean (`batch` 10/10, `anchors` 0, `general` 0, `positions` 0 of the ten's cells
+— the one flagged cell in the whole bank is `t1-clamp-laws`, pre-existing); **no
+law has a zero-kill count, against a minimum of 1**; and all ten escape probes
+sit in `mutant_strong`, which is "type-checks and fails at least one law" and so
+is tier 3 rather than tier 4. The corpora are 122 mutants of which 57 are strong.
+Every law set was also read by eye, which is the one check no stage performs:
+each mixes a ground or constructor-headed anchor (`same_shape(P.Leaf{v},
+P.Leaf{w}) == True{}`, `max_prefix_sum(Nil{}) == 0n`, `replace_at(0n, h <> t, y)
+== y <> t`) with a structural step law, so each is a complete system of
+recursion equations and the "no absolute anchor" hole is *unavailable* rather
+than merely unflagged. Both designs the brief flagged as hardest — a two-tree
+Boolean and a two-list comparison — landed tier 2 with no shape change, and
+neither agent needed its fallback.
+
+**Three checker facts came out of the round and went into memory rather than
+into a repair.** `author-g1` found that a `+`-marked cons binder cannot be a
+`match` scrutinee — the checker's words are "match scrutinees in binder order
+(this variable is unbound, consumed, or out of order)" — so no body can single
+out a one-element tail, which is why `count_inv_single` and `best_gain_single`
+have no solo killer and why that absence is a limit of the corpus rather than
+evidence of a weak law. `author-g2` found that a closed law at a large literal
+does not fail but **times out**: `Nat.divmod.go` steps once per unit of the
+dividend, so `t2-digit-sum`'s first anchor, written at `987654321n`, hung at
+10.6 s and read as a verdict; every closed law in it was rewritten small (`123n`,
+`1000n`) with the budget moved into a width binder. And `tools.author` **skips**
+the corpus generator when `mutants/*.bend` already exists — the mirror of
+`tools.mutate` deleting it — so a task that wants both sets has to generate
+first and write the hand files second.
+
+**Published.** `tools.publish` — bare, and byte-identical to the manifest it
+replaced, which is the CI in-sync step — takes the manifest **205 → 215**, a pure
+append: nothing removed, no existing entry's fields changed, and `meta["hashes"]`
+fresh on all 215 (**0 stale**, the four-line check Fact 58 ran). The whole bank
+was then re-measured rather than the batch: **215/215 valid over 4,689 checker
+runs, no problems, no law with a zero-kill count (791 laws, mean 3.77, min 1),
+2,315 mutants of which 1,248 are strong and none reads tier 4** — the same shape
+the 205-task reading had, moved by exactly this batch, since 735 → 791 laws is
+the ten tasks' 56 and 2,193 → 2,315 mutants is their 122. The reference latency
+is **68–186 ms, median 77**, taken serially but with `pytest` running against the
+same tree for its first three and a half minutes, so like every bank-wide reading
+here it is good for validity and is a number about the box. The brief's census is
+refreshed to **215 tasks, 745 distinct law names, 364 distinct def names, 219
+distinct policy targets**, its prescribed greps now printing **751 / 366**, and
+the fourteen new target names are appended to its list of taken functions.
+`uv run pytest` is **439 passed**. M2 item 2's 200-task exit is met at **212 of
+215 at tiers 1–4**.
+
 
 ## 1. Deviations from SPEC.md
 
@@ -721,7 +788,7 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf`, `t4-queue-rep`; `t4-nth-maybe` is the same tier stated as a *domain* instead of an invariant |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 205 registered tasks, 29 are tier 1, 137
+**The bank's ceiling is tier 5.** Of the 215 registered tasks, 29 are tier 1, 147
 are tier 2, 31 are tier 3, 5 are tier 4 and 3 are tier 5. One more tier-3 task
 (`t3-swap-sum-pair`) is on disk and unregistered, held at the review checkpoint
 Fact 43 records and marked by a `HOLD` file so that a bare publish skips it. No tier is empty, so what M2's 200 and M4's 500 are short of is
@@ -758,7 +825,19 @@ and `build` are first appearances on the same screen — so the count moves
 the same reason and by the same screen: `dot`, `count_inv`, `best_gain`,
 `lcp_len`, `longest_run_len`, `second_max`/`sec_go`, `collatz_len`,
 `digit_sum`, `is_pow2` and `tree_depth_sum` collide with no target in the bank's
-`meta.json` files. The running distinct-problem figure has not been re-derived
+`meta.json` files. **Fact 60's ten add none either**, by the same screen and one
+step stronger: `same_shape`, `lex_le`, `path_sum`, `max_prefix_sum`/`max_prefix_sum_go`,
+`run_starts`/`run_starts_go`, `replace_at`, `indices_of`, `argmax`/`argmax_go`,
+`distinct`/`distinct_go` and `nth_from_end` are free both as *names* and as
+*functions* — the batch was opened only after reading the prompts of the
+nineteen nearest neighbours (`init`, `delete_at`, `insert_at`, `split_at`,
+`index_of`, `dedup`, `extremes`, `merge`, `chunk_two`, `zip3` and the like) to
+check the thing each name would have to be, which is the discipline the
+paragraph above exists to enforce. `distinct` is global where the bank's `dedup`
+is adjacent-only, `indices_of` returns every position where `index_of` returns
+the first, `path_sum` is leaf-weighted where `tree_level_sum` is depth-indexed,
+and `lex_le`/`same_shape` are the bank's first two-list and two-tree Booleans.
+The running distinct-problem figure has not been re-derived
 since Fact 45's 133 — the batches between then and now were checked for target
 collisions one at a time rather than against a maintained total — so this
 paragraph records the last figure it was computed at and no later one.
@@ -1061,15 +1140,16 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. **200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. Met** —
-   205 tasks (29 tier 1, 137 tier 2, 31 tier 3, 5 tier 4, 3 tier 5), of which
-   **202 sit at tiers 1–4**, validated together rather than per task, because a
+   215 tasks (29 tier 1, 147 tier 2, 31 tier 3, 5 tier 4, 3 tier 5), of which
+   **212 sit at tiers 1–4**, validated together rather than per task, because a
    task is sound only against a corpus that shares the degenerate generator with
-   it. The whole bank was re-measured locally on 2026-09-19, after Fact 59's ten
-   and Fact 54's, Fact 55's and Fact 57's batches and Fact 51's three repairs
-   before them, as **205/205 valid over 4,451 checker runs**, with no problems,
-   no law with a zero-kill count (**735 laws, mean 3.86 kills, min 1**), no
-   mutant reading tier 4, and no task free of warnings: the missing calibration
-   measurement on all 205, and on the 39 tasks at or above `REVIEW_TIER` a
+   it. The whole bank was re-measured locally on 2026-09-19, after Fact 60's ten
+   and Fact 59's ten, Fact 54's, Fact 55's and Fact 57's batches and Fact 51's
+   three repairs before them, as **215/215 valid over 4,689 checker runs**, with
+   no problems, no law with a zero-kill count (**791 laws, mean 3.77 kills, min
+   1**), no mutant reading tier 4, and no task free of warnings: the missing
+   calibration measurement on all 215, and on the 39 tasks at or above
+   `REVIEW_TIER` a
    review warning as well — all 39 with no record, because the 11 records that
    used to sit in `meta.json` were forgeries and were deleted rather than
    migrated (Fact 27). The calibration warning is the one `--strict` promotes,
@@ -1079,7 +1159,7 @@ and the resulting verdicts say `dev_only: true`.
    This measurement is the one M4.3 used to argue *against* waiting for a quiet
    box: V4 reads wall-clock latency, so a bank measured while an authoring agent
    is checking it is a bank measured under contention — but the contention makes
-   a *latency* number about the box, and it does not change whether 205 of 205
+   a *latency* number about the box, and it does not change whether 215 of 215
    validate. The 172-task run was taken under exactly that contention — two
    authoring agents were checking against the same tree — and its reference
    latency reads 71–91 ms, median 78, which is a number about a quiet enough box
@@ -1095,7 +1175,10 @@ and the resulting verdicts say `dev_only: true`.
    load was not measured. **The 205-task run is serial but was taken with
    `pytest` running against the same tree for its first three and a half
    minutes, so its 70–191 ms, median 78, is a number about the box as well**;
-   validity is unaffected and the median is unchanged a fourth time. A
+   **the 215-task run repeats the shape a fifth time — serial, but with `pytest`
+   on the same tree for its opening three and a half minutes, so its 68–186 ms,
+   median 77, is a number about the box too, and the median moves by one
+   millisecond**. A
    bank-wide latency figure has to come from a serial run on a quiet box; every
    reading so far has been good for validity and for little else.
    The 122-task reading that stood here was taken the same way, and
@@ -1105,7 +1188,7 @@ and the resulting verdicts say `dev_only: true`.
    later readings were taken at `--jobs 8` and their per-task `reference_ms`
    spread runs 74–352 ms, which is a number about eight checkers sharing the box
    and not about a task; the serial reading is the one to quote.
-   The 202 tasks at tiers 1–4 clear the 200 by 2, and 27 of the 205 are the two
+   The 212 tasks at tiers 1–4 clear the 200 by 12, and 27 of the 215 are the two
    families §3.9 records: the count and the number of distinct problems are not
    the same number, and only one of the two is what a curriculum buys.
 
@@ -1493,18 +1576,19 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 205, of which 202 are at tiers 1–4, five are
+1. **500+ tasks including tier 5. 215, of which 212 are at tiers 1–4, five are
    tier 4 and three are tier 5.** None of the five tiers is empty, so what is
    left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
-   the same shape of work has since produced 110 more (a 35-task batch from two
+   the same shape of work has since produced 120 more (a 35-task batch from two
    authoring agents, the third tier-5 task, the third and fourth tier-4 ones, the
    Bool-fold duality, the 17-task batch of Fact 42, Fact 43's three — one of
    which is held at review — Fact 44's nine, Fact 45's six, Fact 48's twelve,
-   Fact 50's one, Fact 54's seven, Fact 55's ten, Fact 57's six and Fact 59's
-   ten; the `t2-chunks-laws` repair moved no count, Fact 51's three repairs moved
-   no count, and Facts 49, 52 and 53 are a screen, a screen and a brief rather
-   than tasks), so the remaining 295 are volume and nothing else. The check that keeps it honest (a manifest entry must
+   Fact 50's one, Fact 54's seven, Fact 55's ten, Fact 57's six, Fact 59's
+   ten and Fact 60's ten; the `t2-chunks-laws` repair moved no count, Fact 51's
+   three repairs moved no count, and Facts 49, 52 and 53 are a screen, a screen
+   and a brief rather than tasks), so the remaining 285 are volume and nothing
+   else. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
    waiting room, and it is now written three times over — `t5-run-effect`,
@@ -1647,7 +1731,7 @@ waiting room.
    per-task records. `--json` also had to be fixed to be JSON: the summary
    lines used to follow the document, so the mode existed for callers who could
    not parse it. Two of the four report the bank as it is rather than as a
-   score: calibration is **0 of 205 recorded**, which is item 4's blocked state
+   score: calibration is **0 of 215 recorded**, which is item 4's blocked state
    as a number, and the review fraction is **0 of the 39 tasks that need
    review** — which is *not* the same as thirty-nine tasks having been reviewed,
    and the paragraph here has been wrong in two different directions before
@@ -1664,7 +1748,7 @@ waiting room.
    which is all the check can witness. The eleven forged records were then
    deleted rather than migrated, so the field now reads 0 as well: the 0.205 is
    gone because the records are gone, not because anyone read the laws (Fact
-   27). It is a fraction of the tasks that need review rather than of all 205,
+   27). It is a fraction of the tasks that need review rather than of all 215,
    because below `REVIEW_TIER` the author's own reading *is* the review and
    counting those would report the bank as unreviewed for following its own
    rule.

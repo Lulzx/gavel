@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-lex-le",
+  "tier": 2,
+  "laws": [
+    "lex_le_nil_left",
+    "lex_le_nil_right",
+    "lex_le_cons",
+    "lex_le_self",
+    "lex_le_append"
+  ],
+  "policy_targets": [
+    "lex_le"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "685055785a70a7c8b696461ff891bb397fd1d476372983d8839df31df6f67313",
+    "prelude": "9cbf16f875fa70e50fc4bbc1e9cb6875bc7ec94329d7c422a03dec73243d0600"
+  },
+  "bend_version": "2.0.5"
+}

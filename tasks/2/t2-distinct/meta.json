@@ -1,0 +1,24 @@
+{
+  "task_id": "t2-distinct",
+  "tier": 2,
+  "laws": [
+    "distinct_nil",
+    "distinct_cons",
+    "distinct_go_nil",
+    "distinct_go_step",
+    "distinct_same_seen",
+    "distinct_same",
+    "distinct_nonadjacent"
+  ],
+  "policy_targets": [
+    "distinct",
+    "distinct_go"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "1757ea8a3c907024e4dfc1aef66518029620fd83fc64e8971b426eeb5a41aa11",
+    "prelude": "aeb233a7005ed385d37bf5957dd65515f0d0796c65a7ff5c092edc3313ad4aa3"
+  },
+  "bend_version": "2.0.5"
+}

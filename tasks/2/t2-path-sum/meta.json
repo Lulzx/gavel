@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-path-sum",
+  "tier": 2,
+  "laws": [
+    "path_sum_leaf",
+    "path_sum_node",
+    "path_sum_three",
+    "path_sum_deep",
+    "path_sum_zeroed"
+  ],
+  "policy_targets": [
+    "path_sum"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "fc26092f15abcf9ae594db6c608cc59513de6e0264aaf90aec988316d57411bd",
+    "prelude": "c018df9d2e5bdf1acef33b5c825f56f3909eb994ab9b15d12b50ba43a09ae94f"
+  },
+  "bend_version": "2.0.5"
+}

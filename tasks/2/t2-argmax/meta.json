@@ -1,0 +1,24 @@
+{
+  "task_id": "t2-argmax",
+  "tier": 2,
+  "laws": [
+    "argmax_nil",
+    "argmax_cons",
+    "argmax_go_nil",
+    "argmax_go_step",
+    "argmax_three",
+    "argmax_tie",
+    "argmax_same"
+  ],
+  "policy_targets": [
+    "argmax",
+    "argmax_go"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "1990e2779778847fb4050a83384e3a94b15bdce01ceacc28af752f50e6f130f8",
+    "prelude": "644f37387319fb8fe65a53bdf8b48da9c10d4f0f4a367dda1375141ceefe9766"
+  },
+  "bend_version": "2.0.5"
+}

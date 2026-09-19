@@ -1,0 +1,23 @@
+{
+  "task_id": "t2-nth-from-end",
+  "tier": 2,
+  "laws": [
+    "nth_from_end_nil",
+    "nth_from_end_step",
+    "nth_from_end_pair_last",
+    "nth_from_end_pair_first",
+    "nth_from_end_third",
+    "nth_from_end_last",
+    "nth_from_end_out"
+  ],
+  "policy_targets": [
+    "nth_from_end"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "b6bfb4664f58f32e3b07619f1d67940e4ad83b36d3905db6f63bcc0ecb1b4f2d",
+    "prelude": "053a6dbf987f32e526e492b9eb14743bec5ff05ebd214f304058d94594ef21e9"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-same-shape",
+  "tier": 2,
+  "laws": [
+    "same_shape_leaf_leaf",
+    "same_shape_leaf_node",
+    "same_shape_node_leaf",
+    "same_shape_node_node",
+    "same_shape_relabel",
+    "same_shape_self"
+  ],
+  "policy_targets": [
+    "same_shape"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "3077456f0d090cc2e0f4d29c37145bd34514960ed92502fdea66ab03117c4653",
+    "prelude": "8eabc272cbd78c6e11097ba6ba1467dc3ec4b6fafc98bb4c1331d7999b35c8bf"
+  },
+  "bend_version": "2.0.5"
+}
