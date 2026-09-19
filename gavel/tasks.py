@@ -24,6 +24,17 @@ PRELUDE_FILE = "prelude.bend"
 SOLUTION_FILE = "solution.bend"
 PROOF_FILE = "PROOF.bend"
 
+# A task directory carrying this file is on disk but not part of the bank: it is
+# held at the review checkpoint, and a publish skips it. The marker is a file
+# rather than a manifest field because a manifest field can only describe tasks
+# the manifest already has, and the whole point of a hold is to describe one it
+# must not acquire. Removing the file is the deliberate act that registers it.
+HOLD_FILE = "HOLD"
+
+
+def is_held(root: Path) -> bool:
+    return (root / HOLD_FILE).is_file()
+
 # What the policy is allowed to submit (SPEC.md 6.3).
 SUBMITTED_FILES = (SOLUTION_FILE, PROOF_FILE)
 

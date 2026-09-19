@@ -124,7 +124,8 @@ These are the defects that survive every stage, so they are on you:
 ## Distinctness: the hard constraint
 
 The bank already has **195 registered tasks** (plus one tier-3 task held at the
-review checkpoint and three directories parked under `tasks/2/_abandoned/`), **643
+review checkpoint — it carries a `HOLD` file, which is what keeps it out of the
+bank — and three directories parked under `tasks/2/_abandoned/`), **643
 distinct law names** across **324 distinct def names** and **194 distinct policy
 targets**. A new task must be a new *function*, not the same function at another
 tier, and its law names must not collide with an existing one.

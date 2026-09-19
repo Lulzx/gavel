@@ -1516,6 +1516,28 @@ waiting room.
    repaired, but "recorded instead of changed" is the wrong thing to read as
    *harmless* — a red build is how the next person finds out.
 
+   **Closed 2026-09-19, and the fix is a marker rather than a decision about
+   the task.** The contradiction was never that `t3-swap-sum-pair` should be
+   registered or parked — it was that the repository had **no way to say "on
+   disk, not in the bank"**, so a bare publish could only express the state by
+   silently registering the task. A task directory carrying a `HOLD` file is
+   now held: the bare glob drops it the way it drops a task whose directory is
+   gone, and naming one explicitly is *refused* rather than obeyed, because a
+   hold an argument can lift is not a hold — deleting the marker is the
+   deliberate act that registers the task, and `tools/author.py`'s publish
+   stage refuses a held task too, so there is one state and not two. The
+   boundary the paragraph above draws is unchanged: the checkpoint is still a
+   property of the authoring pipeline and not of the reward path, and no
+   verdict reads a review record. What changed is that the hold is now
+   *representable*, so the bare publish that CI runs agrees with the tree, the
+   in-sync step passes on a fresh clone, and the only remaining way to register
+   an unreviewed tier-3 task is to delete a file that says not to. Measured:
+   `uv run python -m tools.publish` against the real manifest leaves
+   `git diff --exit-code -- manifest.json` with nothing to say, and two new
+   tests in `tests/test_publish.py` pin the skip and the refusal — the skip by
+   seeding a manifest that already contains the held task, because a hold that
+   expires once the task is in the bank is not a hold either.
+
 3. **Published throughput benchmark. Published 2026-09-19, and the blocker was
    the metric rather than the machine.** `tools/soak.py` reports p50/p95/p99 and
    verdicts/min/core from a real run, and M3.5's ten-thousand-episode soak

@@ -15,6 +15,12 @@ this tool's job is only to describe the files. What it does carry is
 republish because dropping it would make the exclusion expire on its own.
 Lifting one is a deliberate edit, not a side effect of editing the task.
 
+A task directory carrying a ``HOLD`` file is held: it is on disk and not in the
+bank. A bare run skips it -- which is what makes a bare run agree with a branch
+whose CI registers a task no person has read yet -- and naming it explicitly is
+refused, because a hold an argument can lift is not a hold. Deleting the marker
+is the deliberate act that registers it, and it is the only one.
+
 Usage:
     uv run python -m tools.publish            # every task under tasks/
     uv run python -m tools.publish tasks/1/t1-add-plus
@@ -31,8 +37,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from gavel.hashing import hash_files, sha256_text  # noqa: E402
 from gavel.laws import split_top_level  # noqa: E402
-from gavel.tasks import (HASH_KEYS, LAWS_FILE, PRELUDE_FILE,  # noqa: E402
-                         SOLUTION_FILE)
+from gavel.tasks import (HASH_KEYS, HOLD_FILE, LAWS_FILE, PRELUDE_FILE,  # noqa: E402
+                         SOLUTION_FILE, is_held)
 from gavel.toolchain import DEFAULT_VERSION, Toolchain  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -116,6 +122,21 @@ def main(argv: list[str] | None = None) -> int:
     roots = ([Path(p).resolve() for p in args.paths] if args.paths else
              sorted(p.parent for p in (REPO_ROOT / "tasks").glob("*/*/LAWS.bend")))
 
+    # A held task is on disk and not in the bank, so the two ways in are closed
+    # differently: a bare run skips it the way it skips a task whose directory
+    # is gone, and naming it explicitly is refused rather than obeyed, because a
+    # hold that an argument can lift is not a hold. Deleting the marker is the
+    # one deliberate act that registers the task.
+    if args.paths:
+        named_held = [root for root in roots if is_held(root)]
+        if named_held:
+            for root in named_held:
+                print(f"publish: {root} is held -- remove "
+                      f"{root / HOLD_FILE} to register it", file=sys.stderr)
+            return 1
+    held = [root for root in roots if is_held(root)]
+    roots = [root for root in roots if not is_held(root)]
+
     # Everything is checked before anything is written. Publishing is a
     # read-then-write per task, so a task that is mid-write used to fail on the
     # eighth of twenty with a FileNotFoundError, having already rewritten the
@@ -137,9 +158,13 @@ def main(argv: list[str] | None = None) -> int:
     entries = {e["task_id"]: e for e in existing.get("tasks", [])}
     if not args.paths:
         entries = {name: e for name, e in entries.items()
-                   if (REPO_ROOT / e["path"]).is_dir()}
+                   if (REPO_ROOT / e["path"]).is_dir()
+                   and not is_held(REPO_ROOT / e["path"])}
+    for root in held:
+        print(f"held: {root.name} is not in the bank ({HOLD_FILE} present)")
     for root in roots:
-        entry = publish_task(root, args.version, previous=entries.get(root.name))
+        entry = publish_task(root, args.version, repo=REPO_ROOT,
+                             previous=entries.get(root.name))
         entries[entry["task_id"]] = entry
         print(f"published {entry['task_id']} (tier {entry['tier']}, "
               f"{len(json.loads((root / 'meta.json').read_text())['laws'])} laws)")

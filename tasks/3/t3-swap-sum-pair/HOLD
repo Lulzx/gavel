@@ -1,0 +1,5 @@
+This task is held at the review checkpoint: it is on disk and not in the bank.
+A publish skips it, so a bare `tools/publish` (which CI runs) leaves the
+manifest alone. A person must read its six laws and write the review record
+before this file is deleted; deleting it is the deliberate act that registers
+the task. See PLAN.md Fact 43 and M4 item 2.

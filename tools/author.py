@@ -58,8 +58,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from gavel.check import CheckConfig  # noqa: E402
 from gavel.env import Action, GavelEnv  # noqa: E402
 from gavel.reviews import load_review  # noqa: E402
-from gavel.tasks import (LAWS_FILE, PRELUDE_FILE, PROOF_FILE,  # noqa: E402
-                         SOLUTION_FILE, Manifest, load_task)
+from gavel.tasks import (HOLD_FILE, LAWS_FILE, PRELUDE_FILE, PROOF_FILE,  # noqa: E402
+                         SOLUTION_FILE, Manifest, is_held, load_task)
 from gavel.toolchain import DEFAULT_VERSION, Toolchain  # noqa: E402
 from gavel.validate import (DEFAULT_BUDGET_MS, REVIEW_TIER,  # noqa: E402
                             review_state, validate_task)
@@ -305,6 +305,12 @@ def stage_review(root: Path, run: Run, repo: Path | None = None) -> None:
 
 def stage_publish(root: Path, run: Run, manifest: Path) -> None:
     assert run.entry is not None
+    if is_held(root):
+        run.stages.append(Stage(
+            "publish", False,
+            f"held: {HOLD_FILE} is present, so this task is on disk and not in "
+            f"the bank; remove {root / HOLD_FILE} to register it"))
+        return
     bank = (json.loads(manifest.read_text()) if manifest.is_file()
             else {"version": 1, "tasks": []})
     entries = {e["task_id"]: e for e in bank.get("tasks", [])}

@@ -5,6 +5,7 @@ No checker: these are properties of the entry, not of the task's soundness.
 
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
@@ -85,3 +86,55 @@ def test_an_incomplete_task_stops_the_whole_run_before_it_writes(task_root,
     # keys in the same order, so a rewrite can be byte-identical and a content
     # check would pass whether or not the guard exists.
     assert (good / "meta.json").stat().st_mtime_ns == before
+
+
+def _fake_repo(tmp_path, names):
+    """A repo with copies of a real task under the given ids."""
+    repo = tmp_path / "repo"
+    for name in names:
+        shutil.copytree(SOURCE_TASK, repo / "tasks" / "1" / name)
+    return repo
+
+
+def test_a_held_task_is_skipped_by_a_bare_run(tmp_path, monkeypatch, capsys):
+    """``HOLD`` is how a task is on disk and not in the bank.
+
+    CI's in-sync step is a *bare* ``tools.publish`` followed by a diff, so a
+    task held at the review checkpoint used to make that step fail on every
+    push: the bare glob registered it, the diff saw seven new lines, and the
+    build went red for a task nobody had read yet.
+    """
+    repo = _fake_repo(tmp_path, ["t1-normal", "t1-held"])
+    (repo / "tasks" / "1" / "t1-held" / "HOLD").write_text("held for review\n")
+    monkeypatch.setattr("tools.publish.REPO_ROOT", repo)
+
+    manifest = tmp_path / "manifest.json"
+    # Pre-seeded as if it had been registered before the hold went on, so the
+    # test covers a bare run *dropping* one and not only never adding it. A
+    # hold that expires when the task is already in the bank is not a hold.
+    manifest.write_text(json.dumps({"tasks": [
+        {"task_id": "t1-held", "tier": 1, "path": "tasks/1/t1-held",
+         "reference": "references/t1-held", "hash": "stale"}]}))
+
+    assert main(["--manifest", str(manifest)]) == 0
+    ids = [t["task_id"] for t in json.loads(manifest.read_text())["tasks"]]
+    assert ids == ["t1-normal"]
+    assert "held" in capsys.readouterr().out
+
+
+def test_a_held_task_is_refused_when_it_is_named(task_root, tmp_path, capsys):
+    """A hold an argument can lift is not a hold, so naming one is an error
+    rather than an override: deleting the marker is the deliberate act."""
+    (task_root / "HOLD").write_text("held for review\n")
+    manifest = tmp_path / "manifest.json"
+    before = (task_root / "meta.json").stat().st_mtime_ns
+
+    assert main([str(task_root), "--manifest", str(manifest)]) == 1
+
+    err = capsys.readouterr().err
+    assert "is held" in err and "HOLD" in err
+    assert not manifest.is_file()
+    # The refusal happens before the metadata is rewritten: a refusal that still
+    # mutated the task would leave it neither published nor untouched, which is
+    # the half-happened state the incomplete-task guard above exists to avoid.
+    assert (task_root / "meta.json").stat().st_mtime_ns == before
