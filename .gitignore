@@ -30,6 +30,11 @@ runs/
 # root, where a stale one sitting beside the real manifest.json is how the
 # wrong file gets published.
 scratch/
+# ...and the same manifest under its older name, for a worker that started
+# before the brief moved the path. Ignored rather than deleted: a round in
+# progress is a file some agent is still writing to, and the harm is the stale
+# root manifest being *committed*, not its sitting there until the round ends.
+manifest.scratch.*.json
 
 # OS
 .DS_Store

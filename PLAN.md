@@ -1012,6 +1012,36 @@ it absent is the only honest state until review happens somewhere the pipeline
 cannot write — which since the Fact 27 repair is `reviews/<task_id>.json`, a
 path the pipeline reads and does not write.
 
+**What a reviewer actually reads is now assembled, and the reading is on the
+record as of 2026-09-19.** `tools/docket.py` joins the three readings that were
+scattered — the per-law mutant kill counts from `tools.validate`, the `anchors`
+and `general` flags from `tools.screens`, and the reference duration — into one
+block per task, with a SHORTLIST at the bottom naming the tasks that have any
+finding, most first. It applies no V4 budget, because latency is a property of
+the episode and not of the laws and the concurrency that makes the command
+usable would inflate the number it was judging; it writes nothing, which is the
+one invariant `tests/test_docket.py` asserts, because a record appearing under
+`reviews/` while this ran would be Fact 27's forgery arriving through a side
+door. Over the **39 tasks at tier 3 or above**: **176 laws, no law with a
+zero-kill count (min 1), no `anchors` flag on any task, and two `general` flags
+— `t4-bst-insert`'s `ins_at` and `t3-merge-len`'s `merge_go` — both of which are
+the screen's documented false positive rather than a hole.** `ins_at`'s three
+laws are one per constructor of its finite type (`Tip{}`, `Bin` with `True{}`
+and `False{}`), which is a definition written out and not an unpinned interior;
+`merge_go` is Fact 49's case, where the constraint arrives through the target's
+own definition and no reading of the law set alone can see it. Every one of the
+39 carries at least four strong mutants, so no task here is guarded by a corpus
+that only just type-checks.
+
+What that does and does not settle: it closes the *derivable* half of the review
+— the shapes a machine can point at — and it is the first reading of this bank
+that says the tier-3+ law sets are clean by every one of them. It does not move
+the checkpoint. M4's "human-reviewed laws for tier ≥ 3" still reads **0 of 39**,
+and the docket is the input to a record rather than the record: the half that
+remains is the half no screen can do, which is reading the laws for whether they
+*determine* the function rather than whether they name it — the question Fact 49
+and Fact 51 are both instances of.
+
 Tier 5's two canonical examples in SPEC §10 (`you_cant_win`, a ledger summing
 to zero) are not in the vendored tree: `toolchain/2.0.5/bend2/` is `main.ts`,
 `bend.ts`, `comp.ts`, `base.bend` and `effs/`, with no `demos/`. Tier 5

@@ -61,6 +61,8 @@ uv run gavel check t1-add-plus --solution my.bend --proof my-proof.bend
 uv run gavel validate                     # V1-V5 over the whole bank
 uv run gavel bench -n 10                  # check latency distribution
 uv run python -m tools.mutate --check     # author mutants and see which are strong
+uv run python -m tools.screens anchors    # the static readings, per task
+uv run python -m tools.docket             # one review block per tier 3+ task
 uv run python -m tools.calibrate --dry-run
 uv run python -m tools.sandbox_check      # prove the sandbox runs a real check
 uv run python -m tools.migrate --from ~/.bend/app/2.0.4/rRKuW7 --label 2.0.4
@@ -72,10 +74,13 @@ bun run examples/client.ts                # a non-Python client
 ## Authoring a task
 
 `tools/author.py` runs the stages in `PLAN.md` §M2 in order — files, derive,
-V1–V5, episode, review, publish — and refuses to carry a task past one it has
-not passed. Translating a module and inventing the laws stay human (or agent)
-work; everything after that is a measurement, so it is a gate rather than a
-maxim.
+screens, mutants, V1–V5, episode, review, publish — and refuses to carry a task
+past one it has not passed. The `screens` stage refuses the two shapes where
+nothing constrains a target at all (a target named only inside a premise; a
+target no law names), because a refusal there costs a two-line law fix while the
+same defect found after a corpus is written against it costs the corpus too.
+Translating a module and inventing the laws stay human (or agent) work;
+everything after that is a measurement, so it is a gate rather than a maxim.
 
 A tier ≥ 3 task stops at the review checkpoint, and **the pipeline cannot clear
 it**. The record lives at `reviews/<task_id>.json`, beside the manifest and
