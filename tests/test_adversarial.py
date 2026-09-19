@@ -179,6 +179,13 @@ CASES: dict[str, Case] = {
         SOLUTION_FILE, ACCEPT,
         "the stub itself: a hole is not a forbidden construct, it is a "
         "submission that has not been written yet"),
+    # --- what the lexer cannot read ---------------------------------------------
+    "an_unterminated_string_literal": Case(
+        SOLUTION_FILE, REJECT,
+        "the gate's lexer stops at an unterminated literal; the file is refused "
+        "as unparsable rather than raising out of the check and losing the turn"),
+    "an_unterminated_char_literal": Case(
+        PROOF_FILE, REJECT, "the same rule for a character literal"),
     # --- the file set ----------------------------------------------------------
     "the_laws_file_submitted_back": Case(
         LAWS_FILE, REJECT,

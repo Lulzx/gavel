@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from .hashing import sha256_text
 from .laws import (ImportSpec, alias_map, has_foreign_import, parse_imports,
                    split_top_level)
+from .lexer import LexError, tokenize
 from .tasks import (HASH_KEYS, LAWS_FILE, PRELUDE_FILE, PROOF_FILE,
                     SOLUTION_FILE, Task)
 from .verdict import GateFinding, GateResult
@@ -96,10 +97,18 @@ def _integrity(task: Task) -> list[GateFinding]:
 def _scan(task: Task, name: str, src: str, policy: GatePolicy) -> list[GateFinding]:
     findings: list[GateFinding] = []
 
+    # Tokenize once, up front. ``split_top_level`` swallows a lexer error and
+    # returns nothing, which would let a file with an unterminated literal
+    # through every scan below unexamined, and ``parse_imports`` does not
+    # swallow it, which used to raise out of the gate and lose the turn. A
+    # file the lexer cannot read is refused here, as a finding, before either.
     try:
-        chunks = split_top_level(src)
-    except Exception as exc:  # a malformed file is the checker's to reject
-        return [GateFinding("unparsable", f"{name} could not be tokenized: {exc}", name)]
+        tokenize(src)
+    except LexError as exc:
+        return [policy.finding(
+            "unparsable", f"{name} could not be tokenized: {exc.message}",
+            name, exc.line)]
+    chunks = split_top_level(src)
 
     for chunk in chunks:
         if chunk.unsafe:

@@ -183,3 +183,15 @@ def test_the_gate_reports_every_finding_not_just_the_first(task, submission):
     assert "unsafe" in found
     assert "main" in found
     assert "law" in found
+
+
+def test_an_unterminated_literal_is_a_finding_not_an_exception(task):
+    """A stray quote used to raise LexError out of the gate, through
+    check_submission and out of env.step, consuming the turn with no verdict."""
+    files = {SOLUTION_FILE: task.stub_src + '\ndef Policy.z() -> String:\n  "abc\n',
+             PROOF_FILE: task.proof_header + "\n"}
+    result = check(task, files)
+    assert not result.ok
+    assert result.codes == ("unparsable",)
+    assert result.findings[0].file == SOLUTION_FILE
+    assert result.findings[0].line == 0 or result.findings[0].line > 1
