@@ -439,6 +439,13 @@
       "hash": "8ed9ee786eab423f5d8e81e195e078e195d8021a95509154a4072bae09e3d0aa"
     },
     {
+      "task_id": "t2-fact-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-fact-laws",
+      "reference": "references/t2-fact-laws",
+      "hash": "c363c92d87918c819aa418e71185220b3faaa6017af150f5b9f4655eef77811f"
+    },
+    {
       "task_id": "t2-fib-pair-sum-laws",
       "tier": 2,
       "path": "tasks/2/t2-fib-pair-sum-laws",

@@ -6,12 +6,14 @@ They are ported here verbatim, with `ROOT` resolved from this file instead of
 hardcoded, so PLAN.md's readings can be reproduced.
 
     uv run python -m tools.screens positions [task-id ...]
-    uv run python -m tools.screens general   [task-id ...]
-    uv run python -m tools.screens batch     <task-id> ...
+    uv run python -m tools.screens general   [manifest.json] [task-id ...]
+    uv run python -m tools.screens batch     [manifest.json] <task-id> ...
 
-`positions` and `general` read the bank; `batch` reads the unpublished batch,
-which it locates through the `manifest.scratch.*.json` files in the repo root,
-or through a manifest path given as `batch`'s first argument.
+`positions` reads the task directories directly, so it sees a task before it is
+registered. `general` and `batch` read `manifest.json` by default and take a
+manifest path as a first argument otherwise; `batch` will also fall back to the
+`manifest.scratch.*.json` files in the repo root, which are untracked and so
+absent from a fresh clone.
 
 None of the three runs the checker, so none of them can tell you whether a body
 escapes a law set. They flag *room* -- a law set that names a target at a point
@@ -210,7 +212,7 @@ def lhs_calls(goal):
     return out
 
 
-def general(ids):
+def general(ids, manifest_path=None):
     """Position-wise screening cannot see the t2-chunks-laws shape: `chunks`
     arg0 was observed open by `chunks_zero` and arg1 open by `chunks_nil`, so no
     cell flagged, while *no single law* reached the recursive branch with every
@@ -231,7 +233,8 @@ def general(ids):
         generally.
     Read the printout; do not treat a flag as a hole.
     """
-    man = json.loads((ROOT / "manifest.json").read_text())
+    man = json.loads(Path(manifest_path).read_text() if manifest_path
+                     else (ROOT / "manifest.json").read_text())
     rows = [t for t in man["tasks"] if not ids or t["task_id"] in ids]
     flagged = 0
     for t in rows:
@@ -330,13 +333,13 @@ def main(argv):
         print(__doc__)
         return 2
     which, ids = argv[0], argv[1:]
-    if which == "batch":
-        manifest_path = ids.pop(0) if ids and ids[0].endswith(".json") else None
-        if not ids:
-            print("batch needs at least one task id")
-            return 2
-        return batch(ids, manifest_path)
-    return {"positions": positions, "general": general}[which](ids)
+    if which == "positions":
+        return positions(ids)
+    manifest_path = ids.pop(0) if ids and ids[0].endswith(".json") else None
+    if which == "batch" and not ids:
+        print("batch needs at least one task id")
+        return 2
+    return {"general": general, "batch": batch}[which](ids, manifest_path)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,35 @@
+{
+  "task_id": "t2-fact-laws",
+  "tier": 2,
+  "title": "factorials, and a map that preserves length",
+  "difficulty_weight": 2.0,
+  "source": {
+    "benchmark": "custom",
+    "origin": "Nat arithmetic and lists"
+  },
+  "tags": [
+    "nat",
+    "factorial",
+    "list",
+    "map",
+    "induction"
+  ],
+  "laws": [
+    "fact_zero",
+    "fact_succ",
+    "facts_nil",
+    "facts_cons",
+    "facts_len"
+  ],
+  "policy_targets": [
+    "fact",
+    "facts"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "2928a1d4bb02d2e320b4c94b3a482a64c7f8ad843ed8d7bbb8dcc1b0f248ef99",
+    "prelude": "6f0e897d2c3b6abbc43042b995ffe3b4e79a5f2855c15cddaed7dbf6bb983e4b"
+  },
+  "bend_version": "2.0.5"
+}
