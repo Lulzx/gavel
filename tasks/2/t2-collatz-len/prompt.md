@@ -46,7 +46,7 @@ take a step case and the two sides are left with the same step term. A body that
 recursed at the same number, or that took the odd branch for even numbers, or
 that forgot to count, is separated here.
 
-`collatz_len_six` and `collatz_len_twentyseven` are the closed values. The laws
+`collatz_len_six` and `collatz_len_fifteen` are the closed values. The laws
 above fix the recurrence and the two answers it stops at; these fix what the
 recurrence is a recurrence *of*, on two numbers whose paths are known, and state
 the walk at a budget it does not exhaust.
@@ -54,4 +54,4 @@ the walk at a budget it does not exhaust.
 Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
 `def L.collatz_len_no_fuel(n)`, `def L.collatz_len_zero(f)`,
 `def L.collatz_len_one(f)`, `def L.collatz_len_step(f, p)`,
-`def L.collatz_len_six()` and `def L.collatz_len_twentyseven()`.
+`def L.collatz_len_six()` and `def L.collatz_len_fifteen()`.

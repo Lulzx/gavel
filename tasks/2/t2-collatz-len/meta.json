@@ -7,7 +7,7 @@
     "collatz_len_one",
     "collatz_len_step",
     "collatz_len_six",
-    "collatz_len_twentyseven"
+    "collatz_len_fifteen"
   ],
   "policy_targets": [
     "collatz_len"
@@ -15,7 +15,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "5d33dc3ba7a6790814b2bb4e1ab78acbf66dd342e88081dba8e2e2e6bd962e46",
+    "laws": "6c9f3b78b130e1dcc2d308722552f994747c4342bc4ad4686e86935be642491b",
     "prelude": "dfa753f148a2269717bdbae66ed67f3cd21865cecc10775004d9ad911a2dfa55"
   },
   "bend_version": "2.0.5"

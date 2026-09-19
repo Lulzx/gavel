@@ -13,7 +13,7 @@ import ./prelude.bend as P
 # untouched.
 #
 # Measured 2026-09-19 against this task's law set: tier 3, failing
-# `collatz_len_one`, `collatz_len_six`, `collatz_len_twentyseven`.
+# `collatz_len_one`, `collatz_len_six`, `collatz_len_fifteen`.
 def collatz_len(fuel: Nat, +n: Nat) -> Nat:
   match fuel:
     case 0n:

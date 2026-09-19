@@ -48,7 +48,12 @@ law collatz_len_step:
 law collatz_len_six:
   {S.collatz_len(30n, 6n) == 8n : Nat}
 
-# LAW: a longer closed walk. `27n` is the smallest number whose Collatz path is
-# long, and it reaches `1n` in `111n` steps.
-law collatz_len_twentyseven:
-  {S.collatz_len(200n, 27n) == 111n : Nat}
+# LAW: a longer closed walk. `15n` climbs to `160n` before it comes down and
+# reaches `1n` in `17n` steps, all of which `30n` of budget pays for -- more than
+# twice `6n`'s walk, and the odd branch is taken at `15n`, `23n`, `35n`, `53n`
+# and `5n` along the way. It is deliberately not the *longest* small walk: a
+# closed law whose reduction runs for a hundred steps is cheap to write and
+# expensive to check, and V4's budget is a property of the machine the bank is
+# validated on rather than of the law.
+law collatz_len_fifteen:
+  {S.collatz_len(30n, 15n) == 17n : Nat}

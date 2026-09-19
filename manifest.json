@@ -366,7 +366,7 @@
       "tier": 2,
       "path": "tasks/2/t2-collatz-len",
       "reference": "references/t2-collatz-len",
-      "hash": "5b6ea404c1587b15d02f490c7ea8ce207d453d0e5ddd8a10808c468df650f76a"
+      "hash": "018f19a0fcb5e4fa9be9006125481ef715bb34f15262712bb7bac28cf48a16ab"
     },
     {
       "task_id": "t2-concat-map",

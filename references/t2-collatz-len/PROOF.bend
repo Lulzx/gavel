@@ -41,9 +41,10 @@ def L.collatz_len_step(f, p):
 def L.collatz_len_six():
   {==}
 
-# The same computation over a longer closed walk: `27n` climbs above `9000n`
-# before it comes down, and reaches `1n` after `111n` steps, all of which `200n`
-# of budget pays for. Every value on the way is closed, so the parity test, the
-# halving and the `3n*n + 1n` branch all reduce.
-def L.collatz_len_twentyseven():
+# The same computation over a longer closed walk: `15n` climbs to `160n` before
+# it comes down, and reaches `1n` after `17n` steps, all of which `30n` of
+# budget pays for. Every value on the way is closed, so the parity test, the
+# halving and the `3n*n + 1n` branch all reduce. Kept short on purpose: a
+# hundred-step walk reads the same here and costs V4 a multiple of the budget.
+def L.collatz_len_fifteen():
   {==}

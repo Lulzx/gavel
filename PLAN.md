@@ -507,7 +507,7 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     **Published, and this time the whole bank was re-measured rather than the batch.** `tools.publish` over the ten named directories takes the manifest **195 → 205**, a pure append — nothing removed, no existing entry's fields changed — and `meta["hashes"]` is fresh on all 205 (**0 stale**), the four-line check Fact 58 ran. The bank then reads **205/205 valid over 4,451 checker runs**, **735 laws at mean 3.86 kills and min 1**, **2,193 mutants of which 1,191 are strong**, **no law with a zero-kill count and no mutant at tier 4** — the same shape the 195-task reading had, moved by exactly the batch (689 → 735 laws, 2,088 → 2,193 mutants, mean 3.92 → 3.86). The reference latency is **70–191 ms, median 78**, but like Fact 57's bank-wide figure that one was taken under contention — `pytest` ran against the same tree for the first three and a half minutes of it — so it is a number about the box and not the one to quote. The brief's census is refreshed to what the registered bank now holds: **205 tasks, 689 distinct law names, 340 distinct def names, 205 distinct policy targets**, with the prescribed greps printing **695** and **342** because `tasks/*/*/LAWS.bend` also matches the held `t3-swap-sum-pair` (6 laws, 2 defs), and the eleven new target names are added to the brief's list of taken functions. `uv run pytest` is **439 passed**. M2 item 2's 200-task exit is met at **202 of 205 at tiers 1–4** (29 tier 1, 137 tier 2, 31 tier 3, 5 tier 4, and the 3 tier-5 tasks outside the count), against the 192 the previous reading carried.
 
-**Ten more tier-2 tasks, and the round was opened by reading functions rather
+60. **Ten more tier-2 tasks, and the round was opened by reading functions rather
 than names.** Two agents authored five each: `same_shape`, `lex_le`, `path_sum`,
 `max_prefix_sum`/`max_prefix_sum_go`, `run_starts`/`run_starts_go` from one, and
 `replace_at`, `indices_of`, `argmax`/`argmax_go`, `distinct`/`distinct_go`,
@@ -523,56 +523,62 @@ where `index_of` returns the first, `path_sum` weights a tree by the leaves
 beneath a key where `tree_level_sum` weights it by depth, and `lex_le` and
 `same_shape` are the bank's first two-list and two-tree Booleans.
 
-**Verified independently, and against the agents' own reports rather than from
-them.** All ten: `tools.author` reaches `publish` — which is the *episode* stage,
-so the reference is tier 4 at reward 1.000 through `GavelEnv` and not only
-through the checker; `valid` is true with `problems` empty; the four screens are
-clean (`batch` 10/10, `anchors` 0, `general` 0, `positions` 0 of the ten's cells
-— the one flagged cell in the whole bank is `t1-clamp-laws`, pre-existing); **no
-law has a zero-kill count, against a minimum of 1**; and all ten escape probes
-sit in `mutant_strong`, which is "type-checks and fails at least one law" and so
-is tier 3 rather than tier 4. The corpora are 122 mutants of which 57 are strong.
-Every law set was also read by eye, which is the one check no stage performs:
-each mixes a ground or constructor-headed anchor (`same_shape(P.Leaf{v},
-P.Leaf{w}) == True{}`, `max_prefix_sum(Nil{}) == 0n`, `replace_at(0n, h <> t, y)
-== y <> t`) with a structural step law, so each is a complete system of
-recursion equations and the "no absolute anchor" hole is *unavailable* rather
-than merely unflagged. Both designs the brief flagged as hardest — a two-tree
-Boolean and a two-list comparison — landed tier 2 with no shape change, and
-neither agent needed its fallback.
+    **Verified independently, and against the agents' own reports rather than from
+    them.** All ten: `tools.author` reaches `publish` — which is the *episode* stage,
+    so the reference is tier 4 at reward 1.000 through `GavelEnv` and not only
+    through the checker; `valid` is true with `problems` empty; the four screens are
+    clean (`batch` 10/10, `anchors` 0, `general` 0, `positions` 0 of the ten's cells
+    — the one flagged cell in the whole bank is `t1-clamp-laws`, pre-existing); **no
+    law has a zero-kill count, against a minimum of 1**; and all ten escape probes
+    sit in `mutant_strong`, which is "type-checks and fails at least one law" and so
+    is tier 3 rather than tier 4. The corpora are 122 mutants of which 57 are strong.
+    Every law set was also read by eye, which is the one check no stage performs:
+    each mixes a ground or constructor-headed anchor (`same_shape(P.Leaf{v},
+    P.Leaf{w}) == True{}`, `max_prefix_sum(Nil{}) == 0n`, `replace_at(0n, h <> t, y)
+    == y <> t`) with a structural step law, so each is a complete system of
+    recursion equations and the "no absolute anchor" hole is *unavailable* rather
+    than merely unflagged. Both designs the brief flagged as hardest — a two-tree
+    Boolean and a two-list comparison — landed tier 2 with no shape change, and
+    neither agent needed its fallback.
 
-**Three checker facts came out of the round and went into memory rather than
-into a repair.** `author-g1` found that a `+`-marked cons binder cannot be a
-`match` scrutinee — the checker's words are "match scrutinees in binder order
-(this variable is unbound, consumed, or out of order)" — so no body can single
-out a one-element tail, which is why `count_inv_single` and `best_gain_single`
-have no solo killer and why that absence is a limit of the corpus rather than
-evidence of a weak law. `author-g2` found that a closed law at a large literal
-does not fail but **times out**: `Nat.divmod.go` steps once per unit of the
-dividend, so `t2-digit-sum`'s first anchor, written at `987654321n`, hung at
-10.6 s and read as a verdict; every closed law in it was rewritten small (`123n`,
-`1000n`) with the budget moved into a width binder. And `tools.author` **skips**
-the corpus generator when `mutants/*.bend` already exists — the mirror of
-`tools.mutate` deleting it — so a task that wants both sets has to generate
-first and write the hand files second.
+    **Three checker facts came out of the round and went into memory rather than
+    into a repair.** `author-g1` found that a `+`-marked cons binder cannot be a
+    `match` scrutinee — the checker's words are "match scrutinees in binder order
+    (this variable is unbound, consumed, or out of order)" — so no body can single
+    out a one-element tail, which is why `count_inv_single` and `best_gain_single`
+    have no solo killer and why that absence is a limit of the corpus rather than
+    evidence of a weak law. `author-g2` found that a closed law at a large literal
+    does not fail but **times out**: `Nat.divmod.go` steps once per unit of the
+    dividend, so `t2-digit-sum`'s first anchor, written at `987654321n`, hung at
+    10.6 s and read as a verdict; every closed law in it was rewritten small (`123n`,
+    `1000n`) with the budget moved into a width binder. And `tools.author` **skips**
+    the corpus generator when `mutants/*.bend` already exists — the mirror of
+    `tools.mutate` deleting it — so a task that wants both sets has to generate
+    first and write the hand files second.
 
-**Published.** `tools.publish` — bare, and byte-identical to the manifest it
-replaced, which is the CI in-sync step — takes the manifest **205 → 215**, a pure
-append: nothing removed, no existing entry's fields changed, and `meta["hashes"]`
-fresh on all 215 (**0 stale**, the four-line check Fact 58 ran). The whole bank
-was then re-measured rather than the batch: **215/215 valid over 4,689 checker
-runs, no problems, no law with a zero-kill count (791 laws, mean 3.77, min 1),
-2,315 mutants of which 1,248 are strong and none reads tier 4** — the same shape
-the 205-task reading had, moved by exactly this batch, since 735 → 791 laws is
-the ten tasks' 56 and 2,193 → 2,315 mutants is their 122. The reference latency
-is **68–186 ms, median 77**, taken serially but with `pytest` running against the
-same tree for its first three and a half minutes, so like every bank-wide reading
-here it is good for validity and is a number about the box. The brief's census is
-refreshed to **215 tasks, 745 distinct law names, 364 distinct def names, 219
-distinct policy targets**, its prescribed greps now printing **751 / 366**, and
-the fourteen new target names are appended to its list of taken functions.
-`uv run pytest` is **439 passed**. M2 item 2's 200-task exit is met at **212 of
-215 at tiers 1–4**.
+    **Published.** `tools.publish` — bare, and byte-identical to the manifest it
+    replaced, which is the CI in-sync step — takes the manifest **205 → 215**, a pure
+    append: nothing removed, no existing entry's fields changed, and `meta["hashes"]`
+    fresh on all 215 (**0 stale**, the four-line check Fact 58 ran). The whole bank
+    was then re-measured rather than the batch: **215/215 valid over 4,689 checker
+    runs, no problems, no law with a zero-kill count (791 laws, mean 3.77, min 1),
+    2,315 mutants of which 1,248 are strong and none reads tier 4** — the same shape
+    the 205-task reading had, moved by exactly this batch, since 735 → 791 laws is
+    the ten tasks' 56 and 2,193 → 2,315 mutants is their 122. The reference latency
+    is **68–186 ms, median 77**, taken serially but with `pytest` running against the
+    same tree for its first three and a half minutes, so like every bank-wide reading
+    here it is good for validity and is a number about the box. The brief's census is
+    refreshed to **215 tasks, 745 distinct law names, 364 distinct def names, 219
+    distinct policy targets**, its prescribed greps now printing **751 / 366**, and
+    the fourteen new target names are appended to its list of taken functions.
+    `uv run pytest` is **439 passed**. M2 item 2's 200-task exit is met at **212 of
+    215 at tiers 1–4**.
+
+61. **A task validated green locally and failed in CI, and the reason is that V4's budget is a property of the machine rather than of the law.** The CI job for the publish above read **`204/205 valid`** where the same command on the authoring box read 205 of 205, the single failure being `[FAIL] t2-collatz-len tier 2 5157ms 24 check(s) V4: the reference's slowest run took 5157ms, over the 2000ms budget`. Nothing about the *task* was wrong: it type-checked, proved all six laws, and killed every law in its corpus. What was wrong was the **cost of one law**, and cost is the one property no stage here measures against the box the bank will be validated on. The runner's own median is **725 ms** against the authoring box's **77 ms** — a factor of about nine — but the failing law scaled by **28×**, from 186 ms to 5157 ms, because its reduction is long rather than merely wide: it was `collatz_len_twentyseven`, a closed walk stated as `S.collatz_len(200n, 27n) == 111n`, which forces **111** steps of the Collatz map through `Nat.divmod.go`, and that function steps once per unit of its dividend. The next Fact-60 mistake to avoid is therefore not a weak law but an *expensive* one, and the two look identical in a law file: both are a single closed equation.
+
+    **The repair is a swap that keeps the law's job and cuts its length.** `collatz_len_fifteen` states `S.collatz_len(30n, 15n) == 17n` — the same shape (a closed number walked end to end, at a budget it does not exhaust, on a path whose arrows are known), over **17** steps rather than 111, with the odd branch still taken five times along the way. The reference check dropped from **186 ms to 78 ms**, in line with the bank median, so 2000 ms now has an order of magnitude of headroom where it had a third of none. Every law in the task still has a killer — `collatz_len_fifteen` is failed by **5** mutants — and the bank's census is unmoved at **215 tasks, 745 law names, 364 def names, 219 targets**, since a name was replaced rather than added. The law's comment now carries the reason rather than only the arithmetic: a hundred-step closed law is cheap to write and expensive to check, and V4's budget is a fact about the validating machine.
+
+    **One ordering consequence is worth recording because it recurred.** Changing a law's *name* changes the file the law lives in, so `meta["hashes"]` goes stale the moment the edit lands, and the gate then answers **tier 0** with `t2-collatz-len/LAWS.bend does not match its recorded hash` and `'L.collatz_len_fifteen' is not a name this submission may declare` — Fact 49's rule, met again on a one-line edit. Re-running `tools.author` through every stage is what refreshes the hash, and only after it does a timing mean anything. The general lesson for a bank whose CI is the only place the budget is real: **a green local validation is not a green build**, and the class it is blind to is exactly the class this task belonged to — a law correct, well-anchored, and simply too slow for the box.
 
 
 ## 1. Deviations from SPEC.md
