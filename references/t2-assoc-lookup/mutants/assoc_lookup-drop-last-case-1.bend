@@ -1,0 +1,7 @@
+import Base
+import ./prelude.bend as P
+
+def assoc_lookup(kvs: List<&2, P.Entry>, +k: Nat) -> Nat:
+  match kvs:
+    case Nil{}:
+      0n

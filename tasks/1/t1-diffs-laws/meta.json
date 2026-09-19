@@ -1,0 +1,20 @@
+{
+  "task_id": "t1-diffs-laws",
+  "tier": 1,
+  "laws": [
+    "diffs_nil",
+    "diffs_single",
+    "diffs_cons",
+    "diffs_len"
+  ],
+  "policy_targets": [
+    "diffs"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "11cf4f79e6a88f1d6808f666461d15333be3d9e4e78292fc3415387721be9c8b",
+    "prelude": "af867c1e1a730a27e43f238f4430001b3048616395665d589be6bd565b77cce9"
+  },
+  "bend_version": "2.0.5"
+}

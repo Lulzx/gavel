@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-pairs-laws",
+  "tier": 2,
+  "laws": [
+    "pairs_nil",
+    "pairs_single",
+    "pairs_cons",
+    "pairs_len"
+  ],
+  "policy_targets": [
+    "pairs"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "42b490556750425da4c036217c5edc0b33b9d252c104ec9eb79b46dfdaf80ac5",
+    "prelude": "74b45fba7ff5dfb1f44e110a6f241131ae981938c3a3fa5bb2884ab1fa57dfab"
+  },
+  "bend_version": "2.0.5"
+}

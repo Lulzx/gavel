@@ -1,0 +1,19 @@
+{
+  "task_id": "t1-take-while",
+  "tier": 1,
+  "laws": [
+    "take_while_nil",
+    "take_while_keep",
+    "take_while_stop"
+  ],
+  "policy_targets": [
+    "take_while"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "e29da560bfe26a5ec6d3dd0c4a747e9705ef263d4c0ddcee2ca4edd676c6c0c9",
+    "prelude": "f813eb442b3a29b0d65781f084d6682fd025388a4c838277c6a9de36a2d10dd8"
+  },
+  "bend_version": "2.0.5"
+}

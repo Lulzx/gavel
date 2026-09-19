@@ -1,0 +1,23 @@
+{
+  "task_id": "t3-swap-sum-pair",
+  "tier": 3,
+  "laws": [
+    "swap_each_nil",
+    "swap_each_cons",
+    "sum_pair_nil",
+    "sum_pair_cons",
+    "swap_each_swap_each",
+    "sum_pair_swap_each"
+  ],
+  "policy_targets": [
+    "swap_each",
+    "sum_pair"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "baaab67300a8f9bf0ad3bc8eecd9ce2cf60a8f40bb5a6d79711ea39d8f4a4925",
+    "prelude": "8602a648bb88015cf65ced5ae2324c6dea77ed73d62bb8dac7ab091bf06ed8d7"
+  },
+  "bend_version": "2.0.5"
+}

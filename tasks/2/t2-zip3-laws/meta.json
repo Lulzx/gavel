@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-zip3-laws",
+  "tier": 2,
+  "laws": [
+    "zip3_nil_left",
+    "zip3_nil_mid",
+    "zip3_nil_right",
+    "zip3_len",
+    "zip3_cons"
+  ],
+  "policy_targets": [
+    "zip3"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "bd1b3de534f80c35e042941d9babfaf7b38f3799ec615cc2ff8327f05ef2ed45",
+    "prelude": "dabf663e563651b935ad8c63ae3b6e21c0c57794b6f56414b1e96701def50a3f"
+  },
+  "bend_version": "2.0.5"
+}

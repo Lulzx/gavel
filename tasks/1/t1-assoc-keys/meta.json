@@ -1,0 +1,22 @@
+{
+  "task_id": "t1-assoc-keys",
+  "tier": 1,
+  "laws": [
+    "put_cons",
+    "keys_nil",
+    "keys_cons",
+    "keys_put",
+    "keys_len"
+  ],
+  "policy_targets": [
+    "assoc_put",
+    "keys"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "c0d76e7e94b2c0308cfc19bb9eb712febb92de9df1934334cdb2d0bf97c9b37d",
+    "prelude": "085f0cf9646280db28b3f50d89e33086cbec5b1259225487c85ef76f85300c13"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,19 @@
+{
+  "task_id": "t1-drop-while",
+  "tier": 1,
+  "laws": [
+    "drop_while_nil",
+    "drop_while_keep",
+    "drop_while_stop"
+  ],
+  "policy_targets": [
+    "drop_while"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "2602246187d0c4ab08a994ff5a887f2446302808dfeca7ba261ebf43a0f5acae",
+    "prelude": "1750b1236f0daa6e36d78a9826c6b88e96feedec409d947c95e0e25495cc8a65"
+  },
+  "bend_version": "2.0.5"
+}

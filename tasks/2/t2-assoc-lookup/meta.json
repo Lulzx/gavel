@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-assoc-lookup",
+  "tier": 2,
+  "laws": [
+    "lookup_nil",
+    "lookup_cons",
+    "lookup_hit",
+    "lookup_skip"
+  ],
+  "policy_targets": [
+    "assoc_lookup"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "b20ac780a97abf880ea95b9d0ca6c421dccb4b3a7f3d6fcdc20e7f0d48540dbb",
+    "prelude": "749504d5071463248d232e988f2f2f18560627ba20004adfdf0c2b828f554103"
+  },
+  "bend_version": "2.0.5"
+}

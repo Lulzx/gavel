@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-longest-row",
+  "tier": 2,
+  "laws": [
+    "map_len_nil",
+    "map_len_cons",
+    "longest_row_nil",
+    "longest_row_cons",
+    "longest_row_map_len"
+  ],
+  "policy_targets": [
+    "map_len",
+    "longest_row"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "0ca1ad56b28b63f6ae85dcbcf724de70a87c07a6b908e3eec58e1f51085462c7",
+    "prelude": "ba002324981818ceae32389bd0c778caacc9420ee737d7a62cd79e5129b81f12"
+  },
+  "bend_version": "2.0.5"
+}

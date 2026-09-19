@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-assoc-update",
+  "tier": 2,
+  "laws": [
+    "update_nil",
+    "update_cons",
+    "update_hit",
+    "update_skip"
+  ],
+  "policy_targets": [
+    "assoc_update"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "f56ef4914e82d151fc2376989dceb986cc63313d4d6ed324ff12d136acc6bc63",
+    "prelude": "48878f03e626781c97ee1f012641fdb88b6b818ff5b4a8f85ac326ef70c9d195"
+  },
+  "bend_version": "2.0.5"
+}

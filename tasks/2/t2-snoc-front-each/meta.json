@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-snoc-front-each",
+  "tier": 2,
+  "laws": [
+    "snoc_each_nil",
+    "snoc_each_cons",
+    "front_each_nil",
+    "front_each_cons",
+    "snoc_front_commute"
+  ],
+  "policy_targets": [
+    "snoc_each",
+    "front_each"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "9c9be97deb3b7c28f68a957243619d1ad3f1d457cc9a525c0eb7ebab68d679c4",
+    "prelude": "18f611fb015e2719a7fd472837cd63256c47683d32e6fa40b087c9b12830fb01"
+  },
+  "bend_version": "2.0.5"
+}

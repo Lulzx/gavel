@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-scan-add-laws",
+  "tier": 2,
+  "laws": [
+    "scan_add_nil",
+    "scan_add_single",
+    "scan_add_append"
+  ],
+  "policy_targets": [
+    "scan_add"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "f46a8c2da139e82cb8ef3c8364c411c014fe06a8daadef73c941854ed71098a7",
+    "prelude": "66d3fe1af10eb37e324c400f9a19080e98cf3b552a6ad834fe0a3a016c785fae"
+  },
+  "bend_version": "2.0.5"
+}

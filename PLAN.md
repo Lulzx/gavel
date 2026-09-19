@@ -328,6 +328,22 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     `t4-inorder-transport` carries no review record, and its forged-record state is unchanged — this repair added none and deleted none.
 
+42. **Seventeen new tasks went in with 32 escape probes written against them, and none escaped — which is a statement about the probes as much as about the tasks.** The batch is six tier-1 tasks (`t1-assoc-keys`, `t1-assoc-values`, `t1-count-while`, `t1-diffs-laws`, `t1-drop-while`, `t1-take-while`) and eleven tier-2 ones (`t2-assoc-count-key`, `t2-assoc-lookup`, `t2-assoc-update`, `t2-chunk-two-join-two`, `t2-count-up-down`, `t2-pairs-laws`, `t2-partition-below`, `t2-run-max-laws`, `t2-scan-add-laws`, `t2-span-below`, `t2-zip3-laws`), authored by four parallel agents against the brief in `/tmp/gavel-authoring-brief.md`. Every one was re-run through `tools/author.py` by me after the agent reported it, and all seventeen reached exit 0 with no stage refused; the batch adds 73 law names with no collision against the bank's 315 and none inside itself, no stub ships its reference, and every declared target is named by at least one law.
+
+    **The probe is the reference proof against a degenerate body, and the reading is the tier rather than the reward.** Every probe body is the reference `solution.bend` with one substitution, or a solution-local `Policy.*` step with one branch changed, so the signature and the linearity sigils always match; the proof is the task's own reference `PROOF.bend` unchanged. A law set that proves all of its laws for such a body is a hole, and none of the 32 did. Two instrument errors turned up on the way and both are worth the line. First, **a shape rejection is not a kill**: three of my first probes read `tier 1` with `expected : Data / observed : Type` at the definition, which is the checker refusing the *body I wrote*, and it took a corrected binding — `+h` for a head used twice — before the probe measured a law at all. Second, **the reward field is not the reading**: `t1-take-while`'s "take nothing" body read `tier 3, proven 1 of 3` and `reward 0.000`, because SPEC 7.4.2's incident path (`gavel/check.py:_mutant_incident`) zeroes the reward when a submission is byte-identical to a shipped mutant — the corpus had independently generated the same degeneracy. The tier and the failed-law list are the measurement; the reward can be zero for a reason that is the bank working.
+
+    **What the batch is, in the shape §3.9 already records.** Seventeen law sets over ten things a policy learns. `count_while`/`drop_while`/`take_while` are one template — a predicate-driven left walk with `nil`, `keep` and `stop` laws differing only in which of the two `keep_put`/`drop_put`/`count_put` helpers the prelude supplies. `partition_below`/`span_below` are one template over `PairL`, differing in the stop branch. `run_max`/`scan_add` are one template — a scan whose inductive law carries a `_after` helper for the accumulator. `diffs`/`pairs` are one template (adjacent *overlapping* pairs, one extracting a difference and one packaging), while `chunk_two` is the *disjoint* pairing and its inverse `join_two`, which is why it carries the round-trip law `chunk_two(join_two(ps)) == ps` that the other two cannot state. The five `assoc_*` tasks split three ways: `keys`/`values` are projections with the same four-law skeleton, `count_key`/`assoc_lookup` share `key_select`, and `assoc_update` is its own. `count_up_down` and `zip3` are each alone. That is the same discount §3.9 applies to the arithmetic family, and it is recorded here for the same reason: seventeen tasks is not seventeen lessons.
+
+    **The probes did find the shape boundaries, and each one is the law the comments claim kills it.** `cw-count-everything` (a count that never consults the threshold) is killed by `count_while_stop`; `dw-drop-nothing` and `tw-keep-everything` by their `stop` law with the *other* branch proved; `rm-no-running-state` (a map that never threads the maximum) by `run_max_append` alone; `z3-ignores-zs` by `zip3_cons` alone, with `zip3_len` proved — a body that consumes one element from each list has the right length and the wrong contents, which is why that set carries both. `ak-put-noop` (an `assoc_put` that returns its list) is killed only by `put_cons` and `keys_put` and survives `keys_cons` and `keys_len`, so the `put` law is load-bearing rather than decorative. `cu-cons-not-snoc` (a `count_up` that conses where the law says `snoc`) is killed by `count_up_succ` and `len_count_up`, which is the reading that rules out the suspicion that `1n + k` in that law's left-hand side is stuck and the law vacuous: a vacuous law cannot kill a body.
+
+43. **Three more tasks went in, and all six of their base-case laws had no mutant evidence — while every stage passed and the bank validated.** The three are `t2-longest-row` (`map_len`, `longest_row`), `t2-snoc-front-each` (`snoc_each`, `front_each`) and `t3-swap-sum-pair` (`swap_each`, `sum_pair`), left in the working tree by an authoring agent with generated-only mutant corpora of 8, 13 and 8 files. All three were re-run through `tools/author.py` by me: the two tier-2 ones reached exit 0 and published; the tier-3 one stopped at `[hold] review` with exit 3, which is the pipeline working — it cannot write a review record and will not publish without one, so it sits on disk unregistered until a person reads its six laws.
+
+    **The screen and the probes.** Six policy targets, none of which appears anywhere else in the bank, and the batch's sixteen law names collide with no other task's; no stub ships its reference. Ten escape probes were written against the three law sets — the degenerate pair, the "drops every row" pair, the "first row only" pair, the identity pair, the swapped pair, and for the third task a `swap_each` that leaves its records alone and a `sum_pair` that adds only the first one. **None escaped.** One probe measured `tier 1` and is not evidence: `map_len(xss) = xss` is a shape rejection (`List<&2, List<&2, Nat>>` where `List<&2, Nat>` is wanted), which is Fact 42's first instrument error, hit again.
+
+    **The finding is the kill measurement, and it is Fact 42's shape one level up.** Every task's empty case — `map_len_nil`, `longest_row_nil`, `snoc_each_nil`, `front_each_nil`, `swap_each_nil`, `sum_pair_nil` — had **no type-checking mutant failing it**. The generated corpora rewrite a *step*, and a base case is an *answer* reached by a match that has already stopped, so all 29 generated mutants leave it alone. What makes this worth a Fact rather than a footnote is that **nothing refused**: `stage_mutants` passed (`2 of 8 strong`, because one strong mutant is all it asks for), V2 passed, V3 passed, and `validate` would have reported the task valid. A law nothing kills is not a V2 failure — it is a law whose *evidence* is absent, and the only reading that names it is the per-law kill count. Six hand mutants were written, one per law, each measured at tier 3 with its target law in the failed list, and each stamped with that verdict in its header. This is the second time in two days: the 17-task batch of Fact 42 created 26 of the same, and the bank-wide metric is what found those.
+
+    **The bank now reads `144/144 valid over 3,158 checker runs`, `mean 4.53, min 1`, calibration `0 of 144`.** The mean fell from 5.16 to 4.53 across the two batches because 32 laws that had no evidence now have exactly one mutant each — a law with one killer pulls the average down, and that is the honest direction for the number to move.
+
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
 ## 1. Deviations from SPEC.md
@@ -543,10 +559,11 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf`, `t4-queue-rep`; `t4-nth-maybe` is the same tier stated as a *domain* instead of an invariant |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 125 registered tasks, 20 are tier 1, 66
-are tier 2, 31 are tier 3, 5 are tier 4 and 3 are tier 5. No tier is empty, so
-what M2's 200 and M4's 500 are short of is volume rather than a design nobody
-has done yet.
+**The bank's ceiling is tier 5.** Of the 144 registered tasks, 26 are tier 1, 79
+are tier 2, 31 are tier 3, 5 are tier 4 and 3 are tier 5. One more tier-3 task
+(`t3-swap-sum-pair`) is on disk and unregistered, held at the review checkpoint
+Fact 43 records. No tier is empty, so what M2's 200 and M4's 500 are short of is
+volume rather than a design nobody has done yet.
 
 The last 39 of those are a 35-task batch from the two authoring agents, the
 third tier-5 task (`t5-opt-drop`), the third and fourth tier-4 ones
@@ -561,9 +578,12 @@ bank, and each one validated on its own. But a policy that solves one of them
 has learnt nearly all of the others, so they are closer to twenty lessons on one
 template than to twenty lessons, and that is a fact about the bank's *effective*
 size. It is recorded here rather than left inside the count, because the count
-is what M2 is measured by and the difference between 125 tasks and 105 distinct
+is what M2 is measured by and the difference between 144 tasks and 118 distinct
 problems is exactly the kind of gap that reads as progress in a total and
-disappears in a curriculum.
+disappears in a curriculum. The 17-task batch of Fact 42 carries the same
+discount on the same basis, and its ten templates are listed there rather than
+re-derived here. Fact 43's three add no discount: each has targets no other task
+in the bank names.
 
 One task in the batch is the same function as a committed one at another tier,
 and the distinctness rule that would have parked it is deliberately not applied.
@@ -863,25 +883,28 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 125 tasks (20 tier 1, 66 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
+   progress** — 144 tasks (26 tier 1, 79 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
    validated together rather than per task, because a task is sound only against
    a corpus that shares the degenerate generator with it. The whole bank was
-   measured locally on 2026-09-19 as **125/125 valid over 2,767 checker runs**,
+   measured locally on 2026-09-19 as **144/144 valid over 3,158 checker runs**,
    with no problems and no task free of warnings: the missing calibration
-   measurement on all 125, and on the 39 tasks at or above `REVIEW_TIER` a
-   review warning as well — 28 with no record, 8 whose record matches and is
-   still not a review, 3 whose record is about laws that no longer ship (Fact
-   27). The calibration warning is the one `--strict` promotes, and the review
-   warnings are the two it would promote with it, which is why neither mode
-   reddens the bank yet. The last CI run over a whole bank was at 83, `83/83`
-   over 1544, run `35350369509`.
+   measurement on all 144, and on the 39 tasks at or above `REVIEW_TIER` a
+   review warning as well — all 39 with no record, because the 11 records that
+   used to sit in `meta.json` were forgeries and were deleted rather than
+   migrated (Fact 27). The calibration warning is the one `--strict` promotes,
+   and the review warning is the one it would promote with it, which is why
+   neither mode reddens the bank yet. The last CI run over a whole bank was at
+   83, `83/83` over 1544, run `35350369509`.
    This measurement is the one M4.3 used to argue *against* waiting for a quiet
    box: V4 reads wall-clock latency, so a bank measured while an authoring agent
    is checking it is a bank measured under contention — but the contention makes
-   a *latency* number about the box, and it does not change whether 125 of 125
-   validate. The 122-task reading that stood here was taken the same way.
-   The 122 tasks at tiers 1–4 are
-   short of the 200 by 78, and 20 of the 125 are the tier-2 family §3.9 records:
+   a *latency* number about the box, and it does not change whether 144 of 144
+   validate. The 122-task reading that stood here was taken the same way, and
+   the 142- and 144-task ones were taken harder: the load average was 14–17
+   throughout because of a ChatGPT/Codex process outside this repository, and
+   every task still read `[ok]` at a reference latency of 81–152 ms.
+   The 141 tasks at tiers 1–4 are
+   short of the 200 by 59, and 27 of the 144 are the two families §3.9 records:
    the count and the number of distinct problems are not the same number, and
    only one of the two is what a curriculum buys.
 
@@ -1269,13 +1292,14 @@ throughput benchmark, an external training run reporting a solve-rate curve.
 The four have four different states, and only the first is work rather than a
 waiting room.
 
-1. **500+ tasks including tier 5. 125, of which five are tier 4 and three are
+1. **500+ tasks including tier 5. 144, of which five are tier 4 and three are
    tier 5.** None of the five tiers is empty, so what is left here is volume: the
    pipeline that produced 83 tasks produced the 84th and the 85th as well, and
-   the same shape of work has since produced 39 more (a 35-task batch from two
-   authoring agents, the third tier-5 task, the third and fourth tier-4 ones, and
-   the Bool-fold duality), so the remaining 375 are volume
-   and nothing else. The check that keeps it honest (a manifest entry must
+   the same shape of work has since produced 59 more (a 35-task batch from two
+   authoring agents, the third tier-5 task, the third and fourth tier-4 ones, the
+   Bool-fold duality, the 17-task batch of Fact 42, and Fact 43's three — one of
+   which is held at review), so the remaining 356 are
+   volume and nothing else. The check that keeps it honest (a manifest entry must
    resolve to a directory inside the same commit) exists and has already caught
    its own failure once. Tier 5 was the one part of this item that was not a
    waiting room, and it is now written three times over — `t5-run-effect`,
@@ -1287,7 +1311,21 @@ waiting room.
    of the two a law about a *transformation* is.
 2. **Human-reviewed laws for tier ≥ 3. Not satisfied, and the bank no longer
    says it is** — the pipeline can no longer write a review record at all, so
-   what is left is that a person has to read the laws. See below.
+   what is left is that a person has to read the laws. See below. **One
+   boundary is worth stating rather than leaving implied: the checkpoint belongs
+   to `tools/author.py`, not to the bank.** Measured 2026-09-19 on
+   `t3-swap-sum-pair` — held by the authoring pipeline, written into a *scratch*
+   manifest that the real one does not see: `uv run python -m tools.publish
+   --manifest manifest.scratch.review-probe.json tasks/3/t3-swap-sum-pair`
+   registered it, 145 tasks against the real 144, exit 0. So a bare
+   `tools/publish` — which is a command this repository's own README documents
+   and CI runs — will put an unreviewed tier-3 task in the bank. It is not a
+   defect in the reward path, because no verdict reads a review record and
+   `tools/validate.py` reports the missing one as a warning either way; it is
+   the authoring gate being a property of the authoring tool, which is the same
+   shape as the forgeries Fact 27 removed one level down. Closing it would mean
+   refusing a republish of the 31 tier-3 tasks that already carry no record, so
+   it is recorded instead of changed.
 3. **Published throughput benchmark. Published 2026-09-19, and the blocker was
    the metric rather than the machine.** `tools/soak.py` reports p50/p95/p99 and
    verdicts/min/core from a real run, and M3.5's ten-thousand-episode soak
@@ -1363,22 +1401,27 @@ waiting room.
    per-task records. `--json` also had to be fixed to be JSON: the summary
    lines used to follow the document, so the mode existed for callers who could
    not parse it. Two of the four report the bank as it is rather than as a
-   score: calibration is **0 of 125 recorded**, which is item 4's blocked state
-   as a number, and the review fraction is **8 of the 39 tasks that need
-   review** — which is *not* the same as eight tasks having been reviewed, and
-   the first version of this paragraph said it was. That version read "0.0 of
-   the 39", which was worse than wrong in a useful direction: the measured
-   number is 0.2051, because the check counts records whose hashes match the
-   shipped laws and every one of those eight is a record the authoring agent
-   wrote for itself. **The human-reviewed figure is 0 of 39.** A metric named
-   `reviewed_fraction` that reads 0.205 off a bank with no reviewed task is the
-   same defect as `"valid": true` in the manifest, one layer up — a number
-   answering a question the machine is not able to answer — so the field was
-   renamed to `recorded_fraction` and the state `approved` to `current`, which
-   is all the check can witness. It is a fraction of the tasks that need review
-   rather than of all 125, because below `REVIEW_TIER` the author's own reading
-   *is* the review and counting those would report the bank as unreviewed for
-   following its own rule.
+   score: calibration is **0 of 144 recorded**, which is item 4's blocked state
+   as a number, and the review fraction is **0 of the 39 tasks that need
+   review** — which is *not* the same as thirty-nine tasks having been reviewed,
+   and the paragraph here has been wrong in two different directions before
+   reaching it. The first version said "0.0 of the 39", which was worse than
+   wrong in a useful direction: the measured number was 0.2051, because the
+   check counted records whose hashes matched the shipped laws and every one of
+   those eight was a record the authoring agent wrote for itself. **The
+   human-reviewed figure was 0 of 39 then and is 0 of 39 now**, and the two
+   readings differ in what the bank *says* rather than in what it has. A metric
+   named `reviewed_fraction` that reads 0.205 off a bank with no reviewed task
+   is the same defect as `"valid": true` in the manifest, one layer up — a
+   number answering a question the machine is not able to answer — so the field
+   was renamed to `recorded_fraction` and the state `approved` to `current`,
+   which is all the check can witness. The eleven forged records were then
+   deleted rather than migrated, so the field now reads 0 as well: the 0.205 is
+   gone because the records are gone, not because anyone read the laws (Fact
+   27). It is a fraction of the tasks that need review rather than of all 144,
+   because below `REVIEW_TIER` the author's own reading *is* the review and
+   counting those would report the bank as unreviewed for following its own
+   rule.
 
    **The fourth arrived with a triage signal the bank did not have before.**
    "Mean mutants killed per law" needed which laws caught which mutants, which
@@ -1412,11 +1455,20 @@ waiting room.
    is the opposite of a hole and is invisible to every check the bank had.
 
    **The bank-wide reading was `mean 5.1, min 0`, over 376 laws in 125 tasks,
-   and is now `mean 5.16, min 1` over the same 376 laws** — the two numbers are
-   the before and the after of the sweep below, taken by the same command over
-   the whole manifest, both with `125/125 valid`. `min` is the one that moved,
-   which is the point: the mean could not have told the difference between a
-   bank where every law carries evidence and one where eleven carry none.
+   and is now `mean 4.53, min 1` over 459 law declarations in 144 tasks** — the
+   first pair of numbers is the before and the after of the sweep below, and the
+   second pair is the reading two days later, after two more batches added 83
+   registered law declarations and the two sweeps that gave 32 of them their
+   first mutant. It moved
+   twice in the same direction, and the second time it moved *down*: 26 laws in
+   Fact 42's batch and 6 in Fact 43's had no killer at all, and a law with
+   exactly one killer pulls the mean down rather than up. `min` is the number
+   that matters — a mean is compatible with a law nothing fails, and the min is
+   the only reading that names it — and it is 1 at both readings, which is the
+   whole point of the two sweeps. Every reading here was taken by the same
+   command over the whole manifest, and every one of them reported the bank
+   valid; `min` is a separate question from `valid`, and the only one of the two
+   that a zero-kill law changes.
    `t3-pad` was the first law named and not the only one: **11 laws across 10
    tasks** sat at zero kills, and the sweep that found them is the metric's real
    product. `min 0` is the number that matters — a mean of 5.1 is compatible
@@ -1455,6 +1507,47 @@ waiting room.
    it agrees with the reference *at* `Nil{}`. The reading says the corpus is not
    holding the law, which is a statement about the evidence and not about the
    law, and the repair is a file for the same reason `pad_nil`'s was.
+
+   **The sweep was run again over the 17-task batch of Fact 42 and found the
+   same shape in the same place, which is the argument for running it every
+   time.** Adding 73 laws to the bank dropped the reading back to `min 0`:
+   **26 zero-kill laws across all 17 new tasks**, and every one of them is the
+   empty case — `count_while_nil`, `keys_nil`, `values_nil`, `sum_values_nil`,
+   `diffs_nil`, `diffs_single`, `drop_while_nil`, `take_while_nil`,
+   `count_key_nil`, `lookup_nil`, `update_nil`, `chunk_two_nil`,
+   `chunk_two_single`, `join_two_nil`, `count_up_zero`, `count_down_zero`,
+   `pairs_nil`, `pairs_single`, `partition_below_nil`, `span_below_nil`,
+   `run_max_nil`, `scan_add_nil` and `zip3_nil_left`/`_mid`/`_right`, plus
+   `t1-assoc-keys`' `put_cons`, which is the same failure one step in: it is a
+   step law whose left-hand side `Mk{k, v} <> kvs` is a cons the function never
+   looks at, and the generated rule that rewrites steps had nothing to rewrite
+   there. One targeted file per law, 26 written and each re-measured as
+   type-checking with its law in the failed list. The count is worth recording
+   as a rate rather than a total: the previous sweep found 11 in 125 tasks, this
+   one found 26 in 17 — because the batch is almost entirely list- and
+   `PairL`-valued functions whose empty case *is* the base of the recursion,
+   which is exactly where a step-rewriting generator has nothing to say. Two of
+   the 26 needed a second pass: `pairs-single-answers-a-pair.bend` and
+   `chunk-two-single-answers-a-pair.bend` first measured `tier 1` with
+   `x (consumed more than once)`, because the natural mutant builds its pair
+   from the head twice; the `+x` sigil fixes it, and a mutant that does not
+   type-check is evidence of nothing. That is the same instrument error Fact 42
+   records from the probe side.
+
+   **The third run found six, and it is the one that shows the reading is the
+   only thing that names the shape.** Fact 43's three tasks each arrived with a
+   generated corpus of 8, 13 and 8 files and each has two targets, so four
+   laws of every one of them were covered and **the empty case of all six was
+   not** — `map_len_nil`, `longest_row_nil`, `snoc_each_nil`, `front_each_nil`,
+   `swap_each_nil`, `sum_pair_nil`. Nothing refused: `stage_mutants` passed
+   with `2 of 8 strong` because one strong mutant is all it asks for, V2 passed,
+   V3 passed, and `validate` reported the bank valid. That is the argument for
+   running the sweep on every batch rather than when a number looks wrong — the
+   wrong number is the only warning, and for these three there was no wrong
+   number until the per-law count was taken. One file per law, six written and
+   each measured at tier 3 with its law in the failed list, which puts the three
+   at six killers between them and the bank's `min` back at 1 over 459
+   declarations.
 
 **Human-reviewed laws for tier ≥ 3 are still not satisfied, and the bank no
 longer says they are.** The second clause is the half that was closable and it

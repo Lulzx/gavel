@@ -1,0 +1,7 @@
+import Base
+import ./prelude.bend as P
+
+def scan_add(xs: List<Nat>, +acc: Nat) -> List<Nat>:
+  match xs:
+    case Nil{}:
+      Nil{}

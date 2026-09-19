@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-run-max-laws",
+  "tier": 2,
+  "laws": [
+    "run_max_nil",
+    "run_max_single",
+    "run_max_append"
+  ],
+  "policy_targets": [
+    "run_max"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "f0caf199bc171257e7f63be1e05103778d664fb1dc392553f75f2b0c1bf4b6bb",
+    "prelude": "570ed1326572070c800ca01aef22cb486c913b0835275b64546beab4e663c8be"
+  },
+  "bend_version": "2.0.5"
+}

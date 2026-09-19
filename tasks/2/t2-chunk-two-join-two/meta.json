@@ -1,0 +1,23 @@
+{
+  "task_id": "t2-chunk-two-join-two",
+  "tier": 2,
+  "laws": [
+    "chunk_two_nil",
+    "chunk_two_single",
+    "chunk_two_cons",
+    "join_two_nil",
+    "join_two_cons",
+    "chunk_two_join_two"
+  ],
+  "policy_targets": [
+    "chunk_two",
+    "join_two"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "6048b828d2444beeff769bd96e60ef6c8a47b143c0c9eec7348fe8785ba62da3",
+    "prelude": "fe84c99577cfaa7ae19b97e577920404479b0e6be0a5756b5fc12c33c091f092"
+  },
+  "bend_version": "2.0.5"
+}

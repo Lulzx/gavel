@@ -1,0 +1,24 @@
+{
+  "task_id": "t2-count-up-down",
+  "tier": 2,
+  "laws": [
+    "count_up_zero",
+    "count_up_succ",
+    "count_down_zero",
+    "count_down_succ",
+    "count_up_rev_count_down",
+    "len_count_up",
+    "len_count_down"
+  ],
+  "policy_targets": [
+    "count_up",
+    "count_down"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7bfcbbd4354b6b175c583b8ed4298478f8260a8be672598e0f90c718ddb562b4",
+    "prelude": "5793a46e363683f1a3e63e23f39d606aa0de4300f2254abc2351773a16fce549"
+  },
+  "bend_version": "2.0.5"
+}

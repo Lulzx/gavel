@@ -1,0 +1,23 @@
+{
+  "task_id": "t1-assoc-values",
+  "tier": 1,
+  "laws": [
+    "values_nil",
+    "values_cons",
+    "values_put",
+    "sum_values_nil",
+    "sum_values_cons",
+    "sum_values_values"
+  ],
+  "policy_targets": [
+    "values",
+    "sum_values"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "cccebc9bc4ba3b750658f1bd45d48f310555bd8fb6ce2ee669953d5a377f4465",
+    "prelude": "5e2b752b6dc369029fc097a80e85b9d46b3d6c173d73f38ad7e4eb837b566d42"
+  },
+  "bend_version": "2.0.5"
+}

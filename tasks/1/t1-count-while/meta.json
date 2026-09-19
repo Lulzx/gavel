@@ -1,0 +1,19 @@
+{
+  "task_id": "t1-count-while",
+  "tier": 1,
+  "laws": [
+    "count_while_nil",
+    "count_while_keep",
+    "count_while_stop"
+  ],
+  "policy_targets": [
+    "count_while"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "d6f4bd430f6abcd68403bcd27a38cdcf5d5a9863098e1acbd90ee7467ea56684",
+    "prelude": "226b997ffd8b736f8b188e658ad2912806c00ccdd4cb4b77d7883aae37911bcf"
+  },
+  "bend_version": "2.0.5"
+}

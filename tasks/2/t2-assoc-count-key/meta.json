@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-assoc-count-key",
+  "tier": 2,
+  "laws": [
+    "count_key_nil",
+    "count_key_cons",
+    "count_key_hit",
+    "count_key_skip",
+    "count_key_put"
+  ],
+  "policy_targets": [
+    "count_key"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "eb80da4c6e0027fc75ac98de8ee66beed10618ee57fc2cee9822823a4f7f4360",
+    "prelude": "bdd02ce3612c01745bfa5a21d0b664bbef7d946cc439219f50d8ed9798a48790"
+  },
+  "bend_version": "2.0.5"
+}

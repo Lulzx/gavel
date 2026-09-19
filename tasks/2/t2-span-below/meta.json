@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-span-below",
+  "tier": 2,
+  "laws": [
+    "span_below_nil",
+    "span_below_keep",
+    "span_below_stop",
+    "span_below_len"
+  ],
+  "policy_targets": [
+    "span_below"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "415d6d5e1dc71b1df5da02b971ff324e13c5ebabf4f9d616ddff07fbfc8b756a",
+    "prelude": "4efa137c3474d78cc96a02a2ac32d2dd66856f20c5e11da4376bb39fe77cae70"
+  },
+  "bend_version": "2.0.5"
+}

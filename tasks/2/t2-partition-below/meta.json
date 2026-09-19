@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-partition-below",
+  "tier": 2,
+  "laws": [
+    "partition_below_nil",
+    "partition_below_keep",
+    "partition_below_drop",
+    "partition_below_len"
+  ],
+  "policy_targets": [
+    "partition_below"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ec690905c5a77dfefb8826d66dab98aa16303094ddba52692f0428cb191ba231",
+    "prelude": "e7a9c6c4c53a8bb7035aeb016dddd10796a81f855c2030f6a7826e5d10c3213b"
+  },
+  "bend_version": "2.0.5"
+}
