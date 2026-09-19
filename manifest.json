@@ -51,7 +51,7 @@
       "tier": 1,
       "path": "tasks/1/t1-concat-append",
       "reference": "references/t1-concat-append",
-      "hash": "110fa4bbce62d3a656fb35280c92786a0349c36b595ed314462b69f9d83ef3b1"
+      "hash": "d2eed7f2845f7557470054499046ef15c7b5441914fb2515431b136e4f7ca6aa"
     },
     {
       "task_id": "t1-count-while",
@@ -163,7 +163,7 @@
       "tier": 1,
       "path": "tasks/1/t1-rev-append",
       "reference": "references/t1-rev-append",
-      "hash": "3ee91b9d063d171b77358de1bf9f5071f14bfe15c5e349731993ab30d8a2db05"
+      "hash": "90aea4b493ae4f2ddddde30edc9c260a04b810e27b823ffd62cfbef9ce5c9c34"
     },
     {
       "task_id": "t1-rev-snoc",
@@ -1164,7 +1164,7 @@
       "tier": 4,
       "path": "tasks/4/t4-inorder-transport",
       "reference": "references/t4-inorder-transport",
-      "hash": "7cca0758fe364468b2e50d7a21c4e6d87c04bcb90f3a93bef801958ae2af0bb0"
+      "hash": "ab515a44f7ae561f4184aa7ffdd20cc7c4d9162fe3658697b0441eba96a29d4e"
     },
     {
       "task_id": "t4-nth-maybe",

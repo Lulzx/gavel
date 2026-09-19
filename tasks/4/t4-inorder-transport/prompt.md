@@ -1,4 +1,4 @@
-Implement `inorder`, `all_le_put`, `all_ge_put` and `bst`, then prove all eight
+Implement `inorder`, `all_le_put`, `all_ge_put` and `bst`, then prove all twelve
 laws.
 
 `inorder(t)` is the keys of `t` in ascending order: the left subtree's traversal,
@@ -36,6 +36,19 @@ induction. The two pins close it: the leaf pins the accumulator and the node
 pins the combination, and one without the other leaves a body wrong in the
 other case. Both are `{==}`.
 
+`all_le_put_tip` / `all_le_put_bin` and `all_ge_put_tip` / `all_ge_put_bin` are
+the same pair a third time, for the two bound folds, and this one is not
+symmetry either. Neither `all_le_put` nor `all_ge_put` was named on the left of
+any law: both occurred only inside the two premises below, and a target that
+appears only in a premise is not constrained by anything, because the
+submission decides whether the premise is inhabitable at all. An `all_le_put`
+that answers `False{}` at every input makes `inorder_all_le`'s premise
+uninhabitable and the law vacuous, and two lines discharge it -- measured tier 4,
+reward 1.000, for exactly that body. The pair closes it: the tip pins the
+accumulator and the node pins the combination. The node law is the load-bearing
+half; a tip pin alone kills the constant body but leaves a body wrong only at a
+node still able to falsify the premise. All four are `{==}`.
+
 `inorder_all_le` and `inorder_all_ge` are the transports: a bound on the tree
 becomes a bound on the list the traversal produces. Each is an implication whose
 premise names the tree-side fold and whose conclusion names the list-side one.
@@ -68,6 +81,8 @@ declare a binder `+` when the body consults it more than once.
 Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
 `def L.inorder_tip()`, `def L.inorder_bin(l, key, r)`,
 `def L.bst_tip(lo, hi, k)`, `def L.bst_bin(l, key, r, lo, hi, k)`,
+`def L.all_le_put_tip(b, k)`, `def L.all_le_put_bin(l, key, r, b, k)`,
+`def L.all_ge_put_tip(b, k)`, `def L.all_ge_put_bin(l, key, r, b, k)`,
 `def L.inorder_len(t)`, `def L.inorder_all_le(t, b, k, e)`,
 `def L.inorder_all_ge(t, b, k, e)` and `def L.inorder_sorted(t, lo, hi, e)`.
 A law's binders are its def's parameters

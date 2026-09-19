@@ -2,6 +2,7 @@
   "task_id": "t1-rev-append",
   "tier": 1,
   "laws": [
+    "rev_nil",
     "rev_append"
   ],
   "policy_targets": [
@@ -10,7 +11,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "05555c6c1449297613ea83278ef47b1f2d8a94cc5c6f8978187b76b78ba787db",
+    "laws": "cb2e5e31265ec90d4d3aee59401bf5b7c3ffad15210e168eade7d7bdabf62d93",
     "prelude": "e785dc2fb2aafa4396d7442bc08cb69bfe886ad0f125ea07060ee4eaf4660285"
   },
   "bend_version": "2.0.5"

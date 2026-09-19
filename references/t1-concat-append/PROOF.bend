@@ -26,6 +26,11 @@ def Policy.append_assoc(xs: List<&2, Nat>, -ys: List<&2, Nat>, -zs: List<&2, Nat
       %Policy.append_assoc(t, ys, zs) : {h <> P.append(t, P.append(ys, zs)) == h <> _ : List<&2, Nat>}
       {==}
 
+# The base anchor. `concat(Nil{})` unfolds to `Nil{}`: the fold has nothing to
+# put in front of the empty list, so the two sides are the same term.
+def L.concat_nil():
+  {==}
+
 # The base case unfolds to `append(ys, Nil{}) == ys`, which is the identity
 # lemma; the step case leaves `a` outside both sides and reassociates.
 def L.concat_append(xss, ys):

@@ -49,6 +49,55 @@ law bst_bin:
   for +k: Bool
   {S.bst(P.Bin{l, key, r}, lo, hi, k) == Bool.and(S.bst(l, lo, key, k), Bool.and(S.bst(r, key, hi, True{}), Bool.and(P.le(lo, key), P.le(key, hi)))) : Bool}
 
+# The same pair a third time, for the two bound folds -- and this one is not
+# symmetry. Neither `all_le_put` nor `all_ge_put` was named on the left of any
+# law: both occurred *only* inside the premises of `inorder_all_le` /
+# `inorder_all_ge` below. A submission whose `all_le_put` answers `False{}` at
+# every input reduces that premise to `{False{} == True{}}`, which makes the
+# transport law vacuous, and the two-line discharge
+# `Policy.absurd_true(P.all_le_list_put(S.inorder(t), b, k), e)` is then a
+# complete proof of it. **Measured 2026-09-19: tier 4, complete, reward 1.000,
+# all eight laws** for exactly that body -- the probe is
+# `/tmp/esc/t4/solution.bend`, and it is the `all_le_put-answers-false.bend`
+# mutant below paired with its own proof rather than the reference's. That
+# pairing is the whole point: the reference proof is not the test, the policy
+# writes its own. The lesson generalises past this task: a target that a law bag
+# mentions *only* in a premise is a target no law constrains, because the
+# submission controls whether the premise is inhabitable at all.
+#
+# The pair is the repair. `all_le_put_tip` alone is not enough and the reason is
+# worth keeping: it kills the constant body, which is wrong at the tip, but a
+# body wrong only at a node still makes the premise falsely uninhabitable there
+# and the law still proves vacuously. The node law is what makes the premise
+# *inhabitable rather than merely unfalsifiable*, so it has to be present for
+# the transport to say anything. One without the other leaves a body wrong in
+# the other case; `{==}` proves all four.
+law all_le_put_tip:
+  for b: Nat
+  for k: Bool
+  {S.all_le_put(P.Tip{}, b, k) == k : Bool}
+
+law all_le_put_bin:
+  for +l: P.Tree
+  for +key: Nat
+  for +r: P.Tree
+  for +b: Nat
+  for +k: Bool
+  {S.all_le_put(P.Bin{l, key, r}, b, k) == S.all_le_put(r, b, Bool.and(S.all_le_put(l, b, k), P.le(key, b))) : Bool}
+
+law all_ge_put_tip:
+  for b: Nat
+  for k: Bool
+  {S.all_ge_put(P.Tip{}, b, k) == k : Bool}
+
+law all_ge_put_bin:
+  for +l: P.Tree
+  for +key: Nat
+  for +r: P.Tree
+  for +b: Nat
+  for +k: Bool
+  {S.all_ge_put(P.Bin{l, key, r}, b, k) == S.all_ge_put(r, b, Bool.and(S.all_ge_put(l, b, k), P.le(b, key))) : Bool}
+
 # The traversal visits each node exactly once: a measure law. Blind to order,
 # so the arithmetic carries it rather than the tree induction. It is implied by
 # the two pins above, and it is kept anyway: the laws are also the readable

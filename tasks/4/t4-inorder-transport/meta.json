@@ -6,6 +6,10 @@
     "inorder_bin",
     "bst_tip",
     "bst_bin",
+    "all_le_put_tip",
+    "all_le_put_bin",
+    "all_ge_put_tip",
+    "all_ge_put_bin",
     "inorder_len",
     "inorder_all_le",
     "inorder_all_ge",
@@ -20,7 +24,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "b91cfe009566921c40798cf314cad1b3398d0913324f7f2a7edafc5d2f4f12f6",
+    "laws": "bdb312d4ebf9785c0330c20a4ff6126a70b093e99736680d1cb0359fdfa46fb8",
     "prelude": "5104e2e47b22310917aa58cb2ab98d2e177970a9a166aae11f559b0f2dbaadc4"
   },
   "bend_version": "2.0.5"

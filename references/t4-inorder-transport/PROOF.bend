@@ -303,6 +303,20 @@ def L.bst_tip(lo, hi, k):
 def L.bst_bin(l, key, r, lo, hi, k):
   {==}
 
+# The bound folds' pins, for the same reason `bst` has a pair: the law set named
+# neither target outside a premise, so neither was constrained by anything.
+def L.all_le_put_tip(b, k):
+  {==}
+
+def L.all_le_put_bin(l, key, r, b, k):
+  {==}
+
+def L.all_ge_put_tip(b, k):
+  {==}
+
+def L.all_ge_put_bin(l, key, r, b, k):
+  {==}
+
 def L.inorder_len(t):
   Policy.inorder_size(t)
 

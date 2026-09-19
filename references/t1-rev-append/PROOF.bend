@@ -3,6 +3,11 @@ import ./prelude.bend as P
 import ./solution.bend as S
 import ./LAWS.bend as L
 
+# The base anchor. `reverse(Nil{})` unfolds to `Nil{}`, so the two sides of the
+# law are the same term and there is nothing to say about them.
+def L.rev_nil():
+  {==}
+
 # `append` matches on its first argument, so with a variable `xs` the goal does
 # not reduce on its own. Both sides unfold to the same cons cell.
 def L.rev_append(xs, x):
