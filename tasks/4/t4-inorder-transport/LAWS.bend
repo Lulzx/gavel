@@ -22,6 +22,33 @@ law inorder_bin:
   for +r: P.Tree
   {S.inorder(P.Bin{l, key, r}) == P.append(S.inorder(l), key <> S.inorder(r)) : List<&2, Nat>}
 
+# The same pair for `bst`, and they are here for a measured reason rather than
+# symmetry. `inorder_sorted` below was for a long time the only law naming
+# `bst`, and it instantiates the accumulator at the literal `True{}`: every
+# recursive `bst` call threads either that literal or the same accumulator, so
+# the leaf's `False{}` branch is unreachable from every law. A `bst` whose tip
+# answers `True{}` instead of the accumulator is therefore the reference
+# function on every term any law mentions, and it would have earned a full
+# reward. **Measured 2026-09-19: tier 4, complete, reward 1.000, all six laws**
+# -- the escape is `mutants/bst-tip-ignores-the-accumulator.bend`. The pair is
+# the repair, exactly as the pair above is for `inorder`: the leaf pins the
+# accumulator, the node pins the combination, and one without the other leaves
+# a body wrong in the other case. `{==}` proves both.
+law bst_tip:
+  for lo: Nat
+  for hi: Nat
+  for k: Bool
+  {S.bst(P.Tip{}, lo, hi, k) == k : Bool}
+
+law bst_bin:
+  for +l: P.Tree
+  for +key: Nat
+  for +r: P.Tree
+  for +lo: Nat
+  for +hi: Nat
+  for +k: Bool
+  {S.bst(P.Bin{l, key, r}, lo, hi, k) == Bool.and(S.bst(l, lo, key, k), Bool.and(S.bst(r, key, hi, True{}), Bool.and(P.le(lo, key), P.le(key, hi)))) : Bool}
+
 # The traversal visits each node exactly once: a measure law. Blind to order,
 # so the arithmetic carries it rather than the tree induction. It is implied by
 # the two pins above, and it is kept anyway: the laws are also the readable
@@ -58,15 +85,21 @@ law inorder_all_ge:
 #
 # This law is what the `bst` target is for, and it is also the one whose weight
 # is easiest to overstate. The premise is not vacuous, and a mutant cannot make
-# it vacuous: `bst` is a policy target, but the reference proof reads the
-# invariant through `Policy.bst_ind`, which projects its conjuncts with
-# `Policy.and_l`/`and_r`. A body that drops a conjunct changes the shape of
-# `S.bst(t, lo, hi, True{})` and the projections stop type-checking; a body that
-# keeps the shape but changes which bound goes where leaves the projections
-# standing but cannot close the induction. Either way the submission falls to
-# tier 2 with nothing proven, rather than satisfying this law's premise
-# trivially. Measured 2026-09-19: all four `bst` mutants measured failed at
-# `Policy.bst_ind`, none of them here.
+# it vacuous *by changing the shape of `bst`*: a body that drops a conjunct
+# changes the shape of `S.bst(t, lo, hi, True{})` and the projections stop
+# type-checking, and a body that keeps the shape but changes which bound goes
+# where cannot close the induction. Measured 2026-09-19: all four `bst` mutants
+# measured failed at `Policy.bst_ind`, none of them here.
+#
+# **That argument was too strong, and the `bst_tip`/`bst_bin` pair above is the
+# correction.** It reasons about the *reference* proof, and the reference proof
+# is not the test: the policy writes its own. The counterexample is a body that
+# keeps the shape and changes nothing the law can see -- a leaf answering
+# `True{}` instead of the accumulator -- which is the reference function on
+# every term this law and every other mentions, and which read tier 4 with
+# reward 1.000 under a `k`-specialised induction. This law pins the traversal's
+# order given the invariant; the pair above pins the invariant. Neither implies
+# the other.
 law inorder_sorted:
   for +t: P.Tree
   for +lo: Nat

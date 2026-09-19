@@ -1,4 +1,4 @@
-Implement `inorder`, `all_le_put`, `all_ge_put` and `bst`, then prove all six
+Implement `inorder`, `all_le_put`, `all_ge_put` and `bst`, then prove all eight
 laws.
 
 `inorder(t)` is the keys of `t` in ascending order: the left subtree's traversal,
@@ -23,6 +23,18 @@ definition written out, one case per constructor, and they are what makes the
 stub's first obligation an obligation. `inorder_len` is the measure law, one
 element per node. It is implied by the pins and is kept anyway, because the laws
 are also the readable statement of what the function is.
+
+`bst_tip` and `bst_bin` are the same pair for the fourth target, and they are
+here for a measured reason rather than for symmetry. For a long time
+`inorder_sorted` below was the only law naming `bst`, and it instantiates the
+accumulator at the literal `True{}`; every recursive `bst` call threads either
+that literal or the same accumulator, so the leaf's `False{}` branch was
+unreachable from every law. A `bst` whose leaf answers `True{}` instead of the
+accumulator is then the reference function on every term any law mentions, and
+it earned a full reward -- tier 4, reward 1.000 -- under a `k`-specialised
+induction. The two pins close it: the leaf pins the accumulator and the node
+pins the combination, and one without the other leaves a body wrong in the
+other case. Both are `{==}`.
 
 `inorder_all_le` and `inorder_all_ge` are the transports: a bound on the tree
 becomes a bound on the list the traversal produces. Each is an implication whose
@@ -54,9 +66,11 @@ so destructuring a node and also passing it on is "consumed more than once";
 declare a binder `+` when the body consults it more than once.
 
 Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.inorder_tip()`, `def L.inorder_bin(l, key, r)`, `def L.inorder_len(t)`,
-`def L.inorder_all_le(t, b, k, e)`, `def L.inorder_all_ge(t, b, k, e)` and
-`def L.inorder_sorted(t, lo, hi, e)`. A law's binders are its def's parameters
+`def L.inorder_tip()`, `def L.inorder_bin(l, key, r)`,
+`def L.bst_tip(lo, hi, k)`, `def L.bst_bin(l, key, r, lo, hi, k)`,
+`def L.inorder_len(t)`, `def L.inorder_all_le(t, b, k, e)`,
+`def L.inorder_all_ge(t, b, k, e)` and `def L.inorder_sorted(t, lo, hi, e)`.
+A law's binders are its def's parameters
 in order, and a premise `for e: {...}` is one more parameter. Proof helpers go
 under the reserved `Policy.` namespace, which the gate ignores, and none of them
 may cite a law.

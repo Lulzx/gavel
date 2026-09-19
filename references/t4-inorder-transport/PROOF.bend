@@ -294,6 +294,15 @@ def L.inorder_tip():
 def L.inorder_bin(l, key, r):
   {==}
 
+# The `inorder` pins read the body's right-hand side back; these two do the same
+# for `bst`, whose leaf answers its accumulator and whose node is the
+# conjunction of the two recursions and the two bounds.
+def L.bst_tip(lo, hi, k):
+  {==}
+
+def L.bst_bin(l, key, r, lo, hi, k):
+  {==}
+
 def L.inorder_len(t):
   Policy.inorder_size(t)
 
