@@ -13,6 +13,8 @@ The stages, in order:
 
     files       every file the later stages read is present and non-empty
     derive      metadata from the task's own files (tools/publish.py)
+    screens     the static screens (tools/screens.py), before any checker run
+    mutants     generate a corpus; refuse if any mutant still proves every law
     invariants  V1-V5 on the derived task (gavel/validate.py)
     episode     the reference scored through GavelEnv, not through the checker
     review      tier >= 3 stops here until a person has written the record
@@ -63,6 +65,7 @@ from gavel.tasks import (HOLD_FILE, LAWS_FILE, PRELUDE_FILE, PROOF_FILE,  # noqa
 from gavel.toolchain import DEFAULT_VERSION, Toolchain  # noqa: E402
 from gavel.validate import (DEFAULT_BUDGET_MS, REVIEW_TIER,  # noqa: E402
                             review_state, validate_task)
+from tools.screens import anchor_reports, general_flags  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = REPO_ROOT / "manifest.json"
@@ -154,6 +157,53 @@ def stage_derive(root: Path, run: Run, repo: Path, version: str) -> None:
         f"tier {run.entry['tier']}, {len(meta['laws'])} laws: "
         f"{', '.join(meta['laws'])}",
         {"laws": meta["laws"], "policy_targets": meta["policy_targets"]}))
+
+
+ANCHOR_REFUSALS = ("A", "C")
+
+"""The two `anchors` flags that are refusals rather than readings.
+
+A is a target every occurrence of which sits inside a `for e: {...}` premise:
+the submission decides whether the premise is inhabitable, so a body that
+falsifies it proves the law vacuously and nothing constrains the target. C is a
+target no law names at all. Both were measured paying full reward in this bank
+before they were closed -- Fact 33 for C, the `all_le_put`/`all_ge_put` pair in
+`t4-inorder-transport` for A -- and neither is escapable by anything the laws
+can see.
+
+B is deliberately *not* a refusal. A target named on both sides of every law
+that names it is free up to a cancelling wrapper, and whether one exists depends
+on the type: `len(xs) = ref(xs) + k` fails `len_append` at every `k` but zero,
+while a list-valued wrapper has no such constraint. So B is recorded and left to
+the author, which is the same triage rule the screen's own docstring states.
+"""
+
+
+def stage_screens(root: Path, run: Run, repo: Path) -> None:
+    """The static screens as a stage, so that "run the screens" is the
+    pipeline's step and not a sentence in a brief that an author may skip.
+
+    None of these runs the checker, so this costs no verdict and cannot see a
+    body that escapes. It sees the shapes where the law set itself leaves a
+    target free, which is what every full-reward hole this bank has paid for on
+    a static reading has been.
+    """
+    row = {"task_id": root.name, "path": root.relative_to(repo).as_posix()}
+    refusals, readings = [], []
+    for target, (flag, why) in sorted(anchor_reports(row, repo).items()):
+        line = f"[{flag}] {target}: {why}"
+        (refusals if flag in ANCHOR_REFUSALS else readings).append(line)
+    for target, sigs in sorted(general_flags(row, repo).items()):
+        readings.append(f"{target}: no law applies it with every argument open "
+                        f"({len(sigs)} application(s), all with a literal)")
+    if refusals:
+        detail = "; ".join(f"anchors {r}" for r in refusals)
+    elif readings:
+        detail = ("no refusal; triage: " + "; ".join(readings))
+    else:
+        detail = "clean: every target has a law of its own with an absolute anchor"
+    run.stages.append(Stage("screens", not refusals, detail,
+                            {"refusals": refusals, "readings": readings}))
 
 
 def stage_mutants(root: Path, run: Run, repo: Path, toolchain: Toolchain) -> None:
@@ -343,6 +393,13 @@ def author(root: Path, *, repo: Path = REPO_ROOT,
     toolchain = Toolchain.load(version)
 
     stage_derive(root, run, repo, version)
+    if not run.ok:
+        return run
+
+    # Before the mutants stage: a refusal here is a two-line law fix, while the
+    # same defect found after a corpus has been generated costs a rewrite of the
+    # laws plus every mutant that was written against them.
+    stage_screens(root, run, repo)
     if not run.ok:
         return run
 

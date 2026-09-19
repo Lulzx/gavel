@@ -16,9 +16,112 @@ from pathlib import Path
 import pytest
 
 from gavel.reviews import review_path
-from tools.author import Run, author, required_files, stage_review
+from tools.author import Run, author, required_files, stage_review, stage_screens
 
 SOURCE_TASK = "t1-add-plus"
+
+
+# --- the screens stage -------------------------------------------------------------
+
+HEAD = """import Base
+import ./prelude.bend as P
+import ./solution.bend as S
+
+"""
+
+STUB_ONE = """import Base
+import ./prelude.bend as P
+
+# TODO(policy): the target the laws below are about.
+def other(xs: List<&2, Nat>) -> List<&2, Nat>:
+  ?TODO
+"""
+
+STUB_TWO = """import Base
+import ./prelude.bend as P
+
+# TODO(policy): named by no law in the fixtures below that use STUB_TWO.
+def thing(xs: List<&2, Nat>) -> List<&2, Nat>:
+  ?TODO
+
+# TODO(policy): the target the laws below are about.
+def other(xs: List<&2, Nat>) -> List<&2, Nat>:
+  ?TODO
+"""
+
+
+def _screens(tmp_path, laws: str, stub: str):
+    """One run of the screens stage over a task directory holding just the two
+    files it reads."""
+    root = tmp_path / "tasks" / "1" / "t1-x"
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "LAWS.bend").write_text(laws)
+    (root / "solution.bend").write_text(stub)
+    run = Run(task_id=root.name, root=root)
+    stage_screens(root, run, tmp_path)
+    return run.stages[-1]
+
+
+def test_a_target_no_law_names_refuses_the_run(tmp_path):
+    """Fact 33's shape, which was measured paying full reward: a target the law
+    set never mentions is substitutable for the reference, so the law set is not
+    about it in any sense. This is the one class a green V1-V5 run says nothing
+    about, because no law fails for the body that ignores the target."""
+    laws = HEAD + """law other_nil:
+  {S.other(Nil{}) == Nil{} : List<&2, Nat>}
+"""
+    stage = _screens(tmp_path, laws, STUB_TWO)
+    assert not stage.ok
+    assert stage.evidence["refusals"] == ["[C] thing: named by no law at all"]
+
+
+def test_a_target_named_only_in_a_premise_refuses_the_run(tmp_path):
+    """The `all_le_put` shape in t4-inorder-transport, before its repair: the
+    submission decides whether the premise is inhabitable, so a body that
+    falsifies it proves the law vacuously and the target is free."""
+    laws = HEAD + """law other_sorted:
+  for +t: List<&2, Nat>
+  for e: {S.thing(t) == True{} : Bool}
+  {S.other(t) == True{} : Bool}
+"""
+    stage = _screens(tmp_path, laws, STUB_TWO)
+    assert not stage.ok
+    assert stage.evidence["refusals"] == [
+        "[A] thing: named only in a premise, by ['other_sorted']"]
+
+
+def test_a_relative_law_is_recorded_and_not_refused(tmp_path):
+    """Flag B is the one anchors flag that is not a refusal. A target named on
+    both sides of every law naming it is free up to a cancelling wrapper, and
+    whether one exists depends on the type -- `len(xs) = ref(xs) + k` is pinned
+    by `len_append` at k = 0 while a list-valued wrapper has no such
+    constraint. The stage records it and leaves the judgement to the author."""
+    laws = HEAD + """law other_append:
+  for +xs: List<&2, Nat>
+  for +ys: List<&2, Nat>
+  {S.other(xs <> ys) == P.append(S.other(xs), S.other(ys)) : List<&2, Nat>}
+"""
+    stage = _screens(tmp_path, laws, STUB_ONE)
+    assert stage.ok
+    assert stage.evidence["refusals"] == []
+    assert "[B] other" in stage.detail
+
+
+def test_a_law_of_its_own_with_an_absolute_anchor_is_clean(tmp_path):
+    """The shape the two refusals are asking for: one law whose right-hand side
+    calls no target, one that applies it with every argument open."""
+    laws = HEAD + """law other_nil:
+  {S.other(Nil{}) == Nil{} : List<&2, Nat>}
+
+law other_cons:
+  for +h: Nat
+  for +t: List<&2, Nat>
+  {S.other(h <> t) == h <> S.other(t) : List<&2, Nat>}
+"""
+    stage = _screens(tmp_path, laws, STUB_ONE)
+    assert stage.ok
+    assert stage.evidence == {"refusals": [], "readings": []}
+    assert stage.detail.startswith("clean:")
 
 
 # --- files ------------------------------------------------------------------------
@@ -180,7 +283,8 @@ def test_a_real_task_runs_the_whole_pipeline(scratch_repo, toolchain):
     run = author(root, repo=scratch_repo, manifest=manifest, backend="plain")
 
     assert [s.name for s in run.stages] == [
-        "files", "derive", "mutants", "invariants", "episode", "review", "publish"]
+        "files", "derive", "screens", "mutants", "invariants", "episode",
+        "review", "publish"]
     assert run.ok, [(s.name, s.detail) for s in run.stages]
     mutants = next(s for s in run.stages if s.name == "mutants")
     assert mutants.evidence["written"] == 0          # the fixture ships a corpus
@@ -268,8 +372,8 @@ def test_a_reference_that_proves_nothing_is_refused_before_anything_is_written(
     run = author(task_root, repo=scratch_repo,
                  manifest=scratch_repo / "manifest.json", backend="plain")
     assert not run.ok
-    assert [s.name for s in run.stages] == ["files", "derive", "mutants",
-                                            "invariants"]
+    assert [s.name for s in run.stages] == ["files", "derive", "screens",
+                                            "mutants", "invariants"]
     assert "not 4" in run.stages[-1].detail
     assert not (scratch_repo / "manifest.json").exists()
     # And the episode stage never ran, so the task was never *rewarded*.

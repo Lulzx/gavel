@@ -241,34 +241,51 @@ def general(ids, manifest_path=None):
     rows = [t for t in man["tasks"] if not ids or t["task_id"] in ids]
     flagged = 0
     for t in rows:
-        tid = t["task_id"]
-        laws_src = (ROOT / t["path"] / "LAWS.bend").read_text()
-        stub = (ROOT / t["path"] / "solution.bend").read_text()
-        targets = [m.group(1) for m in re.finditer(r"^def\s+([A-Za-z_][\w]*)\s*\(", stub, re.M)]
-        if not targets:
-            continue
-        reached = {x: [] for x in targets}
-        for block in goal_blocks(laws_src):
-            for target, args in lhs_calls(block):
-                if target not in reached or not args:
-                    continue
-                if all(not is_literal(a) for a in args):
-                    reached[target].append(block.strip()[:60])
-        bad = [x for x in targets if not reached[x]]
+        bad = general_flags(t)
         if bad:
             flagged += 1
-            print(f"{tid}  (tier {t['tier']})  targets with no general law: {bad}")
-            for x in bad:
-                seen = set()
-                for block in goal_blocks(laws_src):
-                    for target, args in lhs_calls(block):
-                        if target == x:
-                            sig = f"{x}({', '.join(args)})"
-                            if sig not in seen:
-                                seen.add(sig)
-                                print(f"      seen only: {sig}")
+            print(f"{t['task_id']}  (tier {t['tier']})  targets with no general law: {sorted(bad)}")
+            for x in sorted(bad):
+                for sig in bad[x]:
+                    print(f"      seen only: {sig}")
     print(f"\ntasks scanned: {len(rows)}   flagged tasks: {flagged}")
     return 0
+
+
+def general_flags(task: dict, repo: Path | None = None) -> dict[str, list[str]]:
+    """`{target: [application signature, ...]}` for one manifest row.
+
+    Every entry is a target no single law applies with all its arguments open,
+    which is the `t2-chunks-laws` shape. Triage rather than a defect: a finite
+    type whose every constructor is named is pinned by literal laws and this
+    screen cannot tell that from an unpinned interior.
+    """
+    repo = ROOT if repo is None else Path(repo)
+    laws_src = (repo / task["path"] / "LAWS.bend").read_text()
+    stub = (repo / task["path"] / "solution.bend").read_text()
+    targets = [m.group(1) for m in re.finditer(r"^def\s+([A-Za-z_][\w]*)\s*\(", stub, re.M)]
+    if not targets:
+        return {}
+    reached = {x: [] for x in targets}
+    for block in goal_blocks(laws_src):
+        for target, args in lhs_calls(block):
+            if target not in reached or not args:
+                continue
+            if all(not is_literal(a) for a in args):
+                reached[target].append(block.strip()[:60])
+    bad = {}
+    for x in targets:
+        if reached[x]:
+            continue
+        seen = []
+        for block in goal_blocks(laws_src):
+            for target, args in lhs_calls(block):
+                if target == x:
+                    sig = f"{x}({', '.join(args)})"
+                    if sig not in seen:
+                        seen.append(sig)
+        bad[x] = seen
+    return bad
 
 
 # --------------------------------------------------------------------------
@@ -335,45 +352,61 @@ def anchors(ids, manifest_path=None):
     rows = [t for t in man["tasks"] if not ids or t["task_id"] in ids]
     flagged = 0
     for t in rows:
-        tid = t["task_id"]
-        laws_src = (ROOT / t["path"] / "LAWS.bend").read_text()
-        stub = (ROOT / t["path"] / "solution.bend").read_text()
-        targets = [m.group(1) for m in re.finditer(r"^def\s+([A-Za-z_][\w]*)\s*\(", stub, re.M)]
-        if not targets:
-            continue
-        bodies = dict(laws_of(ROOT / t["path"] / "LAWS.bend"))
-        reports = {}
-        for x in targets:
-            call = re.compile(rf"\bS\.{re.escape(x)}\s*\(")
-            goal_hits, premise_hits, relat = [], [], []
-            for name, body in bodies.items():
-                for start, end, premise in block_spans(body):
-                    block = body[start:end]
-                    if not call.search(block):
-                        continue
-                    if premise:
-                        premise_hits.append(name)
-                        continue
-                    lhs, rhs = split_eq(block)
-                    goal_hits.append(name)
-                    # Relative means *both* sides. A target the law names only
-                    # on the right is determined by that law, not left free by
-                    # it: the law says `f(x) == target(...)`.
-                    if call.search(rhs) and call.search(lhs):
-                        relat.append(name)
-            if goal_hits and len(relat) == len(goal_hits):
-                reports[x] = ("B", f"every law naming it names it on both sides: {sorted(set(relat))}")
-            elif not goal_hits and premise_hits:
-                reports[x] = ("A", f"named only in a premise, by {sorted(set(premise_hits))}")
-            elif not goal_hits and not premise_hits:
-                reports[x] = ("C", "named by no law at all")
+        reports = anchor_reports(t)
         if reports:
             flagged += 1
-            print(f"{tid}  (tier {t['tier']})")
+            print(f"{t['task_id']}  (tier {t['tier']})")
             for x, (code, why) in sorted(reports.items()):
                 print(f"      [{code}] {x}: {why}")
     print(f"\ntasks scanned: {len(rows)}   flagged tasks: {flagged}")
     return 0
+
+
+def anchor_reports(task: dict, repo: Path | None = None) -> dict[str, tuple[str, str]]:
+    """`{target: (flag, detail)}` for one manifest row, without printing.
+
+    Split out of `anchors` so the authoring pipeline can read the same
+    verdicts rather than a second implementation of them. Two of the three
+    flags are refusals there -- A and C are the shapes where nothing
+    constrains the target at all, and both were measured paying full reward
+    before they were closed -- while B is a reading, because a relative law
+    is only escapable when a cancelling wrapper exists.
+    """
+    repo = ROOT if repo is None else Path(repo)
+    laws_src = (repo / task["path"] / "LAWS.bend").read_text()
+    stub = (repo / task["path"] / "solution.bend").read_text()
+    targets = [m.group(1) for m in re.finditer(r"^def\s+([A-Za-z_][\w]*)\s*\(", stub, re.M)]
+    if not targets:
+        return {}
+    bodies = dict(laws_of(repo / task["path"] / "LAWS.bend"))
+    reports = {}
+    for x in targets:
+        call = re.compile(rf"\bS\.{re.escape(x)}\s*\(")
+        goal_hits, premise_hits, relat = [], [], []
+        for name, body in bodies.items():
+            for start, end, premise in block_spans(body):
+                block = body[start:end]
+                if not call.search(block):
+                    continue
+                if premise:
+                    premise_hits.append(name)
+                    continue
+                lhs, rhs = split_eq(block)
+                goal_hits.append(name)
+                # Relative means *both* sides. A target the law names only
+                # on the right is determined by that law, not left free by
+                # it: the law says `f(x) == target(...)`.
+                if call.search(rhs) and call.search(lhs):
+                    relat.append(name)
+        if goal_hits and len(relat) == len(goal_hits):
+            reports[x] = ("B", f"every law naming it names it on both sides: {sorted(set(relat))}")
+        elif not goal_hits and premise_hits:
+            reports[x] = ("A", f"named only in a premise, by {sorted(set(premise_hits))}")
+        elif not goal_hits and not premise_hits:
+            reports[x] = ("C", "named by no law at all")
+    return reports
+
+
 
 
 # --------------------------------------------------------------------------

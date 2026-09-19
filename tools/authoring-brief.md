@@ -119,11 +119,22 @@ These are the defects that survive every stage, so they are on you:
      to a cancelling wrapper: `f(xs) = c ++ ref(xs)` satisfies every such law
      when the constant cancels. A relative law is not an anchor — add one law
      whose right-hand side does not call the target (`f(Nil{}) == Nil{}`).
-   Run the screens before you ask anyone to look at the task:
+   `tools.author` runs `anchors` and `general` for you, as the `screens` stage,
+   and it **refuses** on the two flags that mean nothing constrains the target:
+   A (named only in a premise) and C (named by no law at all). Both were
+   measured paying full reward here before they were closed, and neither is
+   escapable by anything the laws can see, so they are a gate rather than a
+   reading. Flag B and every `general` flag are recorded in the stage's detail
+   and do not refuse — a relative law is only escapable when a cancelling
+   wrapper exists, which depends on the type. Measured 2026-09-19: the stage
+   refuses **0 of the 225** registered tasks and records 7 as triage, so it
+   closes the class for new work without invalidating the bank.
 
-       uv run python -m tools.screens anchors  scratch/<YOURTAG>.json <task-id>
-       uv run python -m tools.screens general  scratch/<YOURTAG>.json <task-id>
+   The two screens `tools.author` does not run are yours, because neither can
+   be reduced to a per-target question:
+
        uv run python -m tools.screens positions <task-id>
+       uv run python -m tools.screens batch     <task-id>
 
    A flag is triage, not a defect, and a clean run is not a proof — but all
    three of the tier-4 holes this bank was paying full reward for on 2026-09-19
