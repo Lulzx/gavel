@@ -1,5 +1,15 @@
 import Base
 
+# How many elements a list has. This is here because a law has to be able to say
+# how many elements an answer carries and not only which ones: sortedness is a
+# property a list with elements missing still has.
+def len(xs: List<&2, Nat>) -> Nat:
+  match xs:
+    case Nil{}:
+      0n
+    case h <> t:
+      1n + len(t)
+
 def le(a: Nat, b: Nat) -> Bool:
   match a:
     case 0n:

@@ -106,3 +106,36 @@ def L.insert_gt(x, y, e):
 def L.isort_swap(x, y, e):
   %Equal.sym(Bool, P.le(x, y), False{}, e) : {P.insert_put(Nil{}, y, x, _) == y <> x <> Nil{} : List<&2, Nat>}
   {==}
+
+# `insert_put` adds exactly two elements to its list argument, whatever the
+# decision: each leaf is a two-element list on the empty list, and the recursive
+# leaf keeps the head and recurses. `h` and `y` are live because the leaves use
+# them; the decision is the argument the four cases split on.
+def Policy.insert_put_len(t: List<&2, Nat>, +h: Nat, +y: Nat, k: Bool)
+    -> {P.len(P.insert_put(t, h, y, k)) == 1n + (1n + P.len(t)) : Nat}:
+  match t:
+    case Nil{}:
+      match k:
+        case True{}:
+          {==}
+        case False{}:
+          {==}
+    case +h2 <> t2:
+      match k:
+        case True{}:
+          {==}
+        case False{}:
+          %Equal.sym(Nat, P.len(P.insert_put(t2, h2, y, P.le(y, h2))),
+                     1n + (1n + P.len(t2)),
+                     Policy.insert_put_len(t2, h2, y, P.le(y, h2)))
+              : {1n + _ == 1n + (1n + (1n + P.len(t2))) : Nat}
+          {==}
+
+# `insert` is `insert_put` on the tail, so the count follows from just above.
+def L.insert_len(xs, y):
+  match xs:
+    case Nil{}:
+      {==}
+    case +h <> t:
+      %Policy.insert_put_len(t, h, y, P.le(y, h)) : {P.len(S.insert(h <> t, y)) == _ : Nat}
+      {==}

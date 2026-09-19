@@ -83,3 +83,8 @@ def L.rev_rev(xs):
       %Equal.sym(List<&2, Nat>, S.rev(P.snoc(S.rev(t), h)), h <> S.rev(S.rev(t)), Policy.rev_snoc(S.rev(t), h)) : {_ == h <> t : List<&2, Nat>}
       %Equal.sym(List<&2, Nat>, S.rev(S.rev(t)), t, L.rev_rev(t)) : {h <> _ == h <> t : List<&2, Nat>}
       {==}
+
+# The singleton law is `rev`'s own unfolding: the empty list reverses to itself,
+# so the step answers `P.snoc(Nil{}, x)`, which computes to `x <> Nil{}`.
+def L.rev_singleton(x):
+  {==}

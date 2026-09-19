@@ -681,7 +681,7 @@
       "tier": 3,
       "path": "tasks/3/t3-isort-sorted",
       "reference": "references/t3-isort-sorted",
-      "hash": "de643030ffa0bdaf9bbcc0d668a13e1f98655fd216bdede9e53f35695979240a"
+      "hash": "3978197552cbc566a725c4fd9b5b8929db7fb80443c4592e492bbf3e596c5480"
     },
     {
       "task_id": "t3-last-snoc",
@@ -744,7 +744,7 @@
       "tier": 3,
       "path": "tasks/3/t3-rev-rev",
       "reference": "references/t3-rev-rev",
-      "hash": "22704f38da3e2b6b8f6351f8536927afa465b1b9389cecfdb751aebe53cb6d59"
+      "hash": "23b131e8e4a8ecff704577d29b8da8a2a074f6d728a375f5a6b5426a21dc14d5"
     },
     {
       "task_id": "t3-rle-expand",

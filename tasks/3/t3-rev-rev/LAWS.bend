@@ -40,3 +40,16 @@ law rev_append:
 law rev_rev:
   for +xs: List<&2, Nat>
   {S.rev(S.rev(xs)) == xs : List<&2, Nat>}
+
+# LAW: a one-element list reverses to itself. The three laws above pin the
+# *order* of the answer and its length and nothing else. `rev_append` says `rev`
+# turns an append around and `rev_rev` says it is its own inverse, so `rev` is
+# an anti-automorphism of `append` that squares to the identity -- and on the
+# free monoid that determines it only up to a fixed involution of the elements:
+# "reverse, and map every element by the same involution" satisfies all three.
+# A one-element list has nowhere for a permutation to act, so this is the law
+# that observes what happens to the element itself, which the other three
+# cannot see.
+law rev_singleton:
+  for x: Nat
+  {S.rev(x <> Nil{}) == x <> Nil{} : List<&2, Nat>}

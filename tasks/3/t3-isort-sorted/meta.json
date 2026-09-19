@@ -6,7 +6,8 @@
     "insert_sorted",
     "insert_le",
     "insert_gt",
-    "isort_swap"
+    "isort_swap",
+    "insert_len"
   ],
   "policy_targets": [
     "insert",
@@ -15,8 +16,8 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "cf7449141ec6a926e92ab38f090c56325d9f3521d9002e266a5af0ad2a348f2b",
-    "prelude": "c3524ca849e040d66676855d043475c753ee008ed3bb5a050ed9420d8742c11a"
+    "laws": "fb5b5237d530967ed4b030c8b38f758ba2f94f82467652d8c8756c41b4751f66",
+    "prelude": "d9b5cd704655fe8f4ed2d960624138066ff27b644efe2f895426a0334b908881"
   },
   "bend_version": "2.0.5"
 }

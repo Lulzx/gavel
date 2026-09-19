@@ -1,4 +1,4 @@
-Implement `rev` on `List<&2, Nat>`, then prove all three laws.
+Implement `rev` on `List<&2, Nat>`, then prove all four laws.
 
 `rev(xs)` returns `xs` backwards. It recurses on `xs`: the empty list reverses
 to itself, and a cons cell reverses its tail and puts the head on the right,
@@ -35,6 +35,16 @@ which the gate ignores and the credit path does not count; a helper may call
 one would make an isolated law depend on a law that has not been credited yet
 and the credit for both would be lost.
 
+The law `rev_singleton` says a one-element list reverses to itself. It is worth
+knowing why it is there, because it does not look like the others. `rev_append`
+and `rev_rev` together say `rev` is an anti-automorphism of `append` that is its
+own inverse, and on lists that determines the *order* of the answer and its
+length but not what happens to each element: "reverse, and map every element by
+the same involution of `Nat`" satisfies all three. A one-element list has
+nowhere for a permutation to act, so this law is the only one that observes the
+element itself, and it closes by direct computation -- `rev(Nil{})` is `Nil{}`,
+so the answer is `P.snoc(Nil{}, x)`, which is `x <> Nil{}`.
+
 The direction of every rewrite is the one that matters. To replace a term `O` in
 the goal you supply a proof of `{R == O}` with `R` the term you want, which is
 `Equal.sym` around a lemma that points the other way: the rewrite fills the hole
@@ -60,6 +70,6 @@ is not one. Anything the policy is not being asked to write is `P.`.
 
 The law-defs are written with no signature and bare binder names, in the fixed
 order `def L.rev_len(xs)`, then `def L.rev_append(xs, ys)`, then
-`def L.rev_rev(xs)`, and each may cite the earlier helpers but never one of the
-other laws. Write the implementations in `solution.bend` and the proofs in
-`PROOF.bend`.
+`def L.rev_rev(xs)`, then `def L.rev_singleton(x)`, and each may cite the
+earlier helpers but never one of the other laws. Write the implementations in
+`solution.bend` and the proofs in `PROOF.bend`.

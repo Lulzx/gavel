@@ -56,3 +56,16 @@ law isort_swap:
   for +y: Nat
   for e: {P.le(x, y) == False{} : Bool}
   {S.isort(x <> y <> Nil{}) == y <> x <> Nil{} : List<&2, Nat>}
+
+# LAW: inserting one element makes the list one longer. The five laws above say
+# what the answer *is* only on lists of at most two elements: `insert_le` and
+# `insert_gt` fix `insert` on a literal one-element list, `isort_swap` fixes
+# `isort` on two, and everything else is a sortedness predicate, which a list
+# with elements missing still satisfies. Nothing counted, so an `insert` that
+# answered a two-element list whenever it was handed a longer one kept every
+# law. This is the law that counts, and it is what ties the answer's length to
+# the argument's.
+law insert_len:
+  for +xs: List<&2, Nat>
+  for +y: Nat
+  {P.len(S.insert(xs, y)) == 1n + P.len(xs) : Nat}
