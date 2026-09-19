@@ -348,6 +348,13 @@
       "hash": "8ed7f4040e9d2e1fcac805760aea48ea64bbb49d74ac4ca818c8bccada86e8d8"
     },
     {
+      "task_id": "t2-count-if-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-count-if-laws",
+      "reference": "references/t2-count-if-laws",
+      "hash": "8bc47a6ef6f748363232b8220236549a51e60c1d0cb6581ac3356f12101b3fe2"
+    },
+    {
       "task_id": "t2-count-odd-laws",
       "tier": 2,
       "path": "tasks/2/t2-count-odd-laws",
@@ -430,6 +437,13 @@
       "path": "tasks/2/t2-elem-laws",
       "reference": "references/t2-elem-laws",
       "hash": "9b5d0c25ca47f4ec1fd76d8b6f632876550d840a8fa11515155544f023f0123b"
+    },
+    {
+      "task_id": "t2-enum-from-len",
+      "tier": 2,
+      "path": "tasks/2/t2-enum-from-len",
+      "reference": "references/t2-enum-from-len",
+      "hash": "f6daede347e84a1b4de775c3abb1d083e269b47727cda490c75777eca0b1f881"
     },
     {
       "task_id": "t2-extremes-laws",
@@ -733,6 +747,13 @@
       "hash": "d04e38856f4c7aef4189bc4958cb3222b30455f9cb4f919d17ad452ab9ac1f4f"
     },
     {
+      "task_id": "t2-split-at-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-split-at-laws",
+      "reference": "references/t2-split-at-laws",
+      "hash": "69c6465bfc94cea170352b3088bdb83325119186f0984b104ce0d4c65a0dc7d9"
+    },
+    {
       "task_id": "t2-sq-all-laws",
       "tier": 2,
       "path": "tasks/2/t2-sq-all-laws",
@@ -880,11 +901,25 @@
       "hash": "c7b1be17ba1007735f25363a93712c4573c0f26a4905feb1065eaf62ee7dbd5d"
     },
     {
+      "task_id": "t2-swap-adjacent-laws",
+      "tier": 2,
+      "path": "tasks/2/t2-swap-adjacent-laws",
+      "reference": "references/t2-swap-adjacent-laws",
+      "hash": "11ea7de3169fb02520b36ff70514fe72c4d1d4fe8c8fdac8257b44c92a6f08aa"
+    },
+    {
       "task_id": "t2-take-laws",
       "tier": 2,
       "path": "tasks/2/t2-take-laws",
       "reference": "references/t2-take-laws",
       "hash": "a50fa8d1bf49ebcf06f18a12170cca937080dfc0c54b890b97b6b85999b44daa"
+    },
+    {
+      "task_id": "t2-transpose-rows",
+      "tier": 2,
+      "path": "tasks/2/t2-transpose-rows",
+      "reference": "references/t2-transpose-rows",
+      "hash": "bfad0936e1f2ece32a650780f7aef3e2f28962ed576e8b9a0cee756cf1de1d3c"
     },
     {
       "task_id": "t2-tree-fold",
@@ -913,6 +948,20 @@
       "path": "tasks/2/t2-triple-all-laws",
       "reference": "references/t2-triple-all-laws",
       "hash": "7f2029a6b143b051cf4b0517fd39ac80f2a1bed6e091c483dff415bc23c0971c"
+    },
+    {
+      "task_id": "t2-unzip-lists",
+      "tier": 2,
+      "path": "tasks/2/t2-unzip-lists",
+      "reference": "references/t2-unzip-lists",
+      "hash": "0cf219be1cdfff47c871af5d582f5da59efd0d314c0ba977ea9ed40878c3f688"
+    },
+    {
+      "task_id": "t2-windows-k",
+      "tier": 2,
+      "path": "tasks/2/t2-windows-k",
+      "reference": "references/t2-windows-k",
+      "hash": "c52d2c07b88838c0293e13a627dfec70cfb0aa55f05d07109cf3f52239529f81"
     },
     {
       "task_id": "t2-zeros-prefix-laws",

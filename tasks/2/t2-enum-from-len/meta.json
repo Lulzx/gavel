@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-enum-from-len",
+  "tier": 2,
+  "laws": [
+    "enum_from_zero",
+    "enum_from_succ",
+    "enum_from_len"
+  ],
+  "policy_targets": [
+    "enum_from"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "63dbfc84f87e736060f5da880098341b04f8dc5fd2afb85157986f281d0b2ccd",
+    "prelude": "afb2969e24202eb231af56cbe98f2513f89a34c5f7816ffb2b72bcac20eefe4a"
+  },
+  "bend_version": "2.0.5"
+}

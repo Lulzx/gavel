@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-count-if-laws",
+  "tier": 2,
+  "laws": [
+    "count_if_nil",
+    "count_if_cons",
+    "count_if_snoc"
+  ],
+  "policy_targets": [
+    "count_if"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "935a6b8a1e628344c460ca9d2aa5e9df2244690121e90903f996c78f08d5b043",
+    "prelude": "f2be36ea320a6a761457e78153168ab3ef776d6b4a772d0cf8f9d9c885ba44cc"
+  },
+  "bend_version": "2.0.5"
+}

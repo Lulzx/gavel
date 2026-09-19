@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-split-at-laws",
+  "tier": 2,
+  "laws": [
+    "split_at_zero",
+    "split_at_nil",
+    "split_at_cons_left",
+    "split_at_cons_right",
+    "split_at_decomp"
+  ],
+  "policy_targets": [
+    "split_at"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7fdce0903d5f36ebd6dcf61a47d510e25ce3a69338d7ed12777a901eaf4469d2",
+    "prelude": "a84413cd8ce81111dcc432700f918966927d22ea22f8900ed4187298c14d1c2b"
+  },
+  "bend_version": "2.0.5"
+}

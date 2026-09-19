@@ -1,0 +1,24 @@
+{
+  "task_id": "t2-transpose-rows",
+  "tier": 2,
+  "laws": [
+    "transpose_nil",
+    "transpose_cons",
+    "transpose_single_row",
+    "insert_row_nil",
+    "insert_row_empty_cols",
+    "insert_row_cons_cols",
+    "transpose_two_by_two"
+  ],
+  "policy_targets": [
+    "insert_row",
+    "transpose"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "aaa6cea31ce9c3c031bbbcf3e55c3e8b04a2242d8369005fec560bb726d9c00d",
+    "prelude": "5fbe9b341a9913a5d87358891526adc9ee2925a2ce2e160c85bf586aa8b97014"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-unzip-lists",
+  "tier": 2,
+  "laws": [
+    "unzip_nil",
+    "unzip_cons_fst",
+    "unzip_cons_snd",
+    "unzip_len_fst",
+    "unzip_len_snd"
+  ],
+  "policy_targets": [
+    "unzip"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "cbb2b0a73e123135c2938ab9e3cff97d4819333238732c92288421a49cc0da38",
+    "prelude": "272a14d335fa1bde406e4daf70804bf36018674e2babcd7c00a238815cbac9bd"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-swap-adjacent-laws",
+  "tier": 2,
+  "laws": [
+    "swap_adjacent_nil",
+    "swap_adjacent_single",
+    "swap_adjacent_cons",
+    "swap_adjacent_len",
+    "swap_adjacent_involutive"
+  ],
+  "policy_targets": [
+    "swap_adjacent"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "4a06c9a013cc55cdd98805f307af88729f67731e072d6cca53d03c15237794b9",
+    "prelude": "7badad1001a6620cdbc19a827ae9d6855e1b43c5841a80f0a1df2cccaa7eafd3"
+  },
+  "bend_version": "2.0.5"
+}

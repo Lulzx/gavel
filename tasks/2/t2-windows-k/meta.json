@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-windows-k",
+  "tier": 2,
+  "laws": [
+    "windows_zero",
+    "windows_succ",
+    "windows_nil",
+    "windows_go_nil",
+    "windows_go_step"
+  ],
+  "policy_targets": [
+    "windows_go",
+    "windows"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "5e2eeaea90540521487d2018ff4e30101c37a2f3da8d1b2454f528fc49f6f156",
+    "prelude": "126fd6fad324d57d5a25cf86e489e91b3b5518a8ba70ca6efa3e0bd703f28055"
+  },
+  "bend_version": "2.0.5"
+}
