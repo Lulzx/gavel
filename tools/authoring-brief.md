@@ -154,20 +154,38 @@ guess. `append`, `len`, `map`, `rev`, `sum`, `take`, `drop`, `zip`, `filter`,
 `sum_even`, `clamp`, `indexed`, `build` are all taken. If the function you
 want is on that list, pick another one.
 
-Good hunting grounds that the list above does not cover — **verify each with the
-grep before you commit to it, because this paragraph goes stale every batch and
-seven of the twenty names that stood here last round are now taken** (`unzip`,
-`transpose`, `windows`, `enum_from`, `count_if`, `split_at` and
-`swap_adjacent` all went in, and `insert_row` and `windows_go` with them).
-Verified free on 2026-09-19: `range` (a counted generator), `qsort` and
-`msort` (comparison-driven sorting against the `isort` already in the bank),
-`nat_to_bin` (the inverse of the taken `bin_to_nat`, which makes a round-trip law
-available), `rotate_left`, `apply_n`, `tree_depth`, `tree_size`,
-`tree_leaf_count`, `flat_map`, `pair_up`, `carry_add`. Beyond names, a
-tree *fold* or a tree insert where `tree_map` and `snoc_tree` only cover the
-functor and the snoc, mutual recursion between two small functions, and any
-two-function *interaction law* (a law whose two sides use two different
-functions the policy must both implement) that is not already in the bank.
+Good hunting grounds that the list above does not cover — **but check the
+candidate's *function*, not its name, and read the prompt of any existing task
+that might be it.** The grep above searches for the name, and a collision
+between two names for one function returns nothing: on 2026-09-19 this paragraph
+shipped a list of which seven of twelve names resolved to a function the bank
+already has — six as registered targets under another name, one as a prelude
+helper. `range` is `count_up` (`t2-count-up-down`); `pair_up` is `pairs`
+(`t2-pairs-laws`) if you mean a sliding pairing or `chunk_two`
+(`t2-chunk-two-join-two`) if you mean disjoint chunks, which is why two authors
+read it two ways; `nat_to_bin` in its only admissible form is `nat_bits`
+(`t2-nat-bits`); `tree_depth` is `height` (`t3-height-mirror`); `rotate_left` is
+`rotate` (`t1-rotate`); `flat_map` is `concat_map` (`t2-concat-map`); and
+`tree_fold` has been taken since, by `t2-tree-fold`. `tree_leaf_count` is the
+permitted kind of repeat — it is the prelude helper `leaves`, and a helper
+repeating across tasks is not a target collision, so do not refuse a task for it.
+**A missing name is not a free function.**
+
+Dead for reasons of the checker rather than the bank: `qsort` and `msort`
+recurse on a computed list and are refused at the *reference* (`expected : a
+decreasing self-call`), so no tier-2 law set survives; width-free `nat_to_bin`
+dies the same way; `apply_n` needs a function argument applied twice, which the
+single-use discipline refuses.
+
+`carry_add` is **unprobed, not refused**. One author dropped it claiming
+`Nat.mod`/`Nat.div` do not exist, having grepped `toolchain/2.0.5/bend2/src` — a
+path that does not exist, whose empty output was read as absence. Both are in
+`base.bend` (`Nat.div` line 615, `Nat.mod` line 622, over `Nat.divmod` at 569),
+and `base.bend` is what a task imports as `Base`. Try it first.
+
+Beyond names: mutual recursion between two small functions, and any two-function
+*interaction law* (a law whose two sides use two different functions the policy
+must both implement) that is not already in the bank.
 
 **Check the target set as well as the law names.** The 188 policy targets in
 the bank are the names a task *asks a policy to implement*; two tasks asking
