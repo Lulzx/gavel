@@ -24,5 +24,12 @@ runs/
 *.sqlite-wal
 *.sqlite-shm
 
+# Per-worker authoring manifests. They are build intermediates -- a round's
+# manifest survives only until the round is collapsed into manifest.json, which
+# tools.author does by re-running each task against it. Kept out of the repo
+# root, where a stale one sitting beside the real manifest.json is how the
+# wrong file gets published.
+scratch/
+
 # OS
 .DS_Store

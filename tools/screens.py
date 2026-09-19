@@ -13,8 +13,10 @@ hardcoded, so PLAN.md's readings can be reproduced.
 `positions` reads the task directories directly, so it sees a task before it is
 registered. `general`, `anchors` and `batch` read `manifest.json` by default and
 take a manifest path as a first argument otherwise; `batch` will also fall back
-to the `manifest.scratch.*.json` files in the repo root, which are untracked and
-so absent from a fresh clone.
+to the scratch manifests, which are untracked and so absent from a fresh clone.
+Those live under `scratch/` (the round in progress) and `scratch/archive/` (the
+rounds that have been collapsed into `manifest.json`); only the live directory is
+searched, because an archived manifest lists tasks that are already registered.
 
 None of the four runs the checker, so none of them can tell you whether a body
 escapes a law set. They flag *room* -- a law set that names a target at a point
@@ -385,14 +387,16 @@ def batch(ids, manifest_path=None):
     against a scratch manifest, which needs the box to itself.
 
     An unpublished task is looked up in `manifest_path` if given, and otherwise
-    in every `manifest.scratch.*.json` in the repo root. Those scratch manifests
-    are untracked, so a fresh clone needs the path.
+    in every scratch manifest in `scratch/`. Those are untracked, so a fresh
+    clone needs the path. The root glob is kept for a worker mid-round that has
+    not been moved yet.
     """
     manifest = json.loads((ROOT / "manifest.json").read_text())
     bank = {t["task_id"]: t for t in manifest["tasks"]}
     bank_sigs = {k: sigs(ROOT / t["path"] / "solution.bend") for k, t in bank.items()}
     cfgs = ([Path(manifest_path)] if manifest_path
-            else sorted(ROOT.glob("manifest.scratch.*.json")))
+            else sorted(ROOT.glob("scratch/*.json"))
+            + sorted(ROOT.glob("manifest.scratch.*.json")))
     pending = {}
     for cfg in cfgs:
         for t in json.loads(cfg.read_text())["tasks"]:

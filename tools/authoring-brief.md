@@ -56,10 +56,20 @@ and never run it with no arguments. Do not edit `manifest.json`.
 Author with a scratch manifest instead, so parallel runs cannot race on the
 bank:
 
-    uv run python -m tools.author tasks/<N>/<id> --manifest manifest.scratch.<YOURTAG>.json
+    uv run python -m tools.author tasks/<N>/<id> --manifest scratch/<YOURTAG>.json
 
 where `<YOURTAG>` is the tag in your assignment. Exit code 0 means every stage
 passed. Iterate until it does.
+
+Scratch manifests live under `scratch/`, which is gitignored, and not at the
+repository root. Fifty-four of them had accumulated there by 2026-09-19 — one
+per worker per round, against a workflow whose unit is a round — and the cost of
+that is not aesthetic: a stale root manifest beside the real `manifest.json` is
+how the wrong file gets published. Rounds that have been collapsed into
+`manifest.json` move to `scratch/archive/`, and `tools.screens batch` searches
+only the live directory, because an archived manifest lists tasks that are
+already registered and would answer a distinctness question with the bank's own
+copy of the answer.
 
 **NEVER pass `--reviewer`.** It writes a review record that claims a human read
 the laws. No human has, so the record is a forgery. Tier 1 and 2 do not need it.
@@ -111,8 +121,8 @@ These are the defects that survive every stage, so they are on you:
      whose right-hand side does not call the target (`f(Nil{}) == Nil{}`).
    Run the screens before you ask anyone to look at the task:
 
-       uv run python -m tools.screens anchors  manifest.scratch.<YOURTAG>.json <task-id>
-       uv run python -m tools.screens general  manifest.scratch.<YOURTAG>.json <task-id>
+       uv run python -m tools.screens anchors  scratch/<YOURTAG>.json <task-id>
+       uv run python -m tools.screens general  scratch/<YOURTAG>.json <task-id>
        uv run python -m tools.screens positions <task-id>
 
    A flag is triage, not a defect, and a clean run is not a proof — but all
@@ -228,7 +238,7 @@ is: the reference `solution.bend` with that one case given a non-empty answer.
 Then measure it — **not** with `tools/mutate`, which unlinks `mutants/*.bend`
 first — but with:
 
-    uv run gavel --manifest manifest.scratch.<YOURTAG>.json check <task-id> \
+    uv run gavel --manifest scratch/<YOURTAG>.json check <task-id> \
       --solution references/<id>/mutants/<your-file>.bend \
       --proof references/<id>/PROOF.bend --backend plain --json
 
