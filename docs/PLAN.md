@@ -1004,7 +1004,7 @@ the competing version was worth rejecting: Option A (`inorder` alone, either
 law set) can only ever put the weight on an unfolding. tier3-author authors the
 task, not because of the ruling but because they hold the green six-law proof and
 the proof is the expensive artifact; tier2-author's staged version is parked under
-`_abandoned/t4-inorder-transport-tier2/`, and their finding is what forced the
+`tasks/4/_abandoned/t4-inorder-transport-tier2/`, and their finding is what forced the
 better design. The park happened on 2026-09-18 rather than at staging time, and
 the delay was a live hazard worth naming: `tools.publish` walks `tasks/` and
 describes whatever it finds, so with the staged dir sitting at `tasks/4/` a

@@ -70,7 +70,7 @@ tests/          the suite, including the adversarial corpus
 docs/           the pages indexed below
 ```
 
-`SPEC.md` is the design. `PLAN.md` is the build log, including every place a
+`docs/SPEC.md` is the design. `docs/PLAN.md` is the build log, including every place a
 measurement of the real checker forced a departure from the spec.
 
 ## Docs
@@ -88,4 +88,4 @@ measurement of the real checker forced a departure from the spec.
 
 The harness runs end to end and has been soaked for ten thousand episodes.
 The bank holds 239 tasks across five tiers. What it still owes is in
-`PLAN.md`, and the largest item is a human reading of every tier-3+ law set.
+`docs/PLAN.md`, and the largest item is a human reading of every tier-3+ law set.
