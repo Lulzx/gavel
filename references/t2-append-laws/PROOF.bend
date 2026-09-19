@@ -22,6 +22,14 @@ def Policy.add_assoc(a: Nat, -b: Nat, -c: Nat) -> {a + (b + c) == (a + b) + c : 
       %Policy.add_assoc(p, b, c) : {1n + (p + (b + c)) == 1n + _ : Nat}
       {==}
 
+# Both are `append`'s own unfolding: the head goes out in front of the
+# recursive call, and the empty case answers its second argument outright.
+def L.append_cons(h, t, ys):
+  {==}
+
+def L.append_nil_left(ys):
+  {==}
+
 def L.len_append(xs, ys):
   match xs:
     case Nil{}:

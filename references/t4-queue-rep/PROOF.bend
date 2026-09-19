@@ -90,6 +90,12 @@ def L.pop_wf(q):
 def L.pop_empty():
   {==}
 
+# `push`'s first case is definitional: the body matches `P.Q{Nil{}, b}` and
+# rebuilds it with the element consed into the front. The back is carried
+# through untouched, which is the part the premise-carrying laws cannot see.
+def L.push_empty(b, x):
+  {==}
+
 def L.push_contents(q, x, e):
   match q:
     case P.Q{Nil{}, b}:

@@ -1,4 +1,4 @@
-Implement `ins_at`, `insert` and `count`, then prove all eight laws.
+Implement `ins_at`, `insert` and `count`, then prove all nine laws.
 
 `insert(t, k)` is `t` with `k` stored in it: the keys already there are kept and
 `k` is added, so an ordered tree stays ordered. `count(t, x)` is how many keys
@@ -21,6 +21,14 @@ submission can put the descent wherever the gate allows -- including under
 `Policy.` -- and leave `ins_at` answering its own tree for full reward. A
 submission may still delegate the work to a `Policy.` helper; what it may not
 do is hand back something `ins_at` is not.
+
+`count_tip` is the third definitional pin, and it is the one that makes `count`
+a value rather than a difference. On its own `insert_count` fixes only how the
+count *changes*: `count(t, x) = 1n + <the real count>` satisfies it at every
+input, because the `1n` appears on both sides and cancels. `count_tip` names
+`count` at a closed term -- `S.count(P.Tip{}, x) == 0n` -- and `1n` is not `0n`.
+It is `count`'s base case, and since every tree is reached from `P.Tip{}` by
+inserts, the base plus the increment determine the function.
 
 `insert_ordered` and `insert_count` are the work.
 
@@ -61,6 +69,7 @@ parts reassembled.
 Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
 `def L.insert_leaf(k)`, `def L.insert_le(x, y, e)`, `def L.insert_gt(x, y, e)`,
 `def L.ins_at_tip(c, k)`, `def L.ins_at_left(l, key, r, k)`,
-`def L.ins_at_right(l, key, r, k)`, `def L.insert_ordered(t, k, e)` and
+`def L.ins_at_right(l, key, r, k)`, `def L.count_tip(x)`,
+`def L.insert_ordered(t, k, e)` and
 `def L.insert_count(t, k, x)`. Proof helpers go under the reserved `Policy.`
 namespace, which the gate ignores, and none of them may cite a law.

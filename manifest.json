@@ -205,7 +205,7 @@
       "tier": 2,
       "path": "tasks/2/t2-append-laws",
       "reference": "references/t2-append-laws",
-      "hash": "2f1f3b2c1987baa6c2cb624043f28c5ee60811e17f90a1adfb1da35f0984d38a"
+      "hash": "56acc288017712ea9292b64a0260394f2d4c0b56f8ede9e9b35e9aaabbd43661"
     },
     {
       "task_id": "t2-at-laws",
@@ -828,7 +828,14 @@
       "tier": 4,
       "path": "tasks/4/t4-bst-insert",
       "reference": "references/t4-bst-insert",
-      "hash": "245bf5fb94c425195d8896d84f8454aab17f9855fad572c06662cb72045ff663"
+      "hash": "0bbf1b2a88edd985f299d04b63962cf3f0dd7a1250855ebb33d1b5b291533a72"
+    },
+    {
+      "task_id": "t4-inorder-transport",
+      "tier": 4,
+      "path": "tasks/4/t4-inorder-transport",
+      "reference": "references/t4-inorder-transport",
+      "hash": "51a4902d0577565fd05870b6a822b39033734308f465330e6eb3b820ba67402a"
     },
     {
       "task_id": "t4-nth-maybe",
@@ -842,7 +849,7 @@
       "tier": 4,
       "path": "tasks/4/t4-queue-rep",
       "reference": "references/t4-queue-rep",
-      "hash": "1f19c2c69351c7021a4783e43cdd34b6fbc7500af75dcdb52f1fa0a4e1e16ded"
+      "hash": "11cdb8b6b039293d49735ed18f2b14195800410b30a5c3af9ad9341782703d00"
     },
     {
       "task_id": "t4-stack-wf",
@@ -863,7 +870,7 @@
       "tier": 5,
       "path": "tasks/5/t5-opt-drop",
       "reference": "references/t5-opt-drop",
-      "hash": "652d5f8393da88a0a056e36980e348009cc1faa35620497c4c7c9c5f094c0e71"
+      "hash": "de5805a5e910b62cf630e68eb9c0311c3d9716fca7a3dd88b36f7ddcb0af9310"
     },
     {
       "task_id": "t5-run-effect",

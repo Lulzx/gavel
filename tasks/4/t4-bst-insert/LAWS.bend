@@ -64,10 +64,27 @@ law insert_ordered:
 
 # The multiset law: the count at any key goes up by exactly one when that key is
 # the one inserted. `is_eq` is a `Nat` (`1n` or `0n`), so the law is an equation
-# between sums of indicators rather than a boolean, and the shape of the answer
-# is what rules out a body that counts something else.
+# between sums of indicators rather than a boolean.
+#
+# It is a *difference*, and a difference cannot see an additive constant. An
+# earlier version of this comment claimed "the shape of the answer is what rules
+# out a body that counts something else"; that is false, and was measured on
+# 2026-09-19. `count(t, x) = 1n + <the real count of t at x>` satisfies this law
+# at every input, because the `1n` occurs on both sides and cancels. Nothing else
+# here applies `count` to a closed term either, so the set as it stood pinned how
+# `count` *changes* and never what it *is*.
 law insert_count:
   for +t: P.Tree
   for +k: Nat
   for +x: Nat
   {S.count(S.insert(t, k), x) == S.count(t, x) + P.is_eq(k, x) : Nat}
+
+# The absolute anchor `insert_count` cannot supply: the empty tree counts
+# nothing. This is the first law in the set that names `count` at a *closed*
+# term, which is what makes the constant above observable -- `1n` is not `0n`.
+# It is also `count`'s base case, so with `insert_count` fixing the increment it
+# determines the function: every tree is reached from `P.Tip{}` by inserts, and
+# what the count does at each one is fixed from there.
+law count_tip:
+  for x: Nat
+  {S.count(P.Tip{}, x) == 0n : Nat}

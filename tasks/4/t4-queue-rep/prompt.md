@@ -1,4 +1,4 @@
-Implement `push` and `pop`, then prove all five laws.
+Implement `push` and `pop`, then prove all six laws.
 
 A queue is a `P.Queue`, a record of two lists: `P.Q{front, back}`. The `front`
 holds the oldest elements, its head being the next one to leave; the `back`
@@ -39,6 +39,15 @@ that pops the newest element instead, or that moves the back across without
 reversing it (`back` is stored newest-first, so the reversal is what keeps the
 queue a queue and not a stack).
 
+`push_empty` is `push`'s first case written out, and it exists because that
+premise below has a cost. `P.wf` is false of exactly the state the first case
+covers -- an empty front with a non-empty back -- so every law that can see
+contents excludes the whole branch, and a body that drops the back there is
+invisible to all of them. `push_wf` does not catch it either, because the wrong
+answer is well-formed. `push_empty` names the case with no premise, so a
+submission may still delegate the work to a helper, but the back has to come
+through.
+
 `push_contents` is the one law carrying a premise, and it is the law that says
 *which end* a push belongs at: pushing appends to the sequence the queue
 represents. Without its premise it is false -- for a queue with an empty front
@@ -70,6 +79,7 @@ other way round into that shape.
 
 Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
 `def L.push_wf(q, x)`, `def L.pop_wf(q)`, `def L.pop_empty()`,
-`def L.push_contents(q, x, e)` and `def L.pop_contents(h, t, b)`. Helpers go
+`def L.push_empty(b, x)`, `def L.push_contents(q, x, e)` and
+`def L.pop_contents(h, t, b)`. Helpers go
 under the reserved `Policy.` namespace, which the gate ignores, and none of them
 may cite a law.

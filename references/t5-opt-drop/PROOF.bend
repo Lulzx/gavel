@@ -60,3 +60,8 @@ def L.opt_sound(p, s):
 
 def L.opt_sound_zero(p):
   Policy.ok(p, True{}, 0n)
+
+# The drop is `opt`'s own body read back: on `P.Twice{} <> t` under a zero claim
+# the body answers `opt(t, True{})` and nothing else.
+def L.opt_twice_zero(t):
+  {==}

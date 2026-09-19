@@ -5,6 +5,7 @@
     "push_wf",
     "pop_wf",
     "pop_empty",
+    "push_empty",
     "push_contents",
     "pop_contents"
   ],
@@ -15,7 +16,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "b0c99aec1c14db7facf1f810beb9e707a2c8d143a6998f007b18684f70b3d96f",
+    "laws": "4041eb227a7d0a00384c680a529475d61dd33de90d98e82b68033723716f4ae3",
     "prelude": "161868faf27595fb80f39ac6f44f431112de351c050509fdf831a942acd55bdd"
   },
   "bend_version": "2.0.5"

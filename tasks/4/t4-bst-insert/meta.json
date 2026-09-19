@@ -9,7 +9,8 @@
     "ins_at_left",
     "ins_at_right",
     "insert_ordered",
-    "insert_count"
+    "insert_count",
+    "count_tip"
   ],
   "policy_targets": [
     "ins_at",
@@ -19,7 +20,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "3ab829fd10fda9c4a58e37b4fe47839dfb956a46efbd93d00a616e400521f8ae",
+    "laws": "76569ec8cc0da25ec1515a995f97ffe58fafa0b97dc8e7f2afdb476d0d67c5dc",
     "prelude": "9ec85b90c9924a82707e2caa4168b37be9ca6e90fa5a2e16f7fcc6c5162154c2"
   },
   "bend_version": "2.0.5"

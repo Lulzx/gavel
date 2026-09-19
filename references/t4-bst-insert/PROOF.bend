@@ -349,3 +349,7 @@ def L.insert_count(t, k, x):
       Policy.count_ins(P.Tip{}, P.le(k, P.root_key(P.Tip{})), k, x)
     case P.Bin{+l, +key, +r}:
       Policy.count_ins(P.Bin{l, key, r}, P.le(k, key), k, x)
+
+# The empty tree's count is `0n` by the reference body's own unfolding.
+def L.count_tip(x):
+  {==}

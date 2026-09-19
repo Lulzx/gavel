@@ -70,3 +70,19 @@ law opt_sound:
 law opt_sound_zero:
   for p: List<&2, P.Op>
   {S.exec(S.opt(p, True{}), 0n) == S.exec(p, 0n) : Nat}
+
+# The drop itself, named. This is the one branch of `opt` the three laws above
+# leave free, and it has to be pinned because it is the only branch that is
+# allowed to remove an instruction.
+#
+# `clean` forbids a `Twice` where the accumulator is known to be zero, and
+# `clean_opt` says `opt` returns nothing it forbids -- but neither says the
+# instruction has to *go*. A `Zero` is always permitted there, and at a
+# known-zero accumulator a `Zero` is a no-op, so an optimiser that answers
+# `P.Zero{} <> opt(t, True{})` is clean and sound and still not the optimiser
+# this task is about. **Measured 2026-09-19: tier 4, complete, reward 1.000
+# against the reference proof**, all seven laws. This law is the definition of
+# the drop, so the branch cannot answer something else and still be clean.
+law opt_twice_zero:
+  for t: List<&2, P.Op>
+  {S.opt(P.Twice{} <> t, True{}) == S.opt(t, True{}) : List<&2, P.Op>}
