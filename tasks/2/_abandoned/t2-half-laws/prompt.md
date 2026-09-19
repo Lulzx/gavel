@@ -18,12 +18,26 @@ ABANDONED, for the record. The second law is the definitional unfolding of
 sides normalise to the same term. Both proofs are therefore `{==}`, the corpus
 carries no evidence of work, and the pipeline's V3 check refuses the task --
 "reference+reflexive-proof proves every law -- the task's reward can be earned
-without solving it". There is no repair available for this function: any law
-whose argument is constructor-headed reduces away, and a law over a stuck
-argument (`S.half(n + n) == n`) cannot be proved, because `half` only ever
-steps on a constructor-headed argument. The task was replaced by
-`t2-sum-half-laws`, which keeps `half` as a per-element operation under a list
-aggregate, where the pinning law is stuck on a variable `xs`.
+without solving it". The task was replaced by `t2-sum-half-laws`, which keeps
+`half` as a per-element operation under a list aggregate, where the pinning law
+is stuck on a variable `xs`.
+
+CORRECTED 2026-09-19. The paragraph above used to end "there is no repair
+available for this function", and that was wrong. It reached for a law over
+`S.half(n + n) == n`, where `n + n` is a `+` on a variable and therefore stuck,
+and concluded that since `half` only steps on a constructor-headed argument no
+such law could be proved. The law does not have to be written with `+`.
+`t2-nat-half` carries `S.half(Nat.double(n)) == n` -- the same statement, with
+`Nat.double(n)` in place of `n + n` -- and it *is* provable: the induction's
+successor case unfolds `Nat.double(p)` into `1n + (1n + Nat.double(p))`, which
+is constructor-headed, so `half` steps on it and the hypothesis at the previous
+number rewrites the rest. Its odd companion `S.half(1n + Nat.double(n)) == n`
+does the same job for the numbers in between. **The mistake was reading "the
+argument is stuck" as a property of the value rather than of the way it was
+built**: `Nat.double(n)` is just as stuck as `n + n`, and it is a single call
+that an induction can unfold, which is the whole difference. The function is
+solved after all, in the task named above, and the laws it is solved with are
+the ones this record claimed did not exist.
 
 Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
 `def L.half_zero()` and `def L.half_succ(p)`.

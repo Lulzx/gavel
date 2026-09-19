@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-concat-map",
+  "tier": 2,
+  "laws": [
+    "concat_map_nil",
+    "concat_map_cons",
+    "concat_map_concat",
+    "concat_map_len"
+  ],
+  "policy_targets": [
+    "concat_map"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "4f755afe9ad61440533b0d9ee30aa8dd877bb8c20c0c00dd4505b545bc444699",
+    "prelude": "37be11e384bd66aba61c9cc06c3bd4698601a299bc613d99b33ec6e802803b41"
+  },
+  "bend_version": "2.0.5"
+}

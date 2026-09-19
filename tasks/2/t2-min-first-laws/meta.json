@@ -1,0 +1,22 @@
+{
+  "task_id": "t2-min-first-laws",
+  "tier": 2,
+  "laws": [
+    "min_first_nil",
+    "min_first_single",
+    "min_first_cons",
+    "min_first_keep",
+    "min_first_swap",
+    "min_first_len"
+  ],
+  "policy_targets": [
+    "min_first"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "e9220f552d4891ad8741b2ef626f2841fac07af38ec5704cbf7db97a2f6362d4",
+    "prelude": "6ec0660a0869061b38752d121f04e0e916c01ae6323fb9cf7ffc478efe7b15a7"
+  },
+  "bend_version": "2.0.5"
+}

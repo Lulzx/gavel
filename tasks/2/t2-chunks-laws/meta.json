@@ -1,0 +1,23 @@
+{
+  "task_id": "t2-chunks-laws",
+  "tier": 2,
+  "laws": [
+    "chunks_nil",
+    "chunks_zero",
+    "chunks_single",
+    "chunks_three_by_two",
+    "chunks_go_fill",
+    "chunks_go_close"
+  ],
+  "policy_targets": [
+    "chunks_go",
+    "chunks"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "2f8cef53f53c7d930dcfda99df8fa611c1f5b4aa066df8c4e9392005aa0e06ab",
+    "prelude": "df7cf9800ac2110bc6a720d4cff82e8ad04855e41e9c2edd20df562b63d72df5"
+  },
+  "bend_version": "2.0.5"
+}

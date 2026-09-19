@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-index-of",
+  "tier": 2,
+  "laws": [
+    "index_of_nil",
+    "index_of_step",
+    "index_of_hit",
+    "index_of_miss"
+  ],
+  "policy_targets": [
+    "index_of"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7f8e8d217bb135081e5b8ed9bd6d707d58674bbc675782f343dd18fe77b40ef7",
+    "prelude": "e1bb3ec31ff8f759438dfca7632201f632c82e1f823723b58a288ace6d638aea"
+  },
+  "bend_version": "2.0.5"
+}

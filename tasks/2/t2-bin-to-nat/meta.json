@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-bin-to-nat",
+  "tier": 2,
+  "laws": [
+    "bin_to_nat_nil",
+    "bin_to_nat_cons",
+    "bin_to_nat_nat_bits"
+  ],
+  "policy_targets": [
+    "bin_to_nat"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "6e0e4f64fc85689a05e7966f587bd4ce4be97f02c4f9c9a79c8cc21f52abbd58",
+    "prelude": "114a978775556f80e24a218e808c53752d79852bf5bba649934a7c0c5beececd"
+  },
+  "bend_version": "2.0.5"
+}

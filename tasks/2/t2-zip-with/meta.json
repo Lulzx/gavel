@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-zip-with",
+  "tier": 2,
+  "laws": [
+    "zip_with_nil_left",
+    "zip_with_nil_right",
+    "zip_with_len",
+    "zip_with_self",
+    "zip_with_cons"
+  ],
+  "policy_targets": [
+    "zip_with"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "482e390e2547b637f63c1f0aaf4592a7f64a146ca15fefa069e225fe35c2eafb",
+    "prelude": "9736507cca877fd23fcf52375e32b713094e2c66f6f4838dc46bdcd142c96907"
+  },
+  "bend_version": "2.0.5"
+}

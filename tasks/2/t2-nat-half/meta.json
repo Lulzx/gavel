@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-nat-half",
+  "tier": 2,
+  "laws": [
+    "half_zero",
+    "half_one",
+    "half_step",
+    "half_double",
+    "half_double_succ"
+  ],
+  "policy_targets": [
+    "half"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "f7c0a967fa7d60bf60294b50ba7107324838b08540819f651004d5b8363ae00c",
+    "prelude": "d02058a265585363a98102baa484ecfcbbdafb6f9fe3b78e9398b01344607a33"
+  },
+  "bend_version": "2.0.5"
+}

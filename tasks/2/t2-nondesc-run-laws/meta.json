@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-nondesc-run-laws",
+  "tier": 2,
+  "laws": [
+    "nondesc_run_nil",
+    "nondesc_run_single",
+    "nondesc_run_up",
+    "nondesc_run_down",
+    "nondesc_run_le_len"
+  ],
+  "policy_targets": [
+    "nondesc_run"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "7977d2f7b8b68e7a48bae27a4141ffe601c30e8022116e9081dd01b6d65d3b3e",
+    "prelude": "64dac92eed1d55bef5322c5bb06f9e431bb30a68aad771938e2003647decb009"
+  },
+  "bend_version": "2.0.5"
+}

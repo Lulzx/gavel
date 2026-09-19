@@ -1,0 +1,19 @@
+{
+  "task_id": "t2-fact-laws",
+  "tier": 2,
+  "laws": [
+    "fact_zero",
+    "fact_succ",
+    "fact_five"
+  ],
+  "policy_targets": [
+    "fact"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "ce1bbeb698a939c78d50d565a1c20646d6d81b11e7f6c2474c0c409aecc3f57e",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}

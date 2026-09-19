@@ -1,0 +1,21 @@
+{
+  "task_id": "t2-del-min-laws",
+  "tier": 2,
+  "laws": [
+    "del_min_nil",
+    "del_min_single",
+    "del_min_keep",
+    "del_min_drop",
+    "del_min_len"
+  ],
+  "policy_targets": [
+    "del_min"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "9ade2d8b85a1faf3fc7a227e5613cb2bfc3ba6505bb7a6e849621de7c794df81",
+    "prelude": "1e5521657d6f34abd951ff500a860568ae96609d0df5aacd7592c6a13b2f0693"
+  },
+  "bend_version": "2.0.5"
+}

@@ -1,0 +1,20 @@
+{
+  "task_id": "t2-gcd-laws",
+  "tier": 2,
+  "laws": [
+    "gcd_no_fuel",
+    "gcd_zero_divisor",
+    "gcd_step",
+    "gcd_twelve_eighteen"
+  ],
+  "policy_targets": [
+    "gcd"
+  ],
+  "prelude_defs": [],
+  "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
+  "hashes": {
+    "laws": "8ad6743190ad3a9ad8cc5cc9e70ecf1d95a6dc09df3ada3ba2535faba6cce126",
+    "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
+  },
+  "bend_version": "2.0.5"
+}
