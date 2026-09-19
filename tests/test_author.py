@@ -15,8 +15,8 @@ from pathlib import Path
 
 import pytest
 
-from tools.author import (REVIEWED_KEY, Run, author, required_files,
-                          review_is_stale, stage_review)
+from gavel.reviews import review_path
+from tools.author import Run, author, required_files, stage_review
 
 SOURCE_TASK = "t1-add-plus"
 
@@ -59,86 +59,100 @@ def test_required_files_wants_the_reference(tmp_path):
 
 # --- the review checkpoint --------------------------------------------------------
 
-def _meta(tier: int, hashes: dict, review: dict | None = None) -> dict:
-    meta = {"task_id": "t-x", "tier": tier, "laws": ["a"], "hashes": hashes}
-    if review is not None:
-        meta[REVIEWED_KEY] = review
-    return meta
-
-
-def test_a_review_is_stale_when_the_laws_change():
-    hashes = {"laws": "aaa", "prelude": "bbb"}
-    reviewed = {"by": "lulzx", "hashes": hashes}
-    assert not review_is_stale(_meta(3, hashes, reviewed))
-    # Same task, one law edited.
-    assert review_is_stale(_meta(3, {"laws": "zzz", "prelude": "bbb"}, reviewed))
-
-
-def test_a_review_with_no_name_is_not_a_review():
-    hashes = {"laws": "aaa", "prelude": "bbb"}
-    assert review_is_stale(_meta(3, hashes, {"hashes": hashes}))
-
-
 def _write_meta(root: Path, meta: dict) -> None:
     root.mkdir(parents=True, exist_ok=True)
     (root / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
 
 
+def _meta(tier: int, hashes: dict) -> dict:
+    return {"task_id": "t-x", "tier": tier, "laws": ["a"], "hashes": hashes}
+
+
+def _write_review(repo: Path, task_id: str, record: dict) -> None:
+    path = review_path(repo, task_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(record, indent=2) + "\n")
+
+
+def _checkpoint(tmp_path, tier: int, hashes: dict, record: dict | None = None):
+    """A task directory at ``tmp_path/tasks/<tier>/t1-x`` and one run of the
+    review stage over it, with a record in ``tmp_path/reviews`` if given."""
+    root = tmp_path / "tasks" / str(tier) / "t1-x"
+    _write_meta(root, _meta(tier, hashes))
+    if record is not None:
+        _write_review(tmp_path, root.name, record)
+    run = Run(task_id=root.name, root=root)
+    stage_review(root, run, tmp_path)
+    return run
+
+
 def test_tier_three_holds_the_run_until_someone_signs(tmp_path):
-    root = tmp_path / "t1-x"
-    _write_meta(root, _meta(3, {"laws": "aaa", "prelude": "bbb"}))
-    run = Run(task_id="t-x", root=root)
-    stage_review(root, run, reviewer=None)
+    run = _checkpoint(tmp_path, 3, {"laws": "aaa", "prelude": "bbb"})
     assert run.blocked
     assert not run.ok
     assert run.stages[-1].name == "review"
     # And it says how to clear it, because the person reading it is the one who
     # has to read the laws first.
-    assert "--reviewer" in run.stages[-1].detail
+    assert f"reviews/{run.task_id}.json" in run.stages[-1].detail
+    assert "unreviewed" in run.stages[-1].detail
 
 
 def test_below_tier_three_the_author_is_the_reviewer(tmp_path):
-    root = tmp_path / "t1-x"
-    _write_meta(root, _meta(2, {"laws": "aaa", "prelude": "bbb"}))
-    run = Run(task_id="t-x", root=root)
-    stage_review(root, run, reviewer=None)
+    run = _checkpoint(tmp_path, 2, {"laws": "aaa", "prelude": "bbb"})
     assert not run.blocked and run.ok
 
 
-def test_approving_records_the_revision_and_clears_the_next_run(tmp_path):
-    """The checkpoint is a gate on the revision, not a toll booth: a second run
-    over unchanged laws must not ask again."""
-    root = tmp_path / "t1-x"
+def test_no_flag_can_clear_the_checkpoint():
+    """The defect Fact 27 is about, asserted as an absence.
+
+    ``--reviewer NAME`` wrote the record into ``meta.json``, which made the
+    pipeline that published a task the same pipeline that attested a person had
+    read it. Eleven tier-3 tasks in the bank were in that state, every record
+    written by the agent that had just written the task. The fix is that the
+    capability is gone rather than discouraged, so this asserts the argument is
+    not merely deprecated -- it is not there to pass.
+    """
+    import inspect
+    from tools import author as author_module
+
+    # The plumbing is gone, not hidden behind a deprecation: no parameter to
+    # pass a name through, no constant naming the field it used to write.
+    assert "reviewer" not in inspect.signature(author_module.author).parameters
+    assert not hasattr(author_module, "REVIEWED_KEY")
+    # And the command line refuses the argument rather than ignoring it.
+    with pytest.raises(SystemExit):
+        author_module.main([str(Path("tasks/3/t3-x")), "--reviewer", "lulzx"])
+
+
+def test_a_record_outside_the_task_directory_clears_the_checkpoint(tmp_path):
+    """The checkpoint is a gate on the revision, not a toll booth: a record that
+    covers these laws must not ask again -- and it is read from ``reviews/``,
+    the one place this pipeline does not write."""
     hashes = {"laws": "aaa", "prelude": "bbb"}
-    _write_meta(root, _meta(3, hashes))
-
-    first = Run(task_id="t-x", root=root)
-    stage_review(root, first, reviewer="lulzx")
+    first = _checkpoint(tmp_path, 3, hashes,
+                        {"by": "lulzx", "hashes": hashes})
     assert not first.blocked and first.ok
-    recorded = json.loads((root / "meta.json").read_text())[REVIEWED_KEY]
-    assert recorded == {"by": "lulzx", "hashes": hashes}
+    assert "lulzx" in first.stages[-1].detail
 
-    second = Run(task_id="t-x", root=root)
-    stage_review(root, second, reviewer=None)
+    second = _checkpoint(tmp_path, 3, hashes)
     assert not second.blocked and second.ok
-    assert "lulzx" in second.stages[-1].detail
 
 
 def test_editing_a_law_after_approval_reopens_the_checkpoint(tmp_path):
-    root = tmp_path / "t1-x"
-    _write_meta(root, _meta(3, {"laws": "aaa", "prelude": "bbb"},
-                            {"by": "lulzx",
-                             "hashes": {"laws": "aaa", "prelude": "bbb"}}))
-    run = Run(task_id="t-x", root=root)
-    stage_review(root, run, reviewer=None)
-    assert not run.blocked          # approved at these laws
+    hashes = {"laws": "aaa", "prelude": "bbb"}
+    run = _checkpoint(tmp_path, 3, hashes, {"by": "lulzx", "hashes": hashes})
+    assert not run.blocked          # recorded at these laws
     # Now the laws change, exactly as tools/publish.py would re-derive them.
-    _write_meta(root, _meta(3, {"laws": "changed", "prelude": "bbb"},
-                            {"by": "lulzx",
-                             "hashes": {"laws": "aaa", "prelude": "bbb"}}))
-    again = Run(task_id="t-x", root=root)
-    stage_review(root, again, reviewer=None)
+    again = _checkpoint(tmp_path, 3, {"laws": "changed", "prelude": "bbb"},
+                        {"by": "lulzx", "hashes": hashes})
     assert again.blocked
+    assert "stale" in again.stages[-1].detail
+
+
+def test_a_record_missing_its_name_is_not_a_record(tmp_path):
+    hashes = {"laws": "aaa", "prelude": "bbb"}
+    run = _checkpoint(tmp_path, 3, hashes, {"hashes": hashes})
+    assert run.blocked
 
 
 # --- the loop, against a real task --------------------------------------------------

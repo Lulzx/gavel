@@ -22,6 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from gavel.reviews import REVIEWS_DIR  # noqa: E402
 from gavel.tasks import load_manifest  # noqa: E402
 from gavel.toolchain import DEFAULT_VERSION, Toolchain, ToolchainError  # noqa: E402
 from gavel.validate import (DEFAULT_BUDGET_MS, REVIEW_TIER,  # noqa: E402
@@ -119,9 +120,10 @@ def main(argv: list[str] | None = None) -> int:
                      for tier, count in bank["tasks_by_tier"].items())
     killed, review = bank["mutants_killed_per_law"], bank["review"]
     print(f"bank: {bank['tasks']} tasks ({tiers}); "
-          f"records {review['current']}/{review['needs_review']} "
-          f"at tier {REVIEW_TIER}+ (a record is not a review); "
-          f"mutants killed per law "
+          f"{REVIEWS_DIR}/ holds {review['current']} of the "
+          f"{review['needs_review']} records tier {REVIEW_TIER}+ asks for "
+          f"(a record is evidence someone wrote one, not that anyone read the "
+          f"laws); mutants killed per law "
           f"mean {killed['mean']}, min {killed['min']}; "
           f"calibration {bank['calibration']['recorded']}/{bank['tasks']}")
     return 1 if failed else 0

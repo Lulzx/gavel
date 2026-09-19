@@ -125,17 +125,26 @@ def validate_task(task: Task, toolchain: Toolchain, *,
 
 # --- review: a judgement the pipeline must not be able to write ----------------
 
-def review_state(meta: dict[str, Any], tier: int) -> str:
+def review_state(meta: dict[str, Any], tier: int,
+                 review: dict[str, Any] | None = None) -> str:
     """What a task's review record actually attests to.
 
     One of ``none-needed`` (below ``REVIEW_TIER``), ``unreviewed``,
     ``current``, or ``stale``.
 
-    ``current`` and not ``approved``: all this function witnesses is that a
-    record exists and attests to the laws the task ships. It cannot witness who
-    wrote one, and the pipeline *can* write one, so naming the state after the
-    judgement would put the same word on a forged record and a genuine one --
-    which is the defect Fact 27 is about, one layer up.
+    ``review`` is the record loaded from ``reviews/<task_id>.json``; the default
+    of ``None`` is "there is no record", which is also what an unreadable one
+    loads as. That file is outside everything the pipeline writes -- see
+    ``gavel/reviews.py`` -- so the fact that one exists is now a fact about a
+    person's commit rather than about a flag someone passed.
+
+    ``current`` and not ``approved``, still: what this function witnesses is
+    that a record exists and attests to the laws the task ships. It cannot
+    witness that a person rather than an agent wrote the file, and no naming
+    change would give it that. What the move bought is narrower and worth
+    stating exactly: the pipeline can no longer *create* the evidence, so
+    forging one is a hand edit to a file whose presence in a diff is the
+    provenance.
 
     A review is recorded against the hashes ``tools/publish.py`` derived from
     ``LAWS.bend`` and ``prelude.bend``, so it covers the immutable files as they
@@ -155,27 +164,27 @@ def review_state(meta: dict[str, Any], tier: int) -> str:
     Two reasons, and the second is the decisive one. A review record is not part
     of the reward function, which is what ``problems`` are about. And the
     validator can see that a record is *about other laws*; it cannot see who
-    wrote it. So failing on ``stale`` would hard-fail three tasks while passing
-    the eight records that match their laws and are just as forged -- a
+    wrote it. So failing on ``stale`` would hard-fail a record that has drifted
+    while passing one that matches its laws and was written by an agent -- a
     validator that endorses the worse defect and refuses the milder one. The
     check is worth having because nothing else noticed when a ``LAWS.bend``
     edit invalidated a record, and it is worth having as a warning, whose
     ``--strict`` promotion is the honest statement: it fails the moment review
     is a thing the bank actually has.
     """
-    review = meta.get("reviewed")
     if not isinstance(review, dict) or not review.get("by"):
         return "unreviewed" if tier >= REVIEW_TIER else "none-needed"
     return "current" if review.get("hashes") == meta.get("hashes") else "stale"
 
 
 def _review_state(task: Task, report: TaskReport) -> None:
-    report.review = review_state(task.meta, task.tier)
+    review = task.review
+    report.review = review_state(task.meta, task.tier, review)
     if report.review == "stale":
         report.warnings.append(
-            f"review: {task.meta['reviewed'].get('by')!r} is recorded against "
-            f"hashes that no longer match {LAWS_FILE} or {PRELUDE_FILE}, so the "
-            f"record attests to laws this task does not ship")
+            f"review: {review.get('by')!r} is recorded against hashes that no "
+            f"longer match {LAWS_FILE} or {PRELUDE_FILE}, so the record attests "
+            f"to laws this task does not ship")
     elif report.review == "unreviewed":
         report.warnings.append(
             f"review: tier {task.tier} carries no review record -- the laws "
@@ -450,14 +459,16 @@ def bank_metrics(reports: list[TaskReport]) -> dict[str, Any]:
     ``mutants_killed_per_law`` and the calibration block are measurements.
     ``recorded_fraction`` is not, and is the one that matters to M4. It counts
     records that match the laws they are recorded against, which is what
-    ``review_state`` can witness -- and it cannot see who wrote one. Measured on
-    the bank it reads 8 of 39, every one of those eight a record the authoring
-    agent wrote for itself; the human-reviewed figure is **0 of 39**. So the
-    fraction is an upper bound that the bank's own history shows is entirely
-    reachable without review, and it is reported next to the raw counts rather
-    than alone so that a reader gets the four states and not just the quotient.
-    It is named for what it measures: a record, not the judgement a record is
-    supposed to be evidence of.
+    ``review_state`` can witness -- and it cannot see who wrote one. On the bank
+    it read **8 of 39** while the pipeline could write the record, every one of
+    those eight a record an authoring agent wrote for itself, against a
+    human-reviewed figure of **0 of 39**; after the records moved to
+    ``reviews/`` -- a directory no tool here writes -- it reads **0 of 39**,
+    which is the first time the number and the truth have agreed. So the
+    fraction is still an upper bound and still named for what it measures: a
+    record, not the judgement a record is supposed to be evidence of. It is
+    reported next to the raw counts rather than alone so that a reader gets the
+    four states and not just the quotient.
 
     A law's kill count is keyed by *task and law*, because ``add_plus`` in one
     task and ``add_plus`` in another are two declarations and a mean over their

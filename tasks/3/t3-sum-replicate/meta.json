@@ -15,12 +15,5 @@
     "laws": "98236783ceec9c02ee98c2cbf5d7dd1d35ff861f34bd1eab3884a310bd7aba84",
     "prelude": "c3b747f54c5dd122060645efad02a49d52e6c2494986678324790183a4747592"
   },
-  "bend_version": "2.0.5",
-  "reviewed": {
-    "by": "lulzx",
-    "hashes": {
-      "laws": "98236783ceec9c02ee98c2cbf5d7dd1d35ff861f34bd1eab3884a310bd7aba84",
-      "prelude": "c3b747f54c5dd122060645efad02a49d52e6c2494986678324790183a4747592"
-    }
-  }
+  "bend_version": "2.0.5"
 }

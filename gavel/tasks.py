@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Iterator
 
 from .hashing import hash_files, sha256_text
+from .reviews import load_review
 
 # The files a task owns. LAWS.bend and prelude.bend are immutable during an
 # episode; solution.bend is the stub the policy replaces.
@@ -97,6 +98,27 @@ class Task:
     def mutant_paths(self) -> tuple[Path, ...]:
         mutants = self.references / "mutants"
         return tuple(sorted(mutants.glob("*.bend"))) if mutants.is_dir() else ()
+
+    @property
+    def repo(self) -> Path:
+        """The repository this task was loaded from.
+
+        Derived from the reference path (``<repo>/references/<task_id>``)
+        rather than carried as a field, so a Task stays a description of its own
+        files and nothing has to be threaded through ``load_task`` to answer
+        where a task-level record outside the task directory lives.
+        """
+        return self.references.parent.parent
+
+    @property
+    def review(self) -> dict[str, Any] | None:
+        """The task's review record, which no tool here can write.
+
+        See ``gavel/reviews.py``: the record lives in ``reviews/<task_id>.json``
+        so that the pipeline that publishes a task is not also able to attest
+        that a person read it.
+        """
+        return load_review(self.repo, self.task_id)
 
     def task_files(self) -> dict[str, str]:
         return {LAWS_FILE: self.laws_src, PRELUDE_FILE: self.prelude_src,

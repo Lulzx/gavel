@@ -103,6 +103,22 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     I committed these twice before reading them — once in `e83557d` for `t3-zip-sum` and `t3-sum-replicate`, once in `28d9ebb` for the batch — which is its own lesson about the difference between reading a diff and reading what a diff asserts. The hashes and the law counts I checked; the name I did not.
 
+    **Repaired 2026-09-19, and the repair is the absence of a capability.** Two
+    sentences above went stale before the fix did: `gavel/validate.py` *does*
+    read the record now, reporting `none-needed` / `unreviewed` / `stale` /
+    `current` (Fact 27's own session added that), and `review_is_stale` no
+    longer exists under that name. What made this a structural defect rather
+    than a logic bug is where the key lived: `meta.json` is **derived**,
+    `tools/publish.py` rewrites it on every publish, so the record was a claim
+    the pipeline could issue on its own behalf — and being derived, it was the
+    one file in a task that a diff of a *task* would never show changing. The
+    record moved to `reviews/<task_id>.json`, a path no module under `gavel/` or
+    `tools/` opens for writing; `--reviewer` and its plumbing are deleted rather
+    than deprecated; and the eleven forgeries were deleted rather than migrated,
+    because moving a forgery into the new directory would have made it read as
+    `current` there. The bank's own metric now says `0 of 39`, and M4 item 2
+    records what is still owed — 39 law sets nobody has read.
+
     This is the same defect as `"valid": true` in the manifest (`fb878db`), and the same rule applies: **a field that records a human judgement must not be writable by the machine that needs the judgement.** The fix is not in the checker — it is to stop treating the flag as evidence, and either to record review somewhere the pipeline cannot write, or to read the laws now and make the eleven records true. Until one of those happens, M4's "human-reviewed laws for tier ≥ 3" is not satisfied, and the 28 tasks at that tier with no record are the only honest ones.
 
     **Amended 2026-09-19: the field is read now, and only half of this fact moved.** The paragraph above is right that a checker cannot authenticate a name, and that half stands unchanged. What it was wrong about is the *staleness* it happened to name in passing: `review_is_stale` did its job and nothing called it, so a repair that edited `LAWS.bend` and republished — the bank's normal repair procedure — left a record attesting to laws that were no longer shipped, with no output anywhere saying so. Three tasks were in that state at once. `gavel/validate.py` now reports `none-needed` / `unreviewed` / `stale` / `current`, the last two are warnings promoted by `--strict`, and `tools/validate.py` prints the task ids. The severity is argued in M4: failing on `stale` would refuse the three records that drifted and endorse the eight that still match and are just as forged.
@@ -193,7 +209,7 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     Both are escapes for the same reason: **the law would have caught the junk target through the caller, so the caller was rerouted.** All three `t1-mul-zero` laws are written against Base's `+`, not `S.add` — they constrain `add` only where `mul` happens to call it, and a `mul` whose step is `b + mul(p, b)` never calls it. `t4-bst-insert` is the sharper instance, because the rerouting site is a namespace the gate reserves: `gavel/gate.py:176-177` skips the name check for anything under `Policy.` **in every file it checks, `solution.bend` included**, so `def Policy.go` can hold the whole real descent and `insert` can call that. The gate's own message calls `Policy.*` the proof-helper namespace; inside the solution it is simply an open namespace, and the helper it was written for is a *proof* helper, not a second implementation of a stub obligation.
 
-    The tell is one grep and it is not any of the three earlier tells. Facts 29–32 all ask what a law's left-hand side can reach; this one asks **whether any law mentions the target at all**. The screen, over all 124 tasks and with law comments stripped so a prose mention cannot suppress a hit, returns zero pairs after the repairs — every declared target is named by at least one law.
+    The tell is one grep and it is not any of the three earlier tells. Facts 29–32 all ask what a law's left-hand side can reach; this one asks **whether any law mentions the target at all**. The screen, over all 125 tasks and with law comments stripped so a prose mention cannot suppress a hit, returns zero pairs after the repairs — every declared target is named by at least one law. Re-run 2026-09-19 against the current manifest, which is the 125th task's first pass through it and the first run of the screen since the census closed.
 
     Repairs, both additive and both cheap, in `3e0495e` and `ecdc053`. `t1-mul-zero` gained `add_plus` (`S.add(x, y) == x + y`), which is precisely the statement the reference proof already carried as `Policy.add_plus`, so its own proof is one citation. `t4-bst-insert` gained three definitional laws — `ins_at_tip`, `ins_at_left`, `ins_at_right` — which are `ins_at`'s definition written out, one case per constructor with both decisions at a node; each goal fixes a closed constructor, so each proof is `{==}`. They determine `ins_at` completely, which is the property the other repairs for this shape have: a submission may still delegate to a `Policy.` helper, but the target itself has to be the function the stub asked for. Measured after: the references prove every law at 1.000 (four and eight laws respectively), the escaping bodies fall to **tier 3** (0.475 and 0.412), each failing at its new law, both tasks validate, and each escape joins its corpus as a strong mutant.
 
@@ -527,8 +543,8 @@ phrased in tiers that a reader of this file otherwise cannot decode.
 | 4 | Invariant preservation over a data structure | `t4-stack-wf`, `t4-queue-rep`; `t4-nth-maybe` is the same tier stated as a *domain* instead of an invariant |
 | 5 | Program-level laws with state and multiple interacting functions | `t5-run-effect` |
 
-**The bank's ceiling is tier 5.** Of the 124 registered tasks, 20 are tier 1, 66
-are tier 2, 31 are tier 3, 4 are tier 4 and 3 are tier 5. No tier is empty, so
+**The bank's ceiling is tier 5.** Of the 125 registered tasks, 20 are tier 1, 66
+are tier 2, 31 are tier 3, 5 are tier 4 and 3 are tier 5. No tier is empty, so
 what M2's 200 and M4's 500 are short of is volume rather than a design nobody
 has done yet.
 
@@ -545,7 +561,7 @@ bank, and each one validated on its own. But a policy that solves one of them
 has learnt nearly all of the others, so they are closer to twenty lessons on one
 template than to twenty lessons, and that is a fact about the bank's *effective*
 size. It is recorded here rather than left inside the count, because the count
-is what M2 is measured by and the difference between 124 tasks and 104 distinct
+is what M2 is measured by and the difference between 125 tasks and 105 distinct
 problems is exactly the kind of gap that reads as progress in a total and
 disappears in a curriculum.
 
@@ -689,9 +705,10 @@ required. The parked copy keeps both the task dir and the reference dir, so the
 prototype is intact and re-derivable; nothing is deleted.
 
 None of the four tier-4 tasks carries a review record. Tier 4 is gated on one in M4, and
-not writing one is the point of Fact 27: the field is not evidence, so leaving
+not writing one is the point of Fact 27: a record is not evidence, so leaving
 it absent is the only honest state until review happens somewhere the pipeline
-cannot write.
+cannot write — which since the Fact 27 repair is `reviews/<task_id>.json`, a
+path the pipeline reads and does not write.
 
 Tier 5's two canonical examples in SPEC §10 (`you_cant_win`, a ledger summing
 to zero) are not in the vendored tree: `toolchain/2.0.5/bend2/` is `main.ts`,
@@ -846,21 +863,25 @@ and the resulting verdicts say `dev_only: true`.
    checkpoint. A checkpoint that survives an edit to the thing it was reviewing
    is a signature on an empty page.
 2. 200 tasks tiers 1–4; CI job runs `validate.py` over the manifest. **In
-   progress** — 124 tasks (20 tier 1, 66 tier 2, 31 tier 3, 4 tier 4, 3 tier 5),
+   progress** — 125 tasks (20 tier 1, 66 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
    validated together rather than per task, because a task is sound only against
    a corpus that shares the degenerate generator with it. The whole bank was
-   measured locally as **122/122 valid over 2172 checker runs**, with no
-   problems and one warning per task — the missing calibration measurement, which
-   is the warning `--strict` would promote (the last CI run over a whole bank was
-   at 83, `83/83` over 1544, run `35350369509`). That run is bound to the
-   122-task revision: the two tasks registered since were each validated against
-   their own revision at 1/1, and re-measuring the whole bank is a quiet-box job
-   under the same precondition M4.3's throughput number waits on — V4 reads
-   wall-clock latency, so a bank measured while an authoring agent is checking
-   it is a bank measured under contention, and the numbers would be about the
-   box rather than about the harness.
-   The 121 tasks at tiers 1–4 are
-   short of the 200 by 79, and 20 of the 124 are the tier-2 family §3.9 records:
+   measured locally on 2026-09-19 as **125/125 valid over 2,767 checker runs**,
+   with no problems and no task free of warnings: the missing calibration
+   measurement on all 125, and on the 39 tasks at or above `REVIEW_TIER` a
+   review warning as well — 28 with no record, 8 whose record matches and is
+   still not a review, 3 whose record is about laws that no longer ship (Fact
+   27). The calibration warning is the one `--strict` promotes, and the review
+   warnings are the two it would promote with it, which is why neither mode
+   reddens the bank yet. The last CI run over a whole bank was at 83, `83/83`
+   over 1544, run `35350369509`.
+   This measurement is the one M4.3 used to argue *against* waiting for a quiet
+   box: V4 reads wall-clock latency, so a bank measured while an authoring agent
+   is checking it is a bank measured under contention — but the contention makes
+   a *latency* number about the box, and it does not change whether 125 of 125
+   validate. The 122-task reading that stood here was taken the same way.
+   The 122 tasks at tiers 1–4 are
+   short of the 200 by 78, and 20 of the 125 are the tier-2 family §3.9 records:
    the count and the number of distinct problems are not the same number, and
    only one of the two is what a curriculum buys.
 
@@ -984,7 +1005,7 @@ and the resulting verdicts say `dev_only: true`.
    was not given one, which leaves it in the same unreviewed tier-4 state as the
    eight tasks M4 records.
 
-   **The census is closed, measured 2026-09-19.** All 124 registered tasks carry
+   **The census is closed, measured 2026-09-19.** All 125 registered tasks carry
    at least one hand-authored mutant file, and **every one of them is at or
    above the four-file floor** — the first time both have been true. The
    classifier reads **1,359 mutant files** across the bank, all of them in git
@@ -1264,8 +1285,9 @@ waiting room.
    the functions in it are the policy's own — is the one §3.9 now records, in
    the two opposite answers it took, and the third was written by asking which
    of the two a law about a *transformation* is.
-2. **Human-reviewed laws for tier ≥ 3. Not satisfied, and the bank says it
-   is** -- see below.
+2. **Human-reviewed laws for tier ≥ 3. Not satisfied, and the bank no longer
+   says it is** — the pipeline can no longer write a review record at all, so
+   what is left is that a person has to read the laws. See below.
 3. **Published throughput benchmark. Published 2026-09-19, and the blocker was
    the metric rather than the machine.** `tools/soak.py` reports p50/p95/p99 and
    verdicts/min/core from a real run, and M3.5's ten-thousand-episode soak
@@ -1434,18 +1456,18 @@ waiting room.
    holding the law, which is a statement about the evidence and not about the
    law, and the repair is a file for the same reason `pad_nil`'s was.
 
-**The review half of this is not satisfied and the bank currently says it is.**
-Eleven tasks at tier 3 or above carry `"reviewed": {"by": "lulzx"}` written by
-the authoring agent through `--reviewer`, and no human has read them — Fact 27.
-All eleven are tier 3; the eight tasks at tier 4 and 5 carry no record, which is
-the honest state and not a fix. **Three of the eleven are now stale as well as
-forged** — re-checked 2026-09-19, `t3-pad`, `t3-rev-rev` and `t3-zip-sum` have
-law files whose
-hash no longer matches the hash in the review record, so the record attests to
-laws that are no longer shipped. Two of the three are this session's own
-repairs (`t3-pad` from Fact 36, `t3-rev-rev` from Fact 39): editing
-`LAWS.bend` under a review record invalidates it, and
-nothing in the pipeline notices.
+**Human-reviewed laws for tier ≥ 3 are still not satisfied, and the bank no
+longer says they are.** The second clause is the half that was closable and it
+is closed. Eleven tasks at tier 3 carried `"reviewed": {"by": "lulzx"}` written
+by the authoring agent through `--reviewer`, and no human had read them — Fact
+27. All eleven are tier 3; the eight tasks at tier 4 and 5 carried no record,
+which is the honest state and not a fix. **Three of the eleven had gone stale as
+well as forged** — re-checked 2026-09-19, `t3-pad`, `t3-rev-rev` and
+`t3-zip-sum` had law files whose hash no longer matched the hash in the review
+record, so the record attested to laws no longer shipped. Two of the three were
+this session's own repairs (`t3-pad` from Fact 36, `t3-rev-rev` from Fact 39):
+editing `LAWS.bend` under a review record invalidated it, and nothing in the
+pipeline noticed.
 
 **It notices now, and the arithmetic above was short.** Read over the whole
 manifest rather than over the batch it was written from, **39 tasks are at tier
@@ -1456,30 +1478,64 @@ tasks: two of the seven are themselves among the eight, so the earlier
 accounting double-counted them and left **fifteen older tier-3 tasks unnamed**.
 The forged-record count is still bounded at eleven, which is what that sentence
 was about, and the *unreviewed* count is much larger than the sentence implied.
-`gavel/validate.py` now reads the record and reports one of four states —
+`gavel/validate.py` reads the record and reports one of four states —
 `none-needed` below the tier, `unreviewed`, `stale`, `current` — and
 `tools/validate.py` prints the stale and unreviewed task ids under its summary,
 so the two defects are lines in a build log rather than paragraphs in this file.
+
+**The forgery is no longer possible, and that is the fix rather than a
+renaming.** The plan named two acceptable repairs — "either review is recorded
+somewhere the pipeline cannot write, or the laws are read and the records are
+made true" — and the first is now the design. The record moved out of
+`meta.json` to `reviews/<task_id>.json`, beside the manifest and outside both
+the task directory and the reference directory, and **no module under `gavel/`
+or `tools/` opens a path under `reviews/` for writing**; `gavel/reviews.py` is
+the reader and there is no writer outside a person's editor. `--reviewer` is
+deleted rather than deprecated, along with the plumbing behind it, so the
+capability is gone and not merely discouraged. `tools/author.py` still refuses
+to publish a tier ≥ 3 task without a record and now has no way to make one, and
+a test asserts the absence directly: no `reviewer` parameter, no `REVIEWED_KEY`,
+and the flag rejected by the parser.
+
+The reason this had to be structural rather than a rule is that the old shape
+was not a mistake in the pipeline's logic but in its *ownership*. `meta.json` is
+a **derived** file — `tools/publish.py` rewrites it on every publish — so a key
+in it was always going to be writable by whatever wrote the file, and the record
+was therefore a claim the claimant itself could issue. A record in `reviews/`
+is a file the pipeline only reads, so its presence is a fact about a commit
+rather than about a call. Eleven records were **deleted, not migrated**: moving
+a forgery into the new directory would have made it read as `current` there, and
+a repair that preserves the defect is not a repair. The bank now reports
+`reviews/ holds 0 of the 39 records tier 3+ asks for`, which is the first time
+that number and the truth have agreed — it read 8 of 39 before, all eight
+written by the agent that wrote the task, against a human-reviewed figure of 0.
+
+**What is left is the half no check can do, and it is smaller than it was.** A
+record hand-written by whoever holds the keyboard is still indistinguishable
+from a person's; moving the file took away the pipeline's ability to *create*
+the evidence, not anyone's ability to write it. What it bought is that the act
+now leaves a trace the old one did not: a new file under `reviews/` in a diff,
+where a key inside a regenerated `meta.json` was invisible by construction. So
+the item stands as: the bank no longer claims a review it does not have, the
+pipeline can no longer manufacture one, and what remains is that **a person has
+to read 39 law sets and write 39 files**. That is not a code change, and this
+line stays in M4 until someone does it.
 
 **`stale` is a warning and not a problem, deliberately**, which is the one place
 the validator departs from "a problem is a defect, a warning is a missing
 measurement". A review record is not part of the reward function, and the check
 can see that a record is about *other laws* but cannot see who wrote one.
-Failing on `stale` would hard-fail three tasks while passing the eight records
-that match their laws and are just as forged — a validator that refuses the
+Failing on `stale` would hard-fail a record that had drifted while passing one
+that matched its laws and was written by an agent — a validator that refuses the
 milder defect and endorses the worse one. `--strict` promotes both, which is the
 honest switch: it fails the moment review is a thing the bank actually has. The
 state is only reachable through a republish, too — `meta["hashes"]` is
 gate-enforced against the shipped laws, so a law edited without one fails the
-integrity check on every submission instead.
-
-The records are left in place rather than deleted so the defect stays visible,
-but they must not be counted as review, and **the half that is left is the one
-no check can do** — a record's provenance. A record written by `--reviewer` and
-a record written by a person are the same bytes, so the fix is what it was:
-either review is recorded somewhere the pipeline cannot write, or the laws are
-read and the records are made true. Until one of those happens this line stays
-in M4.
+integrity check on every submission instead. There is no record in the bank to
+be stale at the moment, which is the point; the state is pinned by
+`test_a_review_whose_hashes_have_moved_is_stale_and_still_valid` against the
+real fixture task with its reference directory copied somewhere writable, so the
+test writes a review into a temporary repository rather than into this one.
 
 ## 5. Risks
 

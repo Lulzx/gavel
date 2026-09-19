@@ -7,11 +7,15 @@ checker are marked ``checker``.
 from __future__ import annotations
 
 import json
+import re
+import shutil
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
 from gavel.degenerate import _zero_of, corpus, laws_of, signatures, unmodelled
+from gavel.reviews import REVIEWS_DIR, review_path
 from gavel.tasks import HASH_KEYS, LAWS_FILE, PROOF_FILE, SOLUTION_FILE
 from gavel.validate import (TaskReport, bank_metrics, review_state,
                             validate_task)
@@ -479,12 +483,33 @@ def test_a_comment_naming_the_prelude_is_not_a_citation(make_task, toolchain, ta
 # --- review: a judgement the pipeline must not be able to write ----------------
 #
 # The bank's M4 line says human-reviewed laws are "not satisfied, and the bank
-# says it is": eleven tier-3 tasks carry a record no human wrote, and three of
-# those records went stale when the same day's repairs edited LAWS.bend under
-# them. Nothing in the pipeline noticed the second half of that. These pin both
-# halves, including the severity -- a stale record is reported and the task
-# stays valid, because the validator cannot see who wrote a record and must not
-# refuse the stale ones while passing the forged-but-matching ones.
+# says it is". It said that because eleven tier-3 tasks carried a record no
+# human wrote -- written by the authoring pipeline itself through a flag -- and
+# three of those records had gone stale when the same day's repairs edited
+# LAWS.bend under them. Nothing noticed the second half. These pin the states,
+# the severity, and the one that is a structural property rather than a value:
+# the record lives in a directory no tool here writes.
+
+def _write_review(task, record) -> None:
+    """Put a record where ``Task.review`` looks for one."""
+    path = review_path(task.repo, task.task_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(record, indent=2) + "\n")
+
+
+@pytest.fixture
+def movable_task(task, tmp_path):
+    """The real fixture task, with its reference directory somewhere writable.
+
+    ``Task.repo`` is derived from ``references``, so a Task that keeps the real
+    one reads its records out of the repository -- and a test that writes a
+    review into the bank it is testing has changed the thing it is measuring.
+    Copied instead, which also means the assertion "there is no record" is about
+    this test's directory rather than about whatever the bank happens to hold.
+    """
+    shutil.copytree(task.references, tmp_path / "references" / task.task_id)
+    return replace(task, references=tmp_path / "references" / task.task_id)
+
 
 def test_a_review_below_the_tier_needs_no_record(make_task):
     """Tier 1 and 2 are reviewed by the author's own reading, so an absent
@@ -492,15 +517,16 @@ def test_a_review_below_the_tier_needs_no_record(make_task):
     assert review_state(make_task(tier=2).meta, 2) == "none-needed"
 
 
-def test_a_review_at_the_tier_with_no_record_is_unreviewed(task, toolchain):
-    """The honest state, and the one the eight tier-4 and tier-5 tasks are in:
-    it must be reported, and it must not read as a defect.
+def test_a_review_at_the_tier_with_no_record_is_unreviewed(movable_task, toolchain):
+    """The honest state, and the one the 39 tier-3-and-above tasks are in: it
+    must be reported, and it must not read as a defect.
 
     Run on the real fixture task rather than a built one so that ``valid`` means
     something: a fabricated task fails V2 for having no mutants, and the
     assertion would pass for a reason that has nothing to do with review.
     """
-    reviewless = replace(task, tier=3)
+    reviewless = replace(movable_task, tier=3)
+    assert reviewless.review is None
     assert review_state(reviewless.meta, 3) == "unreviewed"
     report = validate_task(reviewless, toolchain)
     assert report.review == "unreviewed"
@@ -509,20 +535,21 @@ def test_a_review_at_the_tier_with_no_record_is_unreviewed(task, toolchain):
 
 
 def test_a_review_whose_hashes_match_is_current(make_task):
-    """What the check actually witnesses: the record covers these laws. It says
-    nothing about who wrote it, which is why the flag is not evidence -- Fact 27
-    -- and why the state is ``current`` rather than ``approved``.
+    """What the check actually witnesses: the record covers these laws.
 
-    On the shipped bank every record in this state is one the authoring agent
-    wrote for itself, so the name is the whole of the difference between a
-    metric that reads 8 of 39 and a claim that eight tasks were reviewed."""
+    It still says nothing about who wrote the file, and the move to
+    ``reviews/`` did not give it that -- what it gave it is that the pipeline
+    can no longer *create* the file. So the state stays ``current`` and does not
+    become ``approved``: on the bank this state read 8 of 39 while the flag
+    existed, every one of those eight written by the agent that also wrote the
+    task, against a human-reviewed figure of 0."""
     hashes = {"laws": "aaa", "prelude": "bbb"}
-    task = make_task(tier=3, meta={"hashes": hashes,
-                                   "reviewed": {"by": "lulzx", "hashes": hashes}})
-    assert review_state(task.meta, 3) == "current"
+    task = make_task(tier=3, meta={"hashes": hashes})
+    assert review_state(task.meta, 3, {"by": "lulzx", "hashes": hashes}) == "current"
 
 
-def test_a_review_whose_hashes_have_moved_is_stale_and_still_valid(task, toolchain):
+def test_a_review_whose_hashes_have_moved_is_stale_and_still_valid(movable_task,
+                                                                   toolchain):
     """``t3-pad``, ``t3-rev-rev`` and ``t3-zip-sum`` were in exactly this state.
 
     Only the *recorded* side can drift, and that is what makes the state worth
@@ -540,11 +567,11 @@ def test_a_review_whose_hashes_have_moved_is_stale_and_still_valid(task, toolcha
     blocks at the checkpoint on the same condition; two copies of "is this
     review stale" would be two answers to one question.
     """
-    recorded = dict(task.meta["hashes"])
+    recorded = dict(movable_task.meta["hashes"])
     recorded[HASH_KEYS[LAWS_FILE]] = "0" * 64
-    stale = replace(task, tier=3, meta={
-        **task.meta, "reviewed": {"by": "lulzx", "hashes": recorded}})
-    assert review_state(stale.meta, 3) == "stale"
+    _write_review(movable_task, {"by": "lulzx", "hashes": recorded})
+    stale = replace(movable_task, tier=3)
+    assert review_state(stale.meta, 3, stale.review) == "stale"
     report = validate_task(stale, toolchain)
     assert report.review == "stale"
     assert report.valid, report.problems
@@ -556,10 +583,63 @@ def test_the_review_check_reads_the_hashes_pair_not_the_task_hash(make_task):
     taken over ``meta["hashes"]``, which is the pair of source hashes. Comparing
     the wrong one can only ever disagree, so every task would read stale."""
     hashes = {"laws": "aaa", "prelude": "bbb"}
-    task = make_task(tier=3, hash="not-a-pair",
-                     meta={"hashes": hashes,
-                           "reviewed": {"by": "lulzx", "hashes": hashes}})
-    assert review_state(task.meta, 3) == "current"
+    task = make_task(tier=3, hash="not-a-pair", meta={"hashes": hashes})
+    assert review_state(task.meta, 3, {"by": "lulzx", "hashes": hashes}) == "current"
+
+
+def test_a_record_the_pipeline_cannot_write_is_read_from_the_reviews_directory(
+        movable_task):
+    """The structural half of Fact 27, and the reason the record moved.
+
+    The record used to be a ``"reviewed"`` key in ``meta.json``, which
+    ``tools/publish.py`` rewrites on every publish and which
+    ``tools/author.py --reviewer`` could therefore set. A record that lives in
+    ``meta.json`` is a record the pipeline can forge; one that lives beside the
+    manifest in ``reviews/`` is a file nothing here opens for writing, so the
+    only way it appears is that someone put it there.
+
+    Both halves are asserted, because the second is what makes the first mean
+    anything: the key in ``meta.json`` is now inert, and the file is what counts.
+    """
+    tier_three = replace(movable_task, tier=3)
+    tier_three.meta["reviewed"] = {"by": "lulzx",
+                                   "hashes": tier_three.meta["hashes"]}
+    assert review_state(tier_three.meta, 3, tier_three.review) == "unreviewed", \
+        "a reviewed key in meta.json must not read as a record any more"
+
+    _write_review(movable_task, {"by": "lulzx",
+                                 "hashes": movable_task.meta["hashes"]})
+    assert review_state(tier_three.meta, 3, tier_three.review) == "current"
+
+
+def test_the_bank_ships_no_review_records_and_cannot_have_written_them():
+    """Read the bank, and read the source that would have to write a record.
+
+    Two claims, and the second is the one a value cannot make. The bank holds no
+    review record -- the eleven the pipeline wrote for itself were removed when
+    the flag was, rather than migrated to the new directory, because moving a
+    forgery is not a repair. And no module under ``gavel/`` or ``tools/`` opens
+    a path under ``reviews/`` for writing, so the directory can only gain a file
+    from outside this repository.
+
+    Both are checked against the working tree rather than a fixture: this is a
+    statement about the code and the bank as shipped, which is exactly the kind
+    of claim that rots quietly when it is only made in a docstring.
+    """
+    repo = Path(__file__).resolve().parent.parent
+    shipped = sorted(p.stem for p in (repo / REVIEWS_DIR).glob("*.json")) \
+        if (repo / REVIEWS_DIR).is_dir() else []
+    assert shipped == [], f"the bank carries review records: {shipped}"
+
+    writers = []
+    for source in sorted((repo / "gavel").glob("*.py")) + \
+            sorted((repo / "tools").glob("*.py")):
+        for lineno, line in enumerate(source.read_text().splitlines(), 1):
+            if REVIEWS_DIR not in line and "review_path" not in line:
+                continue
+            if re.search(r"write_text|open\([^)]*['\"]w|unlink|mkdir|touch", line):
+                writers.append(f"{source.name}:{lineno}: {line.strip()}")
+    assert writers == [], "a tool writes review records: " + "; ".join(writers)
 
 
 # --- SPEC 12's environment-quality metrics, over a bank release ----------------

@@ -15,7 +15,7 @@ The stages, in order:
     derive      metadata from the task's own files (tools/publish.py)
     invariants  V1-V5 on the derived task (gavel/validate.py)
     episode     the reference scored through GavelEnv, not through the checker
-    review      tier >= 3 stops here until a named human approves this revision
+    review      tier >= 3 stops here until a person has written the record
     publish     the manifest entry, written only once everything above passed
 
 Why an episode and not just V1. V1 asks whether the checker accepts the
@@ -25,17 +25,23 @@ asks through the same env the training loop drives, so the pipeline cannot be
 satisfied by a task the loop would not be. A reference that V1 passes and the
 episode fails is a task whose reward is not what its laws say.
 
-The review binds to a revision, not to a task id. Approval is recorded against
-the hashes of the immutable files, so editing LAWS.bend or prelude.bend after a
-review makes the review stale and the checkpoint fires again. A checkpoint that
-survives an edit to the thing it was reviewing is a signature on an empty page.
+The review binds to a revision, not to a task id. The record is taken against
+the hashes of the immutable files, so editing LAWS.bend or prelude.bend after it
+makes it stale and the checkpoint fires again. A checkpoint that survives an
+edit to the thing it was reviewing is a signature on an empty page.
+
+The review is also the one stage this file cannot satisfy, which is the point:
+it reads ``reviews/<task_id>.json``, a path no tool here writes, so a record in
+it exists because a person put it there.
 
 Usage:
     uv run python -m tools.author tasks/2/t2-new-thing
-    uv run python -m tools.author tasks/3/t3-new-thing --reviewer lulzx
+    uv run python -m tools.author tasks/3/t3-new-thing
     uv run python -m tools.author tasks/1/t1-new-thing --json
 
-Exit codes: 0 published, 1 a stage failed, 3 awaiting review.
+Exit codes: 0 published, 1 a stage failed, 3 awaiting review. A tier 3 task
+reaches 3 every time until a person writes ``reviews/<task_id>.json``; there is
+deliberately no flag that clears it, and ``gavel/reviews.py`` says why.
 """
 
 from __future__ import annotations
@@ -51,6 +57,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from gavel.check import CheckConfig  # noqa: E402
 from gavel.env import Action, GavelEnv  # noqa: E402
+from gavel.reviews import load_review  # noqa: E402
 from gavel.tasks import (LAWS_FILE, PRELUDE_FILE, PROOF_FILE,  # noqa: E402
                          SOLUTION_FILE, Manifest, load_task)
 from gavel.toolchain import DEFAULT_VERSION, Toolchain  # noqa: E402
@@ -60,13 +67,13 @@ from gavel.validate import (DEFAULT_BUDGET_MS, REVIEW_TIER,  # noqa: E402
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = REPO_ROOT / "manifest.json"
 
-REVIEWED_KEY = "reviewed"
 """``REVIEW_TIER`` and the state it gates live in ``gavel.validate``, because
 the check that a record is still about the shipped laws is run by validation as
 well as by this checkpoint, and two copies of "is this review stale" is two
 answers to the same question. Below the tier an author's own reading is the
 review; at and above it the laws can pin more than a person can check by eye,
-which is where a named reviewer is worth the interruption."""
+which is where a named reviewer is worth the interruption. Where the record
+itself lives -- and why nothing here may write it -- is ``gavel/reviews.py``."""
 
 FILES = (LAWS_FILE, PRELUDE_FILE, SOLUTION_FILE)
 
@@ -122,18 +129,6 @@ def required_files(root: Path, repo: Path = REPO_ROOT) -> list[str]:
         if (root / name).is_file() and not (root / name).read_text().strip():
             missing.append(f"{name} (empty)")
     return missing
-
-
-def review_is_stale(meta: dict[str, Any]) -> bool:
-    """Anything that is not an approval of the laws as shipped.
-
-    A thin wrapper over ``gavel.validate.review_state``: the checkpoint blocks
-    on ``unreviewed`` and ``stale`` alike, and a record covering a *different*
-    revision is not an approval of this one. Kept as a name because "stale" is
-    what the checkpoint's message says, and the distinction matters to the
-    validator rather than here -- it reports the two separately.
-    """
-    return review_state(meta, int(meta["tier"])) != "current"
 
 
 # --- stages -----------------------------------------------------------------------
@@ -272,27 +267,40 @@ def stage_episode(root: Path, run: Run, repo: Path, toolchain: Toolchain,
             evidence))
 
 
-def stage_review(root: Path, run: Run, reviewer: str | None) -> None:
+def stage_review(root: Path, run: Run, repo: Path | None = None) -> None:
+    """The checkpoint, which this pipeline can test and cannot clear.
+
+    It used to clear it: ``--reviewer NAME`` wrote a ``"reviewed"`` key into
+    ``meta.json``, which is a *derived* file this pipeline rewrites on every
+    publish. So the tool that published a task was also the tool that attested a
+    person had read its laws, and eleven tier-3 tasks in the bank carried a
+    record an authoring agent wrote for itself. The flag is gone and the record
+    moved to ``reviews/<task_id>.json`` (``gavel/reviews.py``), a path nothing
+    here writes; a person creates that file, and the commit that adds it is the
+    provenance the record itself cannot carry.
+
+    That is the whole of what this stage can be. It reads the record, refuses
+    to publish without one, and has no way to make one -- which is the property
+    worth having, because a checkpoint the guarded pipeline can satisfy on its
+    own is a signature on an empty page.
+    """
     meta = json.loads((root / "meta.json").read_text())
     tier = int(meta["tier"])
     if tier < REVIEW_TIER:
         run.stages.append(Stage("review", True, f"tier {tier}: author's own"))
         return
-    if reviewer is None:
-        if not review_is_stale(meta):
-            run.stages.append(Stage(
-                "review", True,
-                f"approved by {meta[REVIEWED_KEY]['by']} at these laws"))
-            return
-        run.blocked = True
+    record = load_review(repo or REPO_ROOT, root.name)
+    if review_state(meta, tier, record) == "current":
         run.stages.append(Stage(
-            "review", False,
-            f"tier {tier}: needs a named reviewer -- re-run with "
-            f"--reviewer NAME once the laws have been read"))
+            "review", True, f"reviewed by {record['by']} at these laws"))
         return
-    meta[REVIEWED_KEY] = {"by": reviewer, "hashes": meta["hashes"]}
-    (root / "meta.json").write_text(json.dumps(meta, indent=2, sort_keys=False) + "\n")
-    run.stages.append(Stage("review", True, f"approved by {reviewer}"))
+    run.blocked = True
+    state = review_state(meta, tier, record)
+    run.stages.append(Stage(
+        "review", False,
+        f"tier {tier}: {state} -- write reviews/{root.name}.json with the "
+        f"reviewer's name and the hashes in meta.json once the laws have been "
+        f"read; this pipeline cannot write it and will not publish without it"))
 
 
 def stage_publish(root: Path, run: Run, manifest: Path) -> None:
@@ -311,7 +319,7 @@ def stage_publish(root: Path, run: Run, manifest: Path) -> None:
 
 def author(root: Path, *, repo: Path = REPO_ROOT,
            version: str = DEFAULT_VERSION,
-           manifest: Path = MANIFEST, reviewer: str | None = None,
+           manifest: Path = MANIFEST,
            budget_ms: int = DEFAULT_BUDGET_MS,
            backend: str | None = None) -> Run:
     """Every stage, in order, stopping at the first refusal."""
@@ -347,7 +355,7 @@ def author(root: Path, *, repo: Path = REPO_ROOT,
     if not run.ok:
         return run
 
-    stage_review(root, run, reviewer)
+    stage_review(root, run, repo)
     if not run.ok:
         return run
 
@@ -363,9 +371,6 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--manifest", default=str(MANIFEST))
     parser.add_argument("--version", default=DEFAULT_VERSION)
     parser.add_argument("--budget-ms", type=int, default=DEFAULT_BUDGET_MS)
-    parser.add_argument("--reviewer", default=None,
-                        help="name to record as having read the laws; required "
-                             f"for tier {REVIEW_TIER} and above")
     parser.add_argument("--backend", default=None,
                         help="checker isolation backend; default is the one "
                              "GAVEL_BACKEND selects")
@@ -373,7 +378,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     run = author(Path(args.task), version=args.version,
-                 manifest=Path(args.manifest), reviewer=args.reviewer,
+                 manifest=Path(args.manifest),
                  budget_ms=args.budget_ms, backend=args.backend)
 
     if args.json:

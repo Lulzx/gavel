@@ -75,17 +75,32 @@ bun run examples/client.ts                # a non-Python client
 V1–V5, episode, review, publish — and refuses to carry a task past one it has
 not passed. Translating a module and inventing the laws stay human (or agent)
 work; everything after that is a measurement, so it is a gate rather than a
-maxim. A tier ≥ 3 task stops for a named reviewer, and the approval is recorded
-against the hashes of `LAWS.bend` and `prelude.bend`, so editing either reopens
-the checkpoint.
+maxim.
 
-Validation reports the same record independently: a tier ≥ 3 task reads
+A tier ≥ 3 task stops at the review checkpoint, and **the pipeline cannot clear
+it**. The record lives at `reviews/<task_id>.json`, beside the manifest and
+outside both the task directory and the reference directory, and no tool here
+opens a path under `reviews/` for writing — `gavel/reviews.py` is the reader,
+and a test asserts the writer does not exist. A record names its reviewer and
+carries the hashes `tools/publish.py` derives from `LAWS.bend` and
+`prelude.bend`, so editing either one leaves the record pointing at laws the
+task no longer ships and reopens the checkpoint.
+
+That shape is deliberate, and it replaced a worse one. The record used to be a
+`"reviewed"` key inside `meta.json`, written by `--reviewer NAME` — which made
+the pipeline that published a task the same pipeline able to attest a person
+had read it. Eleven tier-3 tasks in the bank were registered that way, every
+record written by the agent that had just written the task, and nothing in the
+bytes distinguished them from a person's.
+
+Validation reads the same record independently: a tier ≥ 3 task reads
 `unreviewed`, `stale` or `current`, and `tools/validate.py` prints the stale
 and unreviewed task ids under its summary. Both are warnings, so they promote
 under `--strict` rather than reddening the bank now — `stale` is about the
 evidence attached to a task and not about the reward function. What neither
-check can do is authenticate the name in the record: a record written by a
-person and one written by whoever ran `--reviewer` are the same bytes.
+check can do is authenticate the *name* in the record: the move took away the
+pipeline's ability to create the file, not the ability of whoever holds a
+keyboard to hand-write one.
 
 ## Running episodes
 
