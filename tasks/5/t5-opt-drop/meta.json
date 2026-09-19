@@ -9,6 +9,7 @@
     "clean_opt",
     "opt_sound",
     "opt_sound_zero",
+    "opt_zero",
     "opt_twice_zero"
   ],
   "policy_targets": [
@@ -18,7 +19,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "b9c8b2c24fcf7fe1a843e9684c6485bc5a98aed5d6e0399a0b920b6db49a5f15",
+    "laws": "e3c8f5134524caf1bb3ec200ef9be24e262bbcf3ddd2518207c6979ab445678c",
     "prelude": "58e0aada8849b24f24b8cfb49f1c16842639c18db78afdb12bf0c0c8877acb6e"
   },
   "bend_version": "2.0.5"

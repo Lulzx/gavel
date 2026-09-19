@@ -41,8 +41,11 @@ law exec_twice:
 # Three obligations, and they are not three ways of saying one thing.
 #
 # `clean_opt` is the specification: under the flag it was handed, what `opt`
-# returns has nothing left to remove. It is the law that catches an optimiser
-# that keeps a redundant instruction.
+# returns has nothing left that `clean` forbids -- a `Twice` where the
+# accumulator is known to be zero, and by construction nothing else. It is the
+# law that catches an optimiser that keeps the one instruction the task is
+# about, and it is *not* enough to pin the program, which is what the two laws
+# at the bottom of this file are for.
 #
 # The other two are the price of removing anything, and there are two of them
 # because the flag is a *claim* about the accumulator and a claim has to be
@@ -71,18 +74,36 @@ law opt_sound_zero:
   for p: List<&2, P.Op>
   {S.exec(S.opt(p, True{}), 0n) == S.exec(p, 0n) : Nat}
 
-# The drop itself, named. This is the one branch of `opt` the three laws above
-# leave free, and it has to be pinned because it is the only branch that is
-# allowed to remove an instruction.
+# Two branches are left free by the three laws above, not one, and both have to
+# be pinned because both are allowed to put something into the output that the
+# property-shaped laws cannot see.
 #
-# `clean` forbids a `Twice` where the accumulator is known to be zero, and
-# `clean_opt` says `opt` returns nothing it forbids -- but neither says the
-# instruction has to *go*. A `Zero` is always permitted there, and at a
-# known-zero accumulator a `Zero` is a no-op, so an optimiser that answers
-# `P.Zero{} <> opt(t, True{})` is clean and sound and still not the optimiser
-# this task is about. **Measured 2026-09-19: tier 4, complete, reward 1.000
-# against the reference proof**, all seven laws. This law is the definition of
-# the drop, so the branch cannot answer something else and still be clean.
+# The first is the `Twice` under `True{}`, and it is free because it is the only
+# branch allowed to *remove* an instruction. `clean` forbids a `Twice` where the
+# accumulator is known to be zero, and `clean_opt` says `opt` returns nothing it
+# forbids -- but neither says the instruction has to *go*. A `Zero` is always
+# permitted there, and at a known-zero accumulator a `Zero` is a no-op, so an
+# optimiser that answers `P.Zero{} <> opt(t, True{})` is clean and sound and
+# still not the optimiser this task is about. **Measured 2026-09-19: tier 4,
+# complete, reward 1.000 against the reference proof**, all seven laws. This law
+# is the definition of the drop, so the branch cannot answer something else and
+# still be clean.
+#
+# The second is `Zero`, and it is free for the opposite reason: a `Zero` *resets*
+# the accumulator, so any instruction the branch emits in front of it is dead,
+# and `clean` -- which tracks the accumulator instruction by instruction --
+# permits a `Zero` wherever one appears. An optimiser whose `Zero` branch answers
+# `P.Zero{} <> P.Zero{} <> ...` or `P.Inc{} <> P.Zero{} <> ...` is therefore
+# clean *and* sound too, and it is not this optimiser either. **Measured
+# 2026-09-19: three such bodies, each at tier 4, complete, reward 1.000, all
+# eight laws proven by the reference proof** -- so the earlier record that called
+# the `Twice`/`True` branch the *only* free one was wrong, and this law is the
+# correction. A property the wrong body satisfies is not a law.
+law opt_zero:
+  for t: List<&2, P.Op>
+  for z: Bool
+  {S.opt(P.Zero{} <> t, z) == P.Zero{} <> S.opt(t, True{}) : List<&2, P.Op>}
+
 law opt_twice_zero:
   for t: List<&2, P.Op>
   {S.opt(P.Twice{} <> t, True{}) == S.opt(t, True{}) : List<&2, P.Op>}
