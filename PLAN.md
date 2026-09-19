@@ -1028,12 +1028,12 @@ and the resulting verdicts say `dev_only: true`.
    progress** — 189 tasks (29 tier 1, 121 tier 2, 31 tier 3, 5 tier 4, 3 tier 5),
    validated together rather than per task, because a task is sound only against
    a corpus that shares the degenerate generator with it. The whole bank was
-   re-measured locally on 2026-09-19, after Fact 54's batch and Fact 51's three
-   repairs before it, as
-   **179/179 valid over 3,891 checker runs**, with no problems, no law with a
-   zero-kill count (**627 laws, mean 4.04 kills, min 1**), no mutant reading
+   re-measured locally on 2026-09-19, after Fact 54's and Fact 55's batches and
+   Fact 51's three repairs before them, as
+   **189/189 valid over 4,096 checker runs**, with no problems, no law with a
+   zero-kill count (**665 laws, mean 3.96 kills, min 1**), no mutant reading
    tier 4, and no task free of warnings: the missing calibration
-   measurement on all 179, and on the 39 tasks at or above `REVIEW_TIER` a
+   measurement on all 189, and on the 39 tasks at or above `REVIEW_TIER` a
    review warning as well — all 39 with no record, because the 11 records that
    used to sit in `meta.json` were forgeries and were deleted rather than
    migrated (Fact 27). The calibration warning is the one `--strict` promotes,
@@ -1047,9 +1047,9 @@ and the resulting verdicts say `dev_only: true`.
    validate. The 172-task run was taken under exactly that contention — two
    authoring agents were checking against the same tree — and its reference
    latency reads 71–91 ms, median 78, which is a number about a quiet enough box
-   and not about the tasks. The 179-task run was taken with every agent idle,
-   and it reads 70–79 ms, median 78: the two runs agree on the median to the
-   millisecond, which is the cleanest evidence in this record that the latency
+   and not about the tasks. The 189-task run was taken with no checker consumer
+   but the run itself, and it reads 70–90 ms, median 78 — the same median a
+   third time, which is the cleanest evidence in this record that the latency
    figure is a property of the checker rather than of the load it was measured
    under.
    The 122-task reading that stood here was taken the same way, and
