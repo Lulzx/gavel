@@ -4,7 +4,9 @@
   "laws": [
     "pred_succ",
     "add_one",
-    "pred_zero"
+    "pred_zero",
+    "add_zero",
+    "add_succ"
   ],
   "policy_targets": [
     "pred",
@@ -13,7 +15,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "a5cadd3d4c284161152f174b594c129763a5ab499e0991b0a1b272bb170055b9",
+    "laws": "d272aeaef9b2c5c61a4e0fc03604d7f3fcee097217b250c4c00d05b0bc5eaf18",
     "prelude": "acd455c2d25c93fcc94b5287e59b9e402fdbb04ed0d062942d14f4c3db0cd52b"
   },
   "bend_version": "2.0.5"

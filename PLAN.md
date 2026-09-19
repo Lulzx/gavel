@@ -392,6 +392,10 @@ blanks. `review_is_stale` does its job, comparing the reviewed hashes to the one
 
     **What the shape is, and it is not Fact 30's or Fact 34's.** The hole is not a branch no left-hand side reaches and not a target no law names — every law here is about a function that exists, and every law's body is reached. It is a **literal standing in for a universal**: `mul_two` is about `mul` at the single first argument `2n`, `pred_add_one` is about `add` at the single second argument `1n`, and a law that names one point leaves the function free at every other point. The standing note for this is "an endpoints-only set leaves the interior free", and this is that sentence one dimension down — here there are not even two endpoints, there is one point. The reason the corpus never found it is the reason Fact 43 found for the empty case and it is mechanical: `tools/mutate.py`'s rules rewrite a *step* of the reference, and a body that is wrong at a literal the law names is a body whose wrongness is invisible to the law, so no generated rule produces one and no measurement of the corpus can see the gap. The repair is always the step, because the step is the only law shape that reaches every point rather than one.
 
+    **The shape is mechanical enough to screen for, and the screen found a third instance.** Both escapes above came out of a probe log, which only reaches the tasks somebody wrote a body for. The shape itself — a target function observed at a position only at literal values — is a property of the law set and can be read off `LAWS.bend` without a body at all. `/tmp/probe/screen-literal-positions.py` is that reading: for every policy target it collects every argument position any law observes, classifies each observation as closed (`\d+n`, or a constructor with a `{}` payload) or open (a variable), and flags every (target, position) cell whose observations are *all* closed. **One flagged cell was a real hole, `t2-pred-laws`, and it is the same shape a third time.** `add_one` is the only law there that applies `add`, it applies the second argument at `1n` alone, and `add(a, b) = 1n + a` — measured 2026-09-19 against the three laws then in the set — reads **tier 4, complete, reward 1.000, `failed` empty**. The `LAWS.bend` comment on `add_one` had claimed it was "the law that pins `add`", which is the same claim `t1-pred-succ`'s comment made and the same amount of truth: it pins `add` at one value of its second argument and nowhere else. The repair is the pair `add_zero` + `add_succ`, the identical two laws `t1-pred-succ` carries, and the prompt now says why — that one value plus the `1n` `add_one` names is not the function, and `add_succ` is the induction in `a` with `b` carried through. `t2-pred-laws` reads **5 laws, 11 strong mutants, no escape, per-law kills mean 7.0 / min 6, no zero-kill law**, the reference proving all five at tier 4; its two mutants are in the corpus with their before-and-after readings in the headers.
+
+    **The screen's own first version was wrong and the way it was wrong is worth recording, because the instrument is meant to be re-run.** It matched the law's left-hand side with a regex that stopped at the first `==`, which for a law with a premise grabs the *premise* block rather than the goal: `premise_flip_flop`-style laws read as though they observed their target inside `P.le(h, n)`. That produced **nine false flags**, and the fix was to scan the whole law body rather than a matched left-hand side — conservative, since a variable anywhere in the law now counts as an open observation, and it cut the flags to two. **One of those two is still there and it is a false positive, recorded here so it is not re-litigated: `t1-clamp-laws clamp(arg3)` is observed only at `True{}` (`clamp_below`) and `False{}` (`clamp_above`, `clamp_inside`).** `arg3` is a `Bool`, `Bool` has exactly two constructors, and both are observed — the position is pinned, not free. The screen reasons about *values seen*, not about the size of the type they live in, so a finite type whose every constructor is named will always flag. That is the whole of the screen's known error, and it is the direction that costs a reading rather than the one that ships a hole: it can flag a pinned cell, never miss a cell that is all-closed.
+
 **Latency.** Re-measured at 187–297 ms per check, consistent with the figure above. Earlier readings of 0.49–0.69 s were taken at load averages of 49–119 on this machine (Chrome and node processes, not Gavel's) and should not be used to revise the figure. `gavel bench` reports the distribution; run it on an idle box before quoting a number.
 
 ## 1. Deviations from SPEC.md
@@ -1662,12 +1666,16 @@ waiting room.
    sometimes, so no log maps them. **What is not in doubt is the shape of the
    gap: the 65 tier-2 tasks and 3 tier-1 tasks those three logs do not reach have
    no new-body reading recorded anywhere, and the corpus reading is all they
-   have.** Fact 47 is what that gap costs — the two escapes it records sat in
+   have.** Fact 47 is what that gap costs — the two tier-1 escapes it records sat in
    `/tmp/probe/sweep/results.json` for three days, unread. Re-running the logs
    against the current bank is the cheapest way to close it, because the bodies
    are already written and only the reading is new; Fact 47's re-run is that
-   reading for the 84 probes that map to a task, and it is where both escapes
-   came from.
+   reading for the 84 probes that map to a task, and it is where both tier-1
+   escapes came from. **The third instance did not need a body and therefore does
+   not count against this gap at all**: `/tmp/probe/screen-literal-positions.py`
+   reads the shape off every `LAWS.bend` in the bank with nothing written against
+   it, which is what makes it a screen rather than a probe. Its one remaining
+   flag is a known false positive and the gap above is unchanged by it.
 
 **Human-reviewed laws for tier ≥ 3 are still not satisfied, and the bank no
 longer says they are.** The second clause is the half that was closable and it
