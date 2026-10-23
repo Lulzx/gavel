@@ -2,7 +2,7 @@
   "version": 1,
   "bend_version": "2.0.5",
   "toolchain_hash": "121c70615f2d37827a9f5489d4800358c69b824348c25be5c72545d9b29dc10d",
-  "bun_version": "1.3.14",
+  "bun_version": "1.4.3",
   "tasks": [
     {
       "task_id": "t1-add-plus",
@@ -667,7 +667,7 @@
       "tier": 2,
       "path": "tasks/2/t2-init-laws",
       "reference": "references/t2-init-laws",
-      "hash": "b7dd9ce5631f92a42a0ca8661fec5dc1288a6bc2e58d4253a2b1576eb6d4580d"
+      "hash": "4c481015ae9a10969216c58f662fef164c1fc2f80ddc9b66d5992997922d33f1"
     },
     {
       "task_id": "t2-insert-at",

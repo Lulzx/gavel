@@ -3,6 +3,10 @@ import ./prelude.bend as P
 import ./solution.bend as S
 import ./LAWS.bend as L
 
+# Definitional: the empty list takes the outer `Nil{}` case.
+def L.init_nil():
+  {==}
+
 # Definitional: the one-element list takes the cons case of the match and then
 # the `Nil{}` case of the match on its tail.
 def L.init_single(h):

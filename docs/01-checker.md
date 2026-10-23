@@ -9,15 +9,18 @@ properties of that program dictate the shape of everything in `gavel/`.
 One run of a proof file cannot tell you which laws passed. It tells you the
 first thing that went wrong and stops.
 
-So partial credit is computed by a fixed-point loop of isolation runs
-(`gavel/check.py`). Each run contains the proof of one law plus the proofs of
-every law already credited, and the law is credited if the run leaves exactly
-the uncredited laws open and nothing else. A proof that leans on a law not yet
-credited fails outright, and a proof with an internal hole inflates the open
-count and is never credited.
+So partial credit is computed by isolation runs in declaration order
+(`gavel/check.py`). Each run contains the proof of one law, the proofs of
+every law already credited, and the reachable `Policy.*` helpers whose law and
+helper dependencies are already satisfied. The law is credited if the run
+leaves exactly the uncredited laws open and nothing else. A proof that leans on
+a law not yet credited fails outright, and a proof with an internal hole
+inflates the open count and is never credited.
 
-The loop is bounded: at most `n` passes over `n` laws, and a hard cap on
-checker runs per verdict.
+Because `book_valid` checks declarations in file order, a proof at index `k`
+can never depend on a law declared after `k`. Walking the filled laws in
+`PROOF.bend` declaration order therefore converges in a single pass (at most
+`n` isolation runs for `n` laws), with a hard cap on checker runs per verdict.
 
 ## A proof may cite only laws declared earlier
 

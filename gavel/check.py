@@ -24,7 +24,7 @@ from .cache import VerdictCache, verdict_key
 from .gate import check as gate_check
 from .gate import imports_laws, law_definitions
 from .laws import alias_map, parse_imports, split_top_level
-from .lexer import KIND_NAME, tokenize
+from .lexer import KIND_NAME, normalize_tokens, tokenize
 from .runner import DEFAULT_LIMITS, Backend, Limits, run_check, select_backend
 from .tasks import (LAWS_FILE, PROOF_FILE, SOLUTION_FILE, Task, cleanup,
                     prepare_workdir, submission_hash)
@@ -119,18 +119,21 @@ def _mutant_incident(task: Task, files: dict[str, str], tier: int) -> str | None
 
     Each task ships solutions with one deliberate semantic bug, and V2 refuses
     the task unless its laws reject all of them. Reaching a proving tier with a
-    solution byte-identical to one of them means that guarantee did not hold in
-    a live episode, so the reward is withheld and the verdict carries the case.
-    The tier is left as computed: it is the evidence.
+    solution byte-identical or token-equivalent (up to comments, whitespace,
+    and local binder renaming) to one of them means that guarantee did not hold
+    in a live episode, so the reward is withheld and the verdict carries the
+    case. The tier is left as computed: it is the evidence.
 
-    The comparison is on the whole file, not on a digest of the submission,
-    because a policy is free to submit a different proof for the same solution.
+    The comparison is on ``solution.bend`` rather than on a digest of the whole
+    submission, because a policy is free to submit a different proof for the
+    same solution.
     """
     if tier < TIER_PARTIAL:
         return None
     source = files.get(SOLUTION_FILE)
     if source is None:
         return None
+    norm_source = normalize_tokens(source)
     for path in task.mutant_paths:
         try:
             mutant = path.read_text()
@@ -138,6 +141,10 @@ def _mutant_incident(task: Task, files: dict[str, str], tier: int) -> str | None
             continue
         if mutant == source:
             return (f"{SOLUTION_FILE} is byte-identical to the mutant "
+                    f"{path.name}, and the checker accepted a proof for it "
+                    f"(tier {tier})")
+        if norm_source is not None and normalize_tokens(mutant) == norm_source:
+            return (f"{SOLUTION_FILE} is token-equivalent to the mutant "
                     f"{path.name}, and the checker accepted a proof for it "
                     f"(tier {tier})")
     return None
@@ -198,43 +205,44 @@ def _fixed_point(task: Task, toolchain: Toolchain, workdir: Path,
                  proof_src: str, laws: list[str], filled: dict[str, object],
                  runs: _Runs, config: CheckConfig,
                  backend: Backend) -> tuple[str, ...]:
-    """Credit each law whose proof stands on its own, to a fixed point.
+    """Credit each law whose proof stands on its own, in a single pass.
 
-    A law is credited when an isolation run -- the header, the helpers it can
-    reach, and the defs of the already-credited laws plus this one -- leaves
-    exactly the uncredited laws open and nothing else. A def with an internal
-    ``?TODO`` inflates the open count and is never credited; a proof that
-    leans on a law not yet credited is a dead claim and fails outright.
+    ``book_valid`` checks declarations in ``PROOF.bend`` order and registers
+    each law's fill only after checking it, so a valid proof at ``index[law]``
+    can only ever depend on declarations with a smaller index. Walking the
+    filled laws in declaration order therefore visits every dependency of a law
+    before the law itself, converging in one pass (at most ``len(filled)``
+    runs) instead of ``O(n^2)``.
+
+    A law is credited when an isolation run -- the header, the usable helpers
+    it can reach, and the defs of the already-credited laws plus this one --
+    leaves exactly the uncredited laws open and nothing else.
     """
     imports = parse_imports(proof_src)
     header = "\n".join(imp.raw for imp in imports if imp.raw)
 
     index = {law: chunk.index for law, chunk in filled.items()}
-    helpers = _usable_helpers(proof_src, imports, laws)
+    ordered = sorted((law for law in laws if law in filled),
+                     key=lambda law: index[law])
 
     proven: list[str] = []
-    changed = True
-    passes = 0
-    while changed and passes < len(laws):
-        passes += 1
-        changed = False
-        for law in laws:
-            if law in proven or law not in filled:
-                continue
-            if len(runs.results) >= config.max_runs:
-                return tuple(proven)
-            selected = [*proven, law]
-            body = _isolation_source(header, helpers, filled, selected, index)
-            (workdir / ISOLATION_FILE).write_text(body)
-            result = runs.add(run_check(toolchain, workdir, ISOLATION_FILE,
-                                        config.limits, backend))
-            remaining = len(laws) - len(selected)
-            if result.ok or (result.todo_count is not None
-                             and result.todo_count == remaining):
-                proven.append(law)
-                changed = True
+    for law in ordered:
+        if len(runs.results) >= config.max_runs:
+            break
+        selected = [*proven, law]
+        helpers = _usable_helpers(proof_src, imports, laws,
+                                  credited=selected, filled=filled)
+        body = _isolation_source(header, helpers, filled, selected, index)
+        (workdir / ISOLATION_FILE).write_text(body)
+        result = runs.add(run_check(toolchain, workdir, ISOLATION_FILE,
+                                    config.limits, backend))
+        remaining = len(laws) - len(selected)
+        if result.ok or (result.todo_count is not None
+                         and result.todo_count == remaining):
+            proven.append(law)
     (workdir / ISOLATION_FILE).unlink(missing_ok=True)
-    return tuple(proven)
+    proven_set = set(proven)
+    return tuple(law for law in laws if law in proven_set)
 
 
 def _isolation_source(header: str, helpers: list[tuple[int, str]],
@@ -247,25 +255,75 @@ def _isolation_source(header: str, helpers: list[tuple[int, str]],
     return f"{header}\n\n{body}\n"
 
 
-def _usable_helpers(proof_src: str, imports, laws: list[str]) -> list[tuple[int, str]]:
-    """Helper defs that do not, by themselves, depend on an open law.
+def _usable_helpers(proof_src: str, imports, laws: list[str],
+                    credited: list[str] | tuple[str, ...] = (),
+                    filled: dict[str, object] | None = None) -> list[tuple[int, str]]:
+    """Helper defs that only depend on credited laws and usable earlier helpers.
 
-    A helper that cites a law would make every isolation run fail until that
-    law is credited, which would withhold credit from laws that have nothing to
-    do with it. Dropping it is conservative in the safe direction: it can only
-    cost the submission credit, never grant it.
+    Walking top-level ``Policy.*`` defs in declaration order closes over both
+    law citations and helper-to-helper calls: a helper may cite a law already
+    in ``credited`` (declared earlier than the helper), and a helper that calls
+    another ``Policy.*`` helper is kept only if that callee is itself usable.
+    When ``filled`` is given, the set is further restricted to helpers
+    transitively reachable from the defs in ``credited`` so an unrelated broken
+    helper written for a failing law cannot poison an independent law's run.
     """
     aliases = alias_map(imports)
     law_module = _module_of(imports)
     law_set = set(laws)
-    out: list[tuple[int, str]] = []
+    credited_set = set(credited)
+    law_index = ({law: getattr(chunk, "index") for law, chunk in filled.items()}
+                 if filled is not None else {})
+
+    usable: dict[str, tuple[int, str]] = {}
     for chunk in split_top_level(proof_src):
         if chunk.kind != "def" or not chunk.name.startswith("Policy."):
             continue
-        if _cited_laws(chunk.text, aliases, law_module, law_set):
+        cited_l = _cited_laws(chunk.text, aliases, law_module, law_set)
+        if not cited_l.issubset(credited_set):
             continue
-        out.append((chunk.index, chunk.text))
-    return out
+        if law_index and any(law_index.get(l, chunk.index) >= chunk.index
+                             for l in cited_l):
+            continue
+        cited_h = _cited_helpers(chunk.text) - {chunk.name}
+        if not cited_h.issubset(usable):
+            continue
+        usable[chunk.name] = (chunk.index, chunk.text)
+
+    if filled is None:
+        return list(usable.values())
+
+    needed: set[str] = set()
+    queue: list[str] = []
+    for law in credited:
+        chunk = filled.get(law)
+        if chunk is None:
+            continue
+        for h in _cited_helpers(getattr(chunk, "text", "")):
+            if h in usable and h not in needed:
+                needed.add(h)
+                queue.append(h)
+    while queue:
+        cur = queue.pop()
+        _, text = usable[cur]
+        for h in _cited_helpers(text):
+            if h in usable and h not in needed:
+                needed.add(h)
+                queue.append(h)
+    return [usable[h] for h in usable if h in needed]
+
+
+def _cited_helpers(text: str) -> set[str]:
+    """``Policy.*`` helper names this chunk mentions."""
+    found: set[str] = set()
+    try:
+        tokens = tokenize(text)
+    except Exception:
+        return found
+    for token in tokens:
+        if token.kind == KIND_NAME and token.text.startswith("Policy."):
+            found.add(token.text)
+    return found
 
 
 def _cited_laws(text: str, aliases: dict[str, str], law_module: str,

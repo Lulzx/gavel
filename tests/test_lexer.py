@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from gavel.lexer import (KIND_AT, KIND_CHAR, KIND_HOLE, KIND_NAME, KIND_NUMBER,
-                         KIND_OP, KIND_STRING, LexError,
+                         KIND_OP, KIND_STRING, LexError, normalize_tokens,
                          strip_comments_and_literals, tokenize)
 
 REPO = Path(__file__).resolve().parents[1]
@@ -130,3 +130,38 @@ def test_the_round_trip_holds_where_the_scanner_is_tricky():
 def test_an_unterminated_literal_is_an_error_not_a_silent_truncation():
     with pytest.raises(LexError):
         tokenize('def f() -> String:\n  "no closing quote\n')
+
+
+def test_normalize_tokens_ignores_comments_whitespace_and_alpha_renaming():
+    one = (
+        "import Base\n\n"
+        "def add(a: Nat, b: Nat) -> Nat:\n"
+        "  match a:\n"
+        "    case 0n:\n"
+        "      b\n"
+        "    case 1n+p:\n"
+        "      1n + add(p, b)\n"
+    )
+    two = (
+        "import Base # header comment\n"
+        "def add(x: Nat, y: Nat) -> Nat:\n"
+        "  # body comment\n"
+        "  match x:\n"
+        "    case 0n:\n"
+        "      y\n"
+        "    case 1n + k:\n"
+        "      1n + add(k, y)\n"
+    )
+    swapped = (
+        "import Base\n"
+        "def add(x: Nat, y: Nat) -> Nat:\n"
+        "  match y:\n"
+        "    case 0n:\n"
+        "      x\n"
+        "    case 1n + k:\n"
+        "      1n + add(k, x)\n"
+    )
+    assert normalize_tokens(one) == normalize_tokens(two)
+    assert normalize_tokens(one) != normalize_tokens(swapped)
+    assert normalize_tokens('def f() -> String:\n  "unterminated\n') is None
+

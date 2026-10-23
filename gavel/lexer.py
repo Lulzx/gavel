@@ -223,3 +223,216 @@ def strip_comments_and_literals(src: str) -> str:
             out[i] = " "
         pos = nl
     return "".join(out)
+
+
+_DECL_HEADS = frozenset({"def", "type", "law"})
+
+
+def normalize_tokens(src: str) -> tuple[tuple[str, str], ...] | None:
+    """Canonical token stream for ``src``, invariant to comments, whitespace,
+    and alpha-renaming of local binders inside each ``def`` or ``law``.
+
+    Returns ``None`` if ``src`` cannot be tokenized.
+    """
+    try:
+        tokens = tokenize(src)
+    except LexError:
+        return None
+
+    # Split into header (imports) and top-level declaration segments.
+    cuts: list[int] = []
+    for i, tok in enumerate(tokens):
+        if tok.kind == KIND_NAME and tok.text in _DECL_HEADS:
+            start = i
+            if (tok.text == "def" and i >= 2
+                    and tokens[i - 1].kind == KIND_NAME and tokens[i - 1].text == "unsafe"
+                    and tokens[i - 2].kind == KIND_AT):
+                start = i - 2
+            cuts.append(start)
+
+    if not cuts:
+        return tuple((t.kind, t.text) for t in tokens)
+
+    out: list[tuple[str, str]] = [(t.kind, t.text) for t in tokens[:cuts[0]]]
+    for idx, start in enumerate(cuts):
+        end = cuts[idx + 1] if idx + 1 < len(cuts) else len(tokens)
+        out.extend(_normalize_decl(tokens[start:end]))
+    return tuple(out)
+
+
+def _normalize_decl(seg: list[Token]) -> list[tuple[str, str]]:
+    """Alpha-normalize local binders inside one top-level declaration."""
+    decl_idx = next((i for i, t in enumerate(seg)
+                     if t.kind == KIND_NAME and t.text in _DECL_HEADS), None)
+    if decl_idx is None or seg[decl_idx].text == "type":
+        return [(t.kind, t.text) for t in seg]
+
+    # Locate the declaration name (skipping optional <...> type params before it).
+    i = decl_idx + 1
+    if i < len(seg) and seg[i].kind == KIND_OP and seg[i].text == "<":
+        angle = 1
+        i += 1
+        while i < len(seg) and angle > 0:
+            if seg[i].kind == KIND_OP and seg[i].text == "<":
+                angle += 1
+            elif seg[i].kind == KIND_OP and seg[i].text == ">":
+                angle -= 1
+            i += 1
+    if i >= len(seg) or seg[i].kind != KIND_NAME:
+        return [(t.kind, t.text) for t in seg]
+    name_idx = i
+    i += 1
+
+    binders: dict[str, str] = {}
+    in_type: set[int] = set()
+
+    def bind(var: str) -> str:
+        if var not in binders:
+            binders[var] = f"${len(binders)}"
+        return binders[var]
+
+    # Optional <...> after def name
+    if i < len(seg) and seg[i].kind == KIND_OP and seg[i].text == "<":
+        angle = 1
+        in_type.add(i)
+        i += 1
+        while i < len(seg) and angle > 0:
+            in_type.add(i)
+            if seg[i].kind == KIND_OP and seg[i].text == "<":
+                angle += 1
+            elif seg[i].kind == KIND_OP and seg[i].text == ">":
+                angle -= 1
+            i += 1
+
+    # Parameter list ( ... )
+    if i < len(seg) and seg[i].kind == KIND_OP and seg[i].text == "(":
+        paren = 1
+        i += 1
+        reading_type = False
+        angle = 0
+        while i < len(seg) and paren > 0:
+            tok = seg[i]
+            if tok.kind == KIND_OP and tok.text == "(":
+                paren += 1
+            elif tok.kind == KIND_OP and tok.text == ")":
+                paren -= 1
+                if paren == 0:
+                    i += 1
+                    break
+            elif paren == 1:
+                if tok.kind == KIND_OP and tok.text == "<":
+                    angle += 1
+                elif tok.kind == KIND_OP and tok.text == ">" and angle > 0:
+                    angle -= 1
+                elif angle == 0 and tok.kind == KIND_OP and tok.text == ":":
+                    reading_type = True
+                    i += 1
+                    continue
+                elif angle == 0 and tok.kind == KIND_OP and tok.text == ",":
+                    reading_type = False
+                    i += 1
+                    continue
+            if reading_type or paren > 1 or angle > 0:
+                in_type.add(i)
+            elif (tok.kind == KIND_NAME and not tok.is_keyword
+                  and "." not in tok.text):
+                bind(tok.text)
+            i += 1
+
+    # Return type up to header ':'
+    paren = angle = brace = 0
+    while i < len(seg):
+        tok = seg[i]
+        if tok.kind == KIND_OP:
+            if tok.text == "(":
+                paren += 1
+            elif tok.text == ")":
+                paren = max(0, paren - 1)
+            elif tok.text == "<":
+                angle += 1
+            elif tok.text == ">":
+                angle = max(0, angle - 1)
+            elif tok.text == "{":
+                brace += 1
+            elif tok.text == "}":
+                brace = max(0, brace - 1)
+            elif tok.text == ":" and paren == 0 and angle == 0 and brace == 0:
+                i += 1
+                break
+        in_type.add(i)
+        i += 1
+
+    body_start = i
+    # Scan body for `for <var>:` binders, `case <pat>:` binders, and `x = ...`
+    in_case_pat = False
+    in_for_binder = False
+    in_for_type = False
+    paren = brace = 0
+    for k in range(body_start, len(seg)):
+        tok = seg[k]
+        if in_for_type:
+            in_type.add(k)
+            if tok.kind == KIND_OP and tok.text == "{":
+                brace += 1
+            elif tok.kind == KIND_OP and tok.text == "}":
+                brace = max(0, brace - 1)
+            elif brace == 0 and (
+                (tok.kind == KIND_NAME and tok.text == "for")
+                or (tok.kind == KIND_OP and tok.text == "{")
+            ):
+                in_for_type = False
+            else:
+                continue
+        if tok.kind == KIND_NAME and tok.text == "for" and not in_case_pat:
+            in_for_binder = True
+            continue
+        if in_for_binder:
+            if tok.kind == KIND_OP and tok.text == ":":
+                in_for_binder = False
+                in_for_type = True
+                brace = 0
+                continue
+            if tok.kind == KIND_NAME and not tok.is_keyword and "." not in tok.text:
+                bind(tok.text)
+            continue
+        if tok.kind == KIND_NAME and tok.text == "case" and not in_case_pat:
+            in_case_pat = True
+            paren = brace = 0
+            continue
+        if in_case_pat:
+            if tok.kind == KIND_OP:
+                if tok.text == "(":
+                    paren += 1
+                elif tok.text == ")":
+                    paren = max(0, paren - 1)
+                elif tok.text == "{":
+                    brace += 1
+                elif tok.text == "}":
+                    brace = max(0, brace - 1)
+                elif tok.text == ":" and paren == 0 and brace == 0:
+                    in_case_pat = False
+                    continue
+            if (tok.kind == KIND_NAME and not tok.is_keyword
+                    and "." not in tok.text
+                    and not (k + 1 < len(seg) and seg[k + 1].kind == KIND_OP
+                             and seg[k + 1].text == "{")):
+                bind(tok.text)
+            continue
+        # Local `x = ...` or `+x = ...` binding
+        if (tok.kind == KIND_NAME and not tok.is_keyword and "." not in tok.text
+                and k + 1 < len(seg)
+                and seg[k + 1].kind == KIND_OP and seg[k + 1].text == "="
+                and (k + 2 >= len(seg) or seg[k + 2].text not in ("=", ">"))
+                and (k == 0 or seg[k - 1].text not in ("=", "!", "<", ">"))):
+            bind(tok.text)
+
+    result: list[tuple[str, str]] = []
+    for k, tok in enumerate(seg):
+        if (k > name_idx and k not in in_type
+                and tok.kind == KIND_NAME and tok.text in binders
+                and not (k + 1 < len(seg) and seg[k + 1].kind == KIND_OP
+                         and seg[k + 1].text == "{")):
+            result.append((tok.kind, binders[tok.text]))
+        else:
+            result.append((tok.kind, tok.text))
+    return result

@@ -73,6 +73,25 @@ def test_constant_body_gives_every_input_the_base_answer():
     assert "add(p, b)" not in mutant.source
 
 
+def test_perturb_base_rewrites_the_base_answer_to_a_well_typed_alternative():
+    nat_mutant = by_rule(ADD, "perturb-base")[0]
+    assert "case 0n:\n      0n" in nat_mutant.source
+    assert "1n + add(p, b)" in nat_mutant.source
+    list_mutant = by_rule(APPEND, "perturb-base")[0]
+    assert "case Nil{}:\n      Nil{}" in list_mutant.source
+    assert "h <> append(t, ys)" in list_mutant.source
+
+
+def test_drop_step_strips_the_outer_constructor_from_a_recursive_call():
+    nat_mutant = by_rule(ADD, "drop-step")[0]
+    assert "case 1n+p:\n      add(p, b)" in nat_mutant.source
+    assert "1n + add(p, b)" not in nat_mutant.source
+    list_mutant = by_rule(APPEND, "drop-step")[0]
+    assert "case h <> t:\n      append(t, ys)" in list_mutant.source
+    assert "h <> append(t, ys)" not in list_mutant.source
+
+
+
 def test_tail_to_whole_recurses_on_the_list_instead_of_its_tail():
     mutant = by_rule(APPEND, "tail-to-whole")[0]
     assert "append(xs, ys)" in mutant.source

@@ -454,6 +454,45 @@ def test_deriving_every_law_but_via_a_hole_earns_nothing(toolchain, two_law):
     assert verdict.reward == pytest.approx(0.1)
 
 
+def test_a_helper_chain_citing_a_credited_law_is_kept_in_isolation(
+        toolchain, manifest):
+    """A Policy.* helper chain that cites an already-proven law must survive
+    into later isolation runs, and laws declared out of task.laws order must
+    converge in a single declaration-order pass."""
+    five_law = manifest.get("t1-len-append")
+    files = {
+        SOLUTION_FILE: five_law.reference_solution,
+        PROOF_FILE: five_law.proof_header + (
+            # Declared first in PROOF.bend, though 4th in LAWS.bend:
+            "\ndef L.append_nil_left(ys):\n"
+            "  {==}\n"
+            # Helper chain: Policy.h2 -> Policy.h1 -> L.append_nil_left
+            "\ndef Policy.h1(ys: List<Nat>) -> {S.append(Nil{}, ys) == ys : List<Nat>}:\n"
+            "  L.append_nil_left(ys)\n"
+            "\ndef Policy.h2(ys: List<Nat>) -> {S.append(Nil{}, ys) == ys : List<Nat>}:\n"
+            "  Policy.h1(ys)\n"
+            # Declared second in PROOF.bend, though 2nd in LAWS.bend; uses Policy.h2:
+            "\ndef L.len_single(x):\n"
+            "  %Policy.h2(Nil{}) : {S.len(x <> _) == 1n : Nat}\n"
+            "  {==}\n"
+            # An uncredited helper chain and a broken law proof:
+            "\ndef Policy.bad_leaf(xs: List<Nat>) -> {S.len(S.append(xs, Nil{})) == S.len(xs) : Nat}:\n"
+            "  L.len_nil_right(xs)\n"
+            "\ndef Policy.bad_caller(xs: List<Nat>) -> {S.len(S.append(xs, Nil{})) == S.len(xs) : Nat}:\n"
+            "  Policy.bad_leaf(xs)\n"
+            "\ndef L.len_nil_right(xs):\n"
+            "  {==}\n"
+        ),
+    }
+    verdict = check_submission(five_law, toolchain, files)
+    assert verdict.tier == TIER_PARTIAL
+    # Returned in canonical task.laws order:
+    assert verdict.proven == ("len_single", "append_nil_left")
+    # 1 full run + 1 solution check + 3 single-pass isolation runs = 5 runs:
+    assert len(verdict.checks) == 5
+
+
+
 # --- a proof that never opens the laws ---------------------------------------------
 
 EMPTY_PROOFS = ("", "import Base\n",
@@ -544,6 +583,29 @@ def test_a_solution_that_is_not_a_mutant_is_never_flagged(toolchain, task):
              PROOF_FILE: task.reference_proof}
     verdict = check_submission(task, toolchain, files)
     assert verdict.incident is None
+
+
+def test_a_mutant_with_comments_and_alpha_renamed_binders_still_trips_the_wire(
+        toolchain, self_mutated):
+    """Whitespace, comments, or renaming local parameters must not bypass the
+    mutant tripwire."""
+    renamed = (
+        "import Base # comment\n\n"
+        "def add(x: Nat, y: Nat) -> Nat:\n"
+        "  match x:\n"
+        "    case 0n:\n"
+        "      y\n"
+        "    case 1n+k:\n"
+        "      1n + add(k, y)\n"
+    )
+    files = {SOLUTION_FILE: renamed, PROOF_FILE: self_mutated.reference_proof}
+    verdict = check_submission(self_mutated, toolchain, files)
+    assert verdict.tier == TIER_COMPLETE
+    assert verdict.reward == 0.0
+    assert verdict.incident is not None
+    assert "token-equivalent" in verdict.incident
+    assert "the-reference.bend" in verdict.incident
+
 
 
 # --- the pin -------------------------------------------------------------------

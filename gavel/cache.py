@@ -234,10 +234,16 @@ class VerdictCache:
             return cursor.rowcount
 
     def close(self) -> None:
-        with self._lock:
-            if self._db is not None:
+        lock = getattr(self, "_lock", None)
+        if lock is None:
+            return
+        with lock:
+            if getattr(self, "_db", None) is not None:
                 self._db.close()
                 self._db = None
+
+    def __del__(self) -> None:
+        self.close()
 
     def __enter__(self) -> "VerdictCache":
         return self

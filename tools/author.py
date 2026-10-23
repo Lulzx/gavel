@@ -247,6 +247,12 @@ def stage_mutants(root: Path, run: Run, repo: Path, toolchain: Toolchain) -> Non
     reports = check_mutants(task, toolchain, mutants)
     strong = [m for m in reports if m["strong"]]
     escaped = [m for m in reports if not m["caught"]]
+    if wrote and strong and not escaped:
+        dest = task.references / "mutants"
+        for m in reports:
+            if not m["type_checks"]:
+                (dest / f"{m['name']}.bend").unlink(missing_ok=True)
+        wrote = len(strong)
     evidence = {
         "written": wrote,
         "mutants": [{"name": m["name"], "tier": m["tier"], "strong": m["strong"]}

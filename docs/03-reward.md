@@ -34,6 +34,7 @@ until the episode ends.
 ## The mutant tripwire
 
 Each task ships wrong solutions that its laws are supposed to reject. If a
-live submission is byte-identical to one of them and still reaches a proving
-tier, the reward is withheld and the verdict records the incident. The tier is
-left as computed, because it is the evidence.
+live submission is byte-identical or token-equivalent (up to comments,
+whitespace, and alpha-renamed local binders) to one of them and still reaches a
+proving tier, the reward is withheld and the verdict records the incident. The
+tier is left as computed, because it is the evidence.

@@ -264,10 +264,80 @@ def rule_constant_body(name, params, lines) -> list[Mutant]:
     return out
 
 
+def rule_perturb_base(name, params, lines) -> list[Mutant]:
+    """Perturb the base case's answer to a distinct well-typed value.
+
+    Step-rewriting rules leave the empty/zero case untouched, so a base-case
+    law (`f(Nil{}) == ...` or `f(0n) == ...`) otherwise records zero kills.
+    """
+    out = []
+    header = _DEF.match(lines[0]) if lines else None
+    ret_type = header.group(3).strip() if header else ""
+    clean_params = {p.lstrip("+") for p in params}
+    for i, end, _ in _blocks(lines, _MATCH):
+        cases = _cases(lines, i, end)
+        if len(cases) < 2:
+            continue
+        base_start, base_end = cases[0]
+        body_indices = [j for j in range(base_start + 1, base_end)
+                        if lines[j].strip() and not lines[j].strip().startswith("#")]
+        if len(body_indices) != 1:
+            continue
+        b_idx = body_indices[0]
+        expr = lines[b_idx].strip()
+        alt = None
+        if expr == "0n":
+            alt = "1n"
+        elif expr == "1n":
+            alt = "0n"
+        elif expr == "True{}":
+            alt = "False{}"
+        elif expr == "False{}":
+            alt = "True{}"
+        elif expr == "Nil{}" and ret_type.startswith("List<") and "Nat" in ret_type:
+            alt = "0n <> Nil{}"
+        elif expr in clean_params:
+            if ret_type == "Nat":
+                alt = "0n"
+            elif ret_type == "Bool":
+                alt = "False{}"
+            elif ret_type.startswith("List<"):
+                alt = "Nil{}"
+        if alt is not None and alt != expr:
+            mutated = list(lines)
+            mutated[b_idx] = " " * _indent(lines[b_idx]) + alt
+            out.append(Mutant(f"{name}-perturb-base-{i}", "perturb-base",
+                              _join(mutated), strong=True))
+    return out
+
+
+def rule_drop_step(name, params, lines) -> list[Mutant]:
+    """Strip ``1n +`` or ``h <>`` from a recursive step call.
+
+    Unlike ``tail-to-whole`` or ``swap-call-arguments`` on a self-call, this
+    keeps the structurally smaller recursion argument in place and drops the
+    head variable cleanly, so it passes both the termination checker and
+    linearity check.
+    """
+    out = []
+    step = re.compile(
+        rf"(?:\b1n\s*\+\s*|\b[A-Za-z_]\w*\s*<>\s*)({re.escape(name)}\([^()]*\))")
+    for i, line in enumerate(lines):
+        found = step.search(line)
+        if found is None:
+            continue
+        mutated = list(lines)
+        mutated[i] = line[:found.start()] + found.group(1) + line[found.end():]
+        out.append(Mutant(f"{name}-drop-step-{i}", "drop-step",
+                          _join(mutated), strong=True))
+    return out
+
+
 # Reordering disjoint match cases is deliberately absent: Nat and List patterns
 # do not overlap, so swapping two cases yields the same function and a mutant
 # that proves nothing. It was the first rule written and the first to escape.
 RULES = (rule_swap_case_bodies, rule_constant_body,
+         rule_perturb_base, rule_drop_step,
          rule_tail_to_whole, rule_swap_call_arguments,
          rule_recursion_to_parameter, rule_drop_last_case,
          rule_nat_base_off_by_one)
