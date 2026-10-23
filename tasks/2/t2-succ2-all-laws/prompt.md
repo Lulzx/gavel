@@ -1,27 +1,17 @@
-Implement `succ2_all` on `List<Nat>`, then prove the two laws about it.
+Implement `succ2_all`, then prove the two laws in `LAWS.bend`.
 
-`succ2_all(xs)` replaces every element with the element plus two. Match on the list: `Nil{}` is
-`Nil{}`, and a cons cell conses the element plus two of the head onto the mapped tail.
-`append` and `succ2` come from the prelude.
+`succ2_all(xs)` is the list of the same length as `xs` in which every element
+`n` is replaced by `n + 2n`, in the same order. The empty list maps to the empty
+list.
 
-The laws are the one-element case and the append case:
+    succ2_all([1n, 4n]) == [3n, 6n]
+    succ2_all([0n]) == [2n]
+    succ2_all(Nil{}) == Nil{}
 
-    S.succ2_all(h <> Nil{}) == (P.succ2(h)) <> Nil{}
-    S.succ2_all(P.append(xs, ys)) == P.append(S.succ2_all(xs), S.succ2_all(ys))
+The laws use the prelude's `P.succ2(n)`, which is `n + 2n`, and
+`P.append(xs, ys)`, the list `xs` followed by the list `ys`.
 
-The first is the weak half: it is definitional, and it fixes one-element lists
-only -- a body that mapped a singleton and did something else with longer lists
-satisfies it. The second is the one that pins `succ2_all`: it is satisfied by the
-identity body, which maps a concatenation to itself, and the base law is what
-rules that body out. It is inductive in `xs` -- `append` matches on its first
-argument, so with a variable `xs` the left-hand side does not reduce on its
-own.
-
-The first law's proof is `{==}`: the match steps on the cons cell and the tail
-is `Nil{}`. The second is an induction in `xs`; its cons case puts the mapped
-head outside on both sides, leaving the hypothesis at `t`. Annotate that step
-with the goal in which the term the hypothesis rewrites has been replaced by
-`_`, and close it with `{==}`.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.succ2_all_single(h)` and `def L.succ2_all_append(xs, ys)`.
+- `succ2_all_single`: mapping the one-element list `[h]` gives the one-element
+  list holding `P.succ2(h)`.
+- `succ2_all_append`: mapping a concatenation is the concatenation of the two
+  mapped lists.

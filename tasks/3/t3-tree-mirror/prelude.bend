@@ -10,7 +10,7 @@ type Tree is Data:
   Leaf{value: Nat}
   Node{l: Tree, r: Tree}
 
-# The number of leaves.
+# The sum of the values at the leaves.
 def size(t: Tree) -> Nat:
   match t:
     case Leaf{v}:

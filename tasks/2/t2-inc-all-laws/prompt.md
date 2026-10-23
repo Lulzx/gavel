@@ -1,27 +1,15 @@
-Implement `inc_all` on `List<Nat>`, then prove the two laws about it.
+Implement `inc_all`, then prove the two laws in `LAWS.bend`.
 
-`inc_all(xs)` replaces every element with its successor, `h + 1n`. Match on the
-list: `Nil{}` is `Nil{}`, and a cons cell conses the incremented head onto the
-incremented tail. `append` comes from the prelude.
+`inc_all(xs)` is the list of the same length in which every element is replaced
+by its successor, `h + 1n`. The empty list gives the empty list.
 
-The laws are the one-element case and the append case:
+    inc_all([1n, 4n]) == [2n, 5n]
+    inc_all([0n])     == [1n]
+    inc_all(Nil{})    == Nil{}
 
-    S.inc_all(h <> Nil{}) == (h + 1n) <> Nil{}
-    S.inc_all(P.append(xs, ys)) == P.append(S.inc_all(xs), S.inc_all(ys))
+The laws use the prelude's `P.append(xs, ys)`, the list `xs` followed by the
+list `ys`.
 
-The first is the weak half: it is definitional, and it fixes one-element lists
-only -- a body that increments a singleton and does something else with longer
-lists satisfies it. The second is the one that pins `inc_all`: it is satisfied
-by the identity body, which maps a concatenation to itself, and the base law is
-what rules that body out. It is inductive in `xs` -- `append` matches on its
-first argument, so with a variable `xs` the left-hand side does not reduce on
-its own.
-
-The first law's proof is `{==}`: the match steps on the cons cell and the tail
-is `Nil{}`. The second is an induction in `xs`; its cons case puts the
-incremented head outside on both sides, leaving the hypothesis at `t`. Annotate
-that step with the goal in which the term the hypothesis rewrites has been
-replaced by `_`, and close it with `{==}`.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.inc_all_single(h)` and `def L.inc_all_append(xs, ys)`.
+- `inc_all_single`: `inc_all(h <> Nil{})` is `(h + 1n) <> Nil{}`.
+- `inc_all_append`: `inc_all` of `P.append(xs, ys)` is `P.append` of `inc_all(xs)`
+  and `inc_all(ys)`.

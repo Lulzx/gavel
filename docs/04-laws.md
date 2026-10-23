@@ -77,3 +77,48 @@ Three things make the sweep easy to get wrong, all of them measured here:
 A pair of laws can pin at most two functions. Beyond that, the corpus of
 degenerate submissions is generated from the task itself, one function at a
 time, so it follows the task rather than needing to be hand-written.
+
+## Pinning is not the same as determining
+
+Ruling out the argument-ignoring bodies is necessary and not sufficient. A law
+set can pin a function on some inputs and leave it free on the rest:
+`t3-absdiff-comm`'s first four laws fix `absdiff` on both axes and on the
+diagonal, and a person found a body that agrees there and is wrong everywhere
+else. That hole was closed by hand. The question is whether any others exist.
+
+V2 was supposed to answer it, and could not. It counts a mutant as caught when
+the mutant fails the *reference proof*, and a proof can fail on a body the laws
+accept: one that rewrites a subterm the reference body *is* cannot be replayed
+on any other body. A policy writes its own proof, so that kill is not a kill.
+
+`gavel/ground.py` asks the question without a proof. It instantiates every law
+at small closed values (Nats up to 3, lists up to length 3, prelude trees to
+depth 2, at most 48 instances a law), evaluates both sides with the checker's
+own evaluator in one run, and compares the functions the laws cite against the
+reference at the same points. A candidate that satisfies every instance and
+still disagrees with the reference is a **hole**, reported with the input it
+disagrees on. V6 runs it over each task's shipped mutants and degenerate
+bodies, and `tools/holes.py` also tries every mutant `tools/mutate.py` can
+derive.
+
+The first sweep found 10 holes in 7 tasks, every one of them a shipped mutant
+whose comment named the law that supposedly rejected it:
+
+- `t2-{count,max,sq,sum,zeros}-prefix-laws`: the laws fixed `f(n, xs)` at
+  `n = 0`, at `n = len(xs)` and on `Nil{}`, so `f(1n + k, xs) = <the whole
+  list's answer>` passed. Closed by a step law, `f(1n + k, h <> t) == ...`.
+- `t3-concat-len`: two measures and the one-piece case left the order of the
+  pieces free. Closed by `concat_cons`.
+- `t3-isort-perm`: counts and two-element lists left `isort` free on lists of
+  three. Closed by `insert_before`, `insert_after` and `isort_cons`.
+
+Two of them were then proved outright against the old laws, in different
+tokens from the shipped mutant so the tripwire would not withhold the reward:
+`sum_prefix` answering `P.sum(xs)` for every nonzero count, and an `isort` that
+never sorts its tail, each **earned reward 1.000**. Both are in `tests/holes/`,
+and `tests/test_ground.py` pins that they no longer do.
+
+A clean screen is a bounded claim: no instance outside the grid was tried, and
+the candidates are only as varied as the mutation rules. It cannot read a law
+whose binder type it has no values for, and says so as a V6 warning rather
+than passing it.

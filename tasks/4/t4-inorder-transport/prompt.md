@@ -1,91 +1,55 @@
-Implement `inorder`, `all_le_put`, `all_ge_put` and `bst`, then prove all twelve
-laws.
+Implement `inorder`, `all_le_put`, `all_ge_put` and `bst`, then prove the twelve
+laws in `LAWS.bend`.
 
-`inorder(t)` is the keys of `t` in ascending order: the left subtree's traversal,
-then the node's key, then the right subtree's. `all_le_put(t, b, k)` is `k`
-conjoined with "every key in `t` is at most `b`", and `all_ge_put` is the same
-with "at least `b`"; both take the answer for the part already walked, the way a
-left-threading list fold does, and return it conjoined with this node's
-comparison, so that the tree fold and the list fold can be walked in the same
-order. `bst(t, lo, hi, k)` is the range invariant: `k` conjoined with "every key
-in `t` lies between `lo` and `hi`", where a node's key is the upper bound for its
-left subtree and the lower bound for its right one.
+The trees are the prelude's `P.Tree`: `P.Tip{}` is the empty tree and
+`P.Bin{l, key, r}` a node with key `key` and subtrees `l` and `r`.
 
-The prelude owns the type (`P.Tip{}`, `P.Bin{l, key, r}`), the comparison
-`P.le`, the traversal's building blocks (`P.append`, `P.len`, `P.size`), the
-sortedness fold `P.sorted_put` and its seed-valued form `P.is_sorted`, the
-seedless list bounds `P.all_le_list` and `P.all_ge_list`, and the left-threading
-list folds `P.all_le_list_put` and `P.all_ge_list_put` that the transports are
-stated with.
+`inorder(t)` is the in-order traversal of `t`: the traversal of the left
+subtree, then the node's key, then the traversal of the right subtree. The empty
+tree gives `Nil{}`. For a search tree this lists the keys in ascending order.
 
-`inorder_tip` and `inorder_bin` are definitional pins: they are `inorder`'s
-definition written out, one case per constructor, and they are what makes the
-stub's first obligation an obligation. `inorder_len` is the measure law, one
-element per node. It is implied by the pins and is kept anyway, because the laws
-are also the readable statement of what the function is.
+`all_le_put(t, b, k)` is `k` and "every key in `t` is at most `b`", as one
+`Bool`. `k` is the answer for whatever was checked before `t`, and the keys of
+`t` are added to it one at a time in in-order, left to right, the same order the
+prelude's list fold `P.all_le_list_put` uses. On the empty tree the answer is
+`k`. `all_ge_put(t, b, k)` is the same with "at least `b`".
 
-`bst_tip` and `bst_bin` are the same pair for the fourth target, and they are
-here for a measured reason rather than for symmetry. For a long time
-`inorder_sorted` below was the only law naming `bst`, and it instantiates the
-accumulator at the literal `True{}`; every recursive `bst` call threads either
-that literal or the same accumulator, so the leaf's `False{}` branch was
-unreachable from every law. A `bst` whose leaf answers `True{}` instead of the
-accumulator is then the reference function on every term any law mentions, and
-it earned a full reward -- tier 4, reward 1.000 -- under a `k`-specialised
-induction. The two pins close it: the leaf pins the accumulator and the node
-pins the combination, and one without the other leaves a body wrong in the
-other case. Both are `{==}`.
+`bst(t, lo, hi, k)` is `k` and the range invariant: every node's key lies
+between `lo` and `hi` (inclusive), where at each node the key becomes the upper
+bound for its left subtree and the lower bound for its right subtree. On the
+empty tree the answer is `k`.
 
-`all_le_put_tip` / `all_le_put_bin` and `all_ge_put_tip` / `all_ge_put_bin` are
-the same pair a third time, for the two bound folds, and this one is not
-symmetry either. Neither `all_le_put` nor `all_ge_put` was named on the left of
-any law: both occurred only inside the two premises below, and a target that
-appears only in a premise is not constrained by anything, because the
-submission decides whether the premise is inhabitable at all. An `all_le_put`
-that answers `False{}` at every input makes `inorder_all_le`'s premise
-uninhabitable and the law vacuous, and two lines discharge it -- measured tier 4,
-reward 1.000, for exactly that body. The pair closes it: the tip pins the
-accumulator and the node pins the combination. The node law is the load-bearing
-half; a tip pin alone kills the constant body but leaves a body wrong only at a
-node still able to falsify the premise. All four are `{==}`.
+    inorder(P.Bin{P.Bin{P.Tip{}, 1n, P.Tip{}}, 3n, P.Bin{P.Tip{}, 5n, P.Tip{}}}) == [1n, 3n, 5n]
+    inorder(P.Bin{P.Tip{}, 4n, P.Bin{P.Tip{}, 2n, P.Tip{}}}) == [4n, 2n]
+    bst(P.Bin{P.Tip{}, 4n, P.Bin{P.Tip{}, 2n, P.Tip{}}}, 0n, 9n, True{}) == False{}
+    all_le_put(P.Bin{P.Tip{}, 4n, P.Tip{}}, 3n, True{}) == False{}
 
-`inorder_all_le` and `inorder_all_ge` are the transports: a bound on the tree
-becomes a bound on the list the traversal produces. Each is an implication whose
-premise names the tree-side fold and whose conclusion names the list-side one.
-They are the pair of laws that make the two folds' association matter, which is
-why both sides thread their accumulator left to right rather than conjoining in
-the order the recursion happens to produce.
+Prelude names: `P.le(a, b)` is `True{}` when `a` is at most `b`. `P.append`
+concatenates two lists, `P.len` counts a list's elements and `P.size(t)` counts
+the nodes of `t`. `P.all_le_list_put(xs, b, k)` is `k` and "every element of
+`xs` is at most `b`", and `P.all_ge_list_put` the same with "at least `b`".
+`P.all_le_list` and `P.all_ge_list` are the same bounds without the `k`.
+`P.sorted_put(xs, p, k)` is `k` and "`p`, then the elements of `xs`, are in
+non-decreasing order"; `P.is_sorted(xs)` is `P.sorted_put(xs, 0n, True{})`.
 
-`inorder_sorted` is the work: the range invariant implies the traversal is
-sorted. Its premise is not decorative -- a traversal of a tree whose keys are
-outside their range is not claimed to be sorted -- and the proof cannot skip it.
-The statement to prove is about a list, and the premise is about a tree, so the
-proof has to carry the bound across the traversal, and what survives the
-induction is not just sortedness: it is sortedness together with the two list
-bounds the transports are about. `Policy.bst_ind` is that stronger statement,
-and the law is then one projection of it. At a node the two subtrees are joined
-by the node's key, so the sortedness of the concatenation is a claim about
-`X ++ [key] ++ Y` given the sortedness of each half and their separation -- the
-step that makes this task more than the sum of its parts.
-
-Two things about the shape of a recursion here, both of which the checker
-enforces with an error rather than a warning. A `match` cannot scrutinise a
-computed value: `match P.le(a, b):` is refused with "a parameter or field
-scrutinee (a match cannot scrutinize a computed value: give it its own def)", so
-a decision has to be a parameter of a def. And two defs may not call each other:
-a recursion has to be a single def that shrinks its argument. Pattern variables
-are Lone -- a variable bound by a pattern is usable live once per branch,
-so destructuring a node and also passing it on is "consumed more than once";
-declare a binder `+` when the body consults it more than once.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.inorder_tip()`, `def L.inorder_bin(l, key, r)`,
-`def L.bst_tip(lo, hi, k)`, `def L.bst_bin(l, key, r, lo, hi, k)`,
-`def L.all_le_put_tip(b, k)`, `def L.all_le_put_bin(l, key, r, b, k)`,
-`def L.all_ge_put_tip(b, k)`, `def L.all_ge_put_bin(l, key, r, b, k)`,
-`def L.inorder_len(t)`, `def L.inorder_all_le(t, b, k, e)`,
-`def L.inorder_all_ge(t, b, k, e)` and `def L.inorder_sorted(t, lo, hi, e)`.
-A law's binders are its def's parameters
-in order, and a premise `for e: {...}` is one more parameter. Proof helpers go
-under the reserved `Policy.` namespace, which the gate ignores, and none of them
-may cite a law.
+- `inorder_tip`: the traversal of the empty tree is `Nil{}`.
+- `inorder_bin`: the traversal of `P.Bin{l, key, r}` is the traversal of `l`
+  appended to `key` followed by the traversal of `r`.
+- `bst_tip`: on the empty tree `bst` answers `k`, whatever `lo` and `hi`.
+- `bst_bin`: `bst(P.Bin{l, key, r}, lo, hi, k)` is the conjunction, in this
+  nesting, of `bst(l, lo, key, k)`, `bst(r, key, hi, True{})`, `P.le(lo, key)`
+  and `P.le(key, hi)`.
+- `all_le_put_tip`: on the empty tree `all_le_put` answers `k`.
+- `all_le_put_bin`: `all_le_put(P.Bin{l, key, r}, b, k)` is `all_le_put` of `r`
+  and `b`, started from `all_le_put(l, b, k)` conjoined with `P.le(key, b)`.
+- `all_ge_put_tip`: on the empty tree `all_ge_put` answers `k`.
+- `all_ge_put_bin`: `all_ge_put(P.Bin{l, key, r}, b, k)` is `all_ge_put` of `r`
+  and `b`, started from `all_ge_put(l, b, k)` conjoined with `P.le(b, key)`.
+- `inorder_len`: the traversal has as many elements as the tree has nodes.
+- `inorder_all_le`: when `all_le_put(t, b, k)` is `True{}`, so is
+  `P.all_le_list_put` of the traversal of `t`, with the same `b` and `k`.
+- `inorder_all_ge`: when `all_ge_put(t, b, k)` is `True{}`, so is
+  `P.all_ge_list_put` of the traversal of `t`, with the same `b` and `k`.
+- `inorder_sorted`: when `bst(t, lo, hi, True{})` is `True{}`, the traversal of
+  `t` is sorted starting from `lo`: `P.sorted_put(inorder(t), lo, True{})` is
+  `True{}`.

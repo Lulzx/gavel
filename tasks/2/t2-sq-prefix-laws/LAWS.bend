@@ -27,3 +27,17 @@ law sq_prefix_len:
 law sq_prefix_nil:
   for k: Nat
   {S.sq_prefix(k, Nil{}) == 0n : Nat}
+
+# LAW: one step of the walk. The three laws above fix `sq_prefix` where the count
+# is `0n`, where the list is `Nil{}`, and on the diagonal where the count is the
+# list's length -- and nowhere else. A body that answers the whole list's total
+# for any nonzero count satisfies all three and is wrong at every count strictly
+# between `0n` and the length: **measured** by `tools/holes.py`, which found two
+# shipped mutants doing exactly that while V2 read them as killed, because the
+# reference proof of the length law did not fit their shape. This law is the
+# interior: with the zero and nil laws it determines `sq_prefix` everywhere.
+law sq_prefix_step:
+  for k: Nat
+  for h: Nat
+  for t: List<Nat>
+  {S.sq_prefix(1n + k, h <> t) == P.sq(h) + S.sq_prefix(k, t) : Nat}

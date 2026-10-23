@@ -24,8 +24,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from gavel.env import GavelEnv  # noqa: E402
-from gavel.policy import (DEFAULT_MODEL, AnthropicPolicy, EchoPolicy,  # noqa: E402
-                          PolicyError, build_prompt)
+from gavel.policy import (DEFAULT_MODEL, AnthropicPolicy,  # noqa: E402
+                          ClaudeCliPolicy, EchoPolicy, PolicyError,
+                          build_prompt, system_prompt)
 from gavel.tasks import load_manifest  # noqa: E402
 from gavel.toolchain import DEFAULT_VERSION, Toolchain  # noqa: E402
 from gavel.verdict import TIER_COMPLETE  # noqa: E402
@@ -86,6 +87,13 @@ def main(argv: list[str] | None = None) -> int:
                         help="turns per attempt; >1 feeds the checker's error back")
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--via", choices=("api", "cli"), default="api",
+                        help="api: POST with ANTHROPIC_API_KEY; cli: the claude "
+                             "CLI's print mode, on the operator's own account")
+    parser.add_argument("--effort", default=None,
+                        help="with --via cli, the CLI's effort level")
+    parser.add_argument("--hints", action="store_true",
+                        help="show each task's hints.md; the rate is then a guided one")
     parser.add_argument("--echo", action="store_true",
                         help="use the stub as the answer, to sanity-check the floor")
     parser.add_argument("--dry-run", action="store_true",
@@ -105,15 +113,27 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.dry_run:
         toolchain = Toolchain.load(manifest.bend_version or DEFAULT_VERSION)
-        env = GavelEnv(manifest=manifest, toolchain=toolchain, seed=args.seed)
-        print(build_prompt(env.reset(tasks[0].task_id)))
+        env = GavelEnv(manifest=manifest, toolchain=toolchain, seed=args.seed,
+                       hints=args.hints)
+        observation = env.reset(tasks[0].task_id)
+        print("=== system\n" + system_prompt(observation))
+        print("\n=== user\n" + build_prompt(observation))
         return 0
 
     toolchain = Toolchain.load(manifest.bend_version or DEFAULT_VERSION)
     env = GavelEnv(manifest=manifest, toolchain=toolchain, seed=args.seed,
-                   max_turns=args.turns)
-    policy = EchoPolicy() if args.echo else AnthropicPolicy(
-        model=args.model, temperature=args.temperature)
+                   max_turns=args.turns, hints=args.hints)
+    try:
+        if args.echo:
+            policy = EchoPolicy()
+        elif args.via == "cli":
+            policy = ClaudeCliPolicy(model=args.model, effort=args.effort)
+        else:
+            policy = AnthropicPolicy(model=args.model, temperature=args.temperature)
+    except PolicyError as exc:
+        print(f"calibrate: {exc}", file=sys.stderr)
+        env.close()
+        return 2
 
     attempts = []
     try:
@@ -132,20 +152,28 @@ def main(argv: list[str] | None = None) -> int:
 
     report = summarise(attempts, args.k)
     report["model"] = policy.name if args.echo else args.model
+    report["via"] = None if args.echo else args.via
     report["turns"] = args.turns
+    report["hints"] = args.hints
     report["temperature"] = args.temperature
     if not args.echo:
         report["input_tokens"] = policy.input_tokens
         report["output_tokens"] = policy.output_tokens
         report["api_calls"] = policy.calls
+        if args.via == "cli":
+            report["cost_usd"] = round(policy.cost_usd, 4)
+            report.pop("temperature")      # the CLI does not take one
 
     if args.write_meta:
+        # A rate measured with the hints shown answers a different question,
+        # and must not land in the field validation reads as the zero-shot one.
+        key = "guided_solve_rate" if args.hints else "zero_shot_solve_rate"
         for task_id, rate in report["per_task"].items():
             meta_path = manifest.get(task_id).root / "meta.json"
             meta = json.loads(meta_path.read_text())
-            meta["zero_shot_solve_rate"] = rate
+            meta[key] = rate
             meta_path.write_text(json.dumps(meta, indent=2) + "\n")
-        print(f"recorded zero_shot_solve_rate on {len(report['per_task'])} task(s)")
+        print(f"recorded {key} on {len(report['per_task'])} task(s)")
 
     print(json.dumps(report, indent=2))
     return 0

@@ -1,43 +1,33 @@
-Implement `windows` and `windows_go`, the sliding window over a list, then prove
-the laws that pin them.
+Implement `windows_go` and `windows`, then prove the five laws in `LAWS.bend`.
 
-`windows(k, xs)` must return every consecutive sublist of `xs` of length `k`, in
-the order they appear. A list of three elements has two windows of length two
-and one of length three, and no window of length four, and there is no window of
-length zero at all.
+`windows(k, xs)` is every run of `k` consecutive elements of `xs`, in the order
+they start. A list of three elements has two windows of length `2n` and none of
+length `4n`, and a length of `0n` has no windows at all. The empty list has no
+windows for any `k`.
 
-The obvious way to write that down is to walk a pointer along the input, where
-the pointer has one element per window still to come. That is `windows_go(ys, k,
-xs)`: while `ys` is non-empty, the window starting at the front of `xs` is still
-available, so it comes off the front of the answer, and the loop continues one
-element along `xs` and one element along `ys`. `windows` itself is the case
-split on `k`: `0n` has no window, and `1n + k` hands the loop the pointer the
-prelude's `lookahead` computes.
+`windows_go(ys, k, xs)` is the walk behind it: it gives one window per element
+of `ys`, ignoring the values in `ys`. The first window is the first `k` elements
+of `xs`, the next is the first `k` elements of `xs` with its first element
+removed, and so on. For a positive `k`, `windows` runs it with a `ys` that has one element per
+window.
 
-Both functions take the length and the input as `+` binders: each names the
-length once for what is taken and once for where the recursion goes, and names
-the input once for the read and once for the step.
+    windows(2n, [1n, 2n, 3n]) == [[1n, 2n], [2n, 3n]]
+    windows(3n, [1n, 2n, 3n]) == [[1n, 2n, 3n]]
+    windows(4n, [1n, 2n, 3n]) == Nil{}
+    windows_go([0n, 0n], 2n, [5n, 6n, 7n]) == [[5n, 6n], [6n, 7n]]
 
-The law `windows_zero` fixes the answer at length zero. It is the weak companion
-that pins that case: `windows_succ` says what a positive length answers in terms
-of the loop, so a body that counted `0n` as one window still satisfies it.
+The laws use four prelude names. `P.take(xs, n)` is the first `n` elements of
+`xs`, or all of `xs` if it has fewer. `P.tail(xs)` is `xs` without its first
+element, and `Nil{}` for the empty list. `P.lookahead(xs, k)` is `Nil{}` when `k`
+is `0n`, and otherwise `xs` with its first `k - 1n` elements removed, which has
+one element per window of length `k`.
 
-The law `windows_succ` is the case split, written out. It is definitional --
-both sides unfold -- and it is the law that says the two functions you write
-have to agree about where the loop starts.
-
-The law `windows_nil` says that an empty input has no windows whatever the
-length. It is the one law here whose two sides do not reduce while the length is
-a variable: the pointer is a stopped match, and nothing about it says the input
-had no elements. The proof is an induction on the length, and each case closes
-by computation because `lookahead` matches on the length first.
-
-The law `windows_go_nil` fixes what the loop answers when the pointer runs out,
-which is the only way it stops: it emits no window that is one element short.
-The law `windows_go_step` fixes the step, and it is the one that says which
-window is emitted -- `k` elements off the front of the input, with the same `k`
-carried to the next turn.
-
-Write the implementations in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.windows_zero(xs)`, `def L.windows_succ(k, xs)`, `def L.windows_nil(k)`,
-`def L.windows_go_nil(k, xs)` and `def L.windows_go_step(h, t, k, xs)`.
+- `windows_zero`: a length of `0n` gives no windows, for any list.
+- `windows_succ`: `windows(1n + k, xs)` is `windows_go` run over
+  `P.lookahead(xs, 1n + k)` with the length `1n + k` and the list `xs`.
+- `windows_nil`: the empty list gives no windows, for any `k`.
+- `windows_go_nil`: with an empty `ys` the walk gives no windows, whatever `k`
+  and `xs` are.
+- `windows_go_step`: with `ys` equal to `h <> t`, the walk gives the window
+  `P.take(xs, k)` followed by the walk over `t` with the same `k` and with
+  `P.tail(xs)` in place of `xs`.

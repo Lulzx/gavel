@@ -2,7 +2,7 @@
   "version": 1,
   "bend_version": "2.0.5",
   "toolchain_hash": "121c70615f2d37827a9f5489d4800358c69b824348c25be5c72545d9b29dc10d",
-  "bun_version": "1.4.3",
+  "bun_version": "1.3.14",
   "tasks": [
     {
       "task_id": "t1-add-plus",
@@ -436,7 +436,7 @@
       "tier": 2,
       "path": "tasks/2/t2-count-prefix-laws",
       "reference": "references/t2-count-prefix-laws",
-      "hash": "7b4d6df696dd31eabec35e19c49f6a1e5ed6a8cca0d198b8c988d90266e75dbe"
+      "hash": "f7ebbc477556eeb025eb90c846483ab91046c0736874a3e928839b4d1a7f4d15"
     },
     {
       "task_id": "t2-count-runs-laws",
@@ -821,7 +821,7 @@
       "tier": 2,
       "path": "tasks/2/t2-max-prefix-laws",
       "reference": "references/t2-max-prefix-laws",
-      "hash": "b8929b416608ea91db067b306110055c12fd0aa0c7598035618bb4dc7baecbd4"
+      "hash": "f9db1cf4d0b25103176792c064e10f720c242e834839d6971be7c195eef64b86"
     },
     {
       "task_id": "t2-max-prefix-sum",
@@ -1115,7 +1115,7 @@
       "tier": 2,
       "path": "tasks/2/t2-sq-prefix-laws",
       "reference": "references/t2-sq-prefix-laws",
-      "hash": "308434c6180c35d77e971f42879d932c197a061aa72dcc9dab03d01cccbb5957"
+      "hash": "8f00cf1234df7c8f0546752bc35672bbb5966316a6a221039060b11304084729"
     },
     {
       "task_id": "t2-sub-all-laws",
@@ -1220,7 +1220,7 @@
       "tier": 2,
       "path": "tasks/2/t2-sum-prefix-laws",
       "reference": "references/t2-sum-prefix-laws",
-      "hash": "a271187024f629bcca0cbe4120c564c408e7837d736f9ba12c46a3a49978f091"
+      "hash": "0cc63782f98d51a0268e58832fcc39fb05cb033b03d60bd14ff61d3a1ccdc759"
     },
     {
       "task_id": "t2-sum-sq-inc-laws",
@@ -1374,7 +1374,7 @@
       "tier": 2,
       "path": "tasks/2/t2-zeros-prefix-laws",
       "reference": "references/t2-zeros-prefix-laws",
-      "hash": "7eee45c0a5087018ab1048b7dc4e0c3c886f65f17a433882014467199e0bceea"
+      "hash": "fa10ae4ee800b5e1fc581ba86ffa7a8e30180330a330af48cf36a4c13ce0c355"
     },
     {
       "task_id": "t2-zip-longest",
@@ -1430,7 +1430,7 @@
       "tier": 3,
       "path": "tasks/3/t3-concat-len",
       "reference": "references/t3-concat-len",
-      "hash": "78d39ba15fae80b373d45862179a324f61e280f1b42f3c95216e042fb6426b2d"
+      "hash": "b6d2df2819f569479c837a9e17f68c33e039c91f52a026a5bb2540de8b900fc9"
     },
     {
       "task_id": "t3-count-append",
@@ -1472,7 +1472,7 @@
       "tier": 3,
       "path": "tasks/3/t3-isort-perm",
       "reference": "references/t3-isort-perm",
-      "hash": "cb1745d92dcd8a79db9ba0865526f87b2b7646eb5581ade211afd534a296f638"
+      "hash": "ed83fb0083ebc2e7915dfd24e92a1c17dcb2b793fb237c13b9bcaff037cc480f"
     },
     {
       "task_id": "t3-isort-sorted",
@@ -1598,7 +1598,7 @@
       "tier": 3,
       "path": "tasks/3/t3-tree-mirror",
       "reference": "references/t3-tree-mirror",
-      "hash": "06b8a832dd22eae164843d87c9028b72388a4edc5e9c5baec136b16dce7284a1"
+      "hash": "0b7543dc3a1230f93e7488c24eb3d5baf5456cd5b2d1a0d5195e6178648f1a4a"
     },
     {
       "task_id": "t3-tree-sum-mirror",

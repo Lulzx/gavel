@@ -1,39 +1,17 @@
-Implement `has_one` on `List<Nat>`, then prove the two laws about it.
+Implement `has_one`, then prove the two laws in `LAWS.bend`.
 
-`has_one(xs)` answers whether `xs` holds a `1n`, which the empty list does
-not. Match on the list: `Nil{}` gives `False{}`, and a cons cell ors its
-head's test into the answer for its tail. `append` and `is_one_b` come from
-the prelude. `Bool.or` matches on its first argument, so the recursion sits on
-the right of the `or`; with a variable head the `or` does not step, which is
-what makes the second law below an induction rather than a computation.
+`has_one(xs)` is `True{}` when some element of `xs` is `1n`, and `False{}` otherwise. The empty
+list has no such element.
 
-The laws are the empty case and the snoc case:
+    has_one([2n, 1n]) == True{}
+    has_one([2n, 3n]) == False{}
+    has_one(Nil{}) == False{}
 
-    S.has_one(Nil{}) == False{}
-    S.has_one(P.append(xs, x <> Nil{})) == Bool.or(S.has_one(xs), P.is_one_b(x))
+The laws use two prelude names. `P.append(xs, ys)` is the list `xs` followed by
+the list `ys`. `P.is_one_b(n)` is `True{}` when `n` is `1n` and `False{}`
+otherwise.
 
-The first is the weak half: it is definitional, and the constant body
-`False{}` satisfies it. The second is the one that pins `has_one`: the
-constant body `True{}` satisfies it -- `or` absorbs `True{}` on either side --
-and the base law is what rules that body out, while the constant body
-`False{}` fails it because the right-hand side is then `is_one_b(x)`, stuck on
-a variable `x`. It is inductive in `xs`: `append` matches on its first
-argument, so with a variable `xs` the left-hand side does not reduce on its
-own.
-
-The first law's proof is `{==}`: the match steps on the cons cell and then
-finds `False{}` for the tail. The second is an induction in `xs`. The `Nil{}`
-case leaves `or(is_one_b(x), False{})` against `is_one_b(x)`; `or` is stuck on
-the variable `is_one_b(x)`, so a helper lemma under the reserved `Policy.`
-namespace proves `or(b, False{}) == b`, inductive in `b`. The cons case uses
-the hypothesis flipped -- `Equal.sym` is the direction that matters, since the
-goal has `has_one(append(t, x <> Nil{}))` on the left and the hypothesis reads
-left to right -- and what is left is the head's test in the middle of a
-disjunction, which a second `Policy.` helper brings out to the front; `or`'s
-associativity is inductive in its first argument, and its other two binders
-want to be erased, since they appear only in the statement and never in the
-computation. Annotate each step with the goal in which the term being
-rewritten has been replaced by `_`, and close it with `{==}`.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.has_one_nil()` and `def L.has_one_snoc(xs, x)`.
+- `has_one_nil`: `has_one(Nil{})` is `False{}`.
+- `has_one_snoc`: `has_one` of `P.append(xs, x <> Nil{})` is
+  `Bool.or(has_one(xs), P.is_one_b(x))`: adding one element at the end ors in
+  that element's test.

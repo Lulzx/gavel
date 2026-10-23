@@ -45,6 +45,26 @@ def pytest_configure(config: pytest.Config) -> None:
         "markers", "checker: exercises the real Bend checker (slow)")
 
 
+@pytest.hookimpl(trylast=True)   # after `-m` has deselected what it will
+def pytest_collection_modifyitems(session: pytest.Session, config: pytest.Config,
+                                  items: list[pytest.Item]) -> None:
+    """Load the toolchain once, before any test, when a selected test needs it.
+
+    A toolchain that fails its pin used to surface as the same ToolchainError
+    in every checker test -- 119 of them on a fresh clone with a newer bun --
+    which buries the one line that says what to do. It is one fact about the
+    machine, so it is reported once and the run stops.
+    """
+    if not any(item.get_closest_marker("checker") for item in items):
+        return
+    from gavel.toolchain import ToolchainError, Toolchain
+    try:
+        Toolchain.load()
+    except ToolchainError as exc:
+        pytest.exit(f"the checker tests cannot run here: {exc}\n"
+                    f"(`pytest -m \"not checker\"` runs the rest)", returncode=3)
+
+
 @pytest.fixture(scope="session")
 def repo() -> Path:
     return REPO
@@ -91,7 +111,7 @@ def make_task():
         meta.update(over.pop("meta", {}))
         fields = dict(
             task_id="t-fake", tier=1, root=REPO, references=REPO,
-            prompt="Prove that `add` agrees with Base's `+`.\n",
+            prompt="Implement `add`, then prove the one law in `LAWS.bend`.\n\n- `add_plus`: `add` agrees with Base's `+`.\n",
             laws_src=FIXTURE_LAWS, prelude_src="import Base\n",
             stub_src=FIXTURE_STUB, meta=meta, hash="")
         fields.update(over)

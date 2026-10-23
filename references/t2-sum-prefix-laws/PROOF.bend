@@ -28,3 +28,7 @@ def L.sum_prefix_nil(k):
       {==}
     case 1n+kp:
       {==}
+
+# Definitional: both matches step on a successor and a cons.
+def L.sum_prefix_step(k, h, t):
+  {==}

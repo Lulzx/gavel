@@ -1,27 +1,17 @@
-Implement `sq_inc_all` on `List<Nat>`, then prove the two laws about it.
+Implement `sq_inc_all`, then prove the two laws in `LAWS.bend`.
 
-`sq_inc_all(xs)` replaces every element with the square of the element plus one. Match on the list: `Nil{}` is
-`Nil{}`, and a cons cell conses the square of the element plus one of the head onto the mapped tail.
-`append` and `sq_inc` come from the prelude.
+`sq_inc_all(xs)` is the list of the same length as `xs` in which every element
+`n` is replaced by `n * n + 1n`, in the same order. The empty list maps to the
+empty list.
 
-The laws are the one-element case and the append case:
+    sq_inc_all([2n, 3n]) == [5n, 10n]
+    sq_inc_all([0n]) == [1n]
+    sq_inc_all(Nil{}) == Nil{}
 
-    S.sq_inc_all(h <> Nil{}) == (P.sq_inc(h)) <> Nil{}
-    S.sq_inc_all(P.append(xs, ys)) == P.append(S.sq_inc_all(xs), S.sq_inc_all(ys))
+The laws use the prelude's `P.sq_inc(n)`, which is `n * n + 1n`, and
+`P.append(xs, ys)`, the list `xs` followed by the list `ys`.
 
-The first is the weak half: it is definitional, and it fixes one-element lists
-only -- a body that mapped a singleton and did something else with longer lists
-satisfies it. The second is the one that pins `sq_inc_all`: it is satisfied by the
-identity body, which maps a concatenation to itself, and the base law is what
-rules that body out. It is inductive in `xs` -- `append` matches on its first
-argument, so with a variable `xs` the left-hand side does not reduce on its
-own.
-
-The first law's proof is `{==}`: the match steps on the cons cell and the tail
-is `Nil{}`. The second is an induction in `xs`; its cons case puts the mapped
-head outside on both sides, leaving the hypothesis at `t`. Annotate that step
-with the goal in which the term the hypothesis rewrites has been replaced by
-`_`, and close it with `{==}`.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.sq_inc_all_single(h)` and `def L.sq_inc_all_append(xs, ys)`.
+- `sq_inc_all_single`: mapping the one-element list `[h]` gives the one-element
+  list holding `P.sq_inc(h)`.
+- `sq_inc_all_append`: mapping a concatenation is the concatenation of the two
+  mapped lists.

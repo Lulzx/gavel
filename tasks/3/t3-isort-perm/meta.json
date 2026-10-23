@@ -5,7 +5,10 @@
     "insert_count",
     "isort_count",
     "isort_swap",
-    "isort_keep"
+    "isort_keep",
+    "insert_before",
+    "insert_after",
+    "isort_cons"
   ],
   "policy_targets": [
     "insert",
@@ -14,7 +17,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "8bd3d50eb45bea7795e0f469898482c0c8e5268ba950b3c335618dbe43b279ef",
+    "laws": "f0321ea425956086f474c2c8160bf85e1682e46d0b20da1b6317726a8297dc6d",
     "prelude": "55ed02337b97bdb9e0982d070bb83e6e064d4b4cd58983ed523a95560a71ccfa"
   },
   "bend_version": "2.0.5"

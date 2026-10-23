@@ -2,15 +2,13 @@ import Base
 import ./prelude.bend as P
 
 # The head is inserted into the tail *as it came*: the recursion is there but
-# the tail is never sorted. Written as a probe for a hole in this law set --
-# the body is correct on one- and two-element lists and is a permutation at
-# every length, so all four law *statements* are true of it, and if the laws
-# alone were the guard the task would pay full reward for a non-sort.
-# Measured: caught, `proof_tier=3` -- the isolated runs prove `insert_count`,
-# `isort_swap` and `isort_keep` and fail `isort_count`, whose induction is
-# stated over the reference's own recursion (`isort(t)` under `insert`).
-# So the guard here is the length law's proof obligation, not its statement;
-# a policy would have to reproduce that induction, which this body cannot.
+# the tail is never sorted. It is right on lists of one and two elements and a
+# permutation at every length, so all four original laws are true of it.
+# This file used to say the guard was `isort_count`'s proof obligation rather
+# than its statement. It was not: `isort_count` follows from `insert_count` in
+# two rewrites, and a token-different spelling of this body with that proof
+# earned **reward 1.000** (`tests/holes/isort_unsorted_tail.*`). Rejected now by
+# `insert_before`, `insert_after` and `isort_cons`.
 def insert(xs: List<&2, Nat>, +y: Nat) -> List<&2, Nat>:
   match xs:
     case Nil{}:

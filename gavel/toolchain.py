@@ -26,6 +26,12 @@ TOOLCHAIN_DIR = REPO_ROOT / "toolchain"
 # checker reads (effs/) and is hashed along with it.
 SOURCE_DIR = "bend2"
 
+# Where ``toolchain.fetch --bun`` puts the pinned bun, one directory per
+# version. Untracked: it is a platform binary, and the pin it satisfies is
+# ``bun.version``, which is tracked.
+BUN_DIR = TOOLCHAIN_DIR / "bun"
+FETCH_BUN = "uv run python -m toolchain.fetch --bun"
+
 
 class ToolchainError(RuntimeError):
     """The pinned checker is missing, corrupt, or not the version we pinned."""
@@ -89,14 +95,32 @@ class Toolchain:
             if pinned and bun_version != pinned and \
                     os.environ.get("GAVEL_ALLOW_BUN_DRIFT") != "1":
                 raise ToolchainError(
-                    f"bun is {bun_version} but the toolchain pins {pinned}. "
-                    f"A different bun can change checker behaviour, so the pin "
-                    f"is enforced; set GAVEL_ALLOW_BUN_DRIFT=1 to override.")
+                    f"bun is {bun_version} ({resolved_bun}) but the toolchain "
+                    f"pins {pinned}. A different bun can change checker "
+                    f"behaviour, so the pin is enforced. Fetch the pinned one "
+                    f"into the repository with `{FETCH_BUN}`; it is preferred "
+                    f"over the bun on PATH once it is there. "
+                    f"GAVEL_ALLOW_BUN_DRIFT=1 overrides the check instead.")
         return cls(version=version, root=home, bun=resolved_bun,
                    bun_version=bun_version, tree_hash=tree_hash(home / SOURCE_DIR))
 
 
+def pinned_bun_version(base: Path = TOOLCHAIN_DIR) -> str | None:
+    path = base / "bun.version"
+    return (path.read_text().strip() or None) if path.is_file() else None
+
+
+def vendored_bun(version: str) -> Path:
+    return BUN_DIR / version / "bun"
+
+
 def _resolve_bun(bun: str | Path | None) -> Path:
+    """Explicit, then ``GAVEL_BUN``, then the vendored pinned bun, then PATH.
+
+    The vendored bun comes before PATH because it is the only one that is known
+    to be the pinned version: a machine's own bun is whatever it last upgraded
+    to, and on a fresh clone that is what made every checker test error out.
+    """
     if bun is not None:
         path = Path(bun).expanduser()
         if not path.is_file():
@@ -108,13 +132,17 @@ def _resolve_bun(bun: str | Path | None) -> Path:
         if not path.is_file():
             raise ToolchainError(f"GAVEL_BUN points at {path}, which is not a file")
         return path
+    pinned = pinned_bun_version()
+    if pinned and vendored_bun(pinned).is_file():
+        return vendored_bun(pinned)
     found = shutil.which("bun")
     if found:
         return Path(found).resolve()
     fallback = Path.home() / ".bun" / "bin" / "bun"
     if fallback.is_file():
         return fallback
-    raise ToolchainError("bun not found: set GAVEL_BUN or put it on PATH")
+    raise ToolchainError(f"bun not found: run `{FETCH_BUN}`, set GAVEL_BUN, "
+                         f"or put it on PATH")
 
 
 def _bun_version(bun: Path) -> str:

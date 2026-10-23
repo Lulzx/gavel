@@ -80,6 +80,10 @@ class GavelEnv:
     """Write the submitted source into the log as well as its hash. Off by
     default; see ``gavel.trajectory`` for why."""
 
+    hints: bool = False
+    """Show each task's ``hints.md`` -- how the reference was written and
+    proved. Off by default: with it on, the task is a guided one."""
+
     backend: InitVar[str | None] = None
     """PLAN §3.7 spells the constructor with this. It is written into ``config``
     rather than stored beside it, so the isolation in force has one home."""
@@ -201,7 +205,7 @@ class GavelEnv:
     def _observation(self, feedback: str | None) -> dict[str, Any]:
         assert self.task is not None
         return self.task.observation(turn=self.turn + 1, max_turns=self.max_turns,
-                                     feedback=feedback)
+                                     feedback=feedback, hints=self.hints)
 
     def _feedback(self, verdict: Verdict) -> str:
         """The checker's words plus the gate's, which is all a policy gets."""

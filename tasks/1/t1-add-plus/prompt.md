@@ -1,20 +1,9 @@
-Implement `add` on `Nat`, then prove the law about it.
+Implement `add`, then prove the one law in `LAWS.bend`.
 
-`add(a, b)` must return the sum of `a` and `b`. Recurse on the first argument.
+`add(a, b)` is the sum of the two numbers `a` and `b`.
 
-The law `add_plus` says that `add` agrees with Base's built-in `+`:
+    add(2n, 3n) == 5n
+    add(0n, 4n) == 4n
+    add(4n, 0n) == 4n
 
-    S.add(x, y) == x + y
-
-The `+` there is Base's addition, not `S.add`. It is inductive in `x`: at `0n`
-the left side reduces to `y` and so does the right, and the step is the
-induction hypothesis at `p`.
-
-Note what the law is *not*. A law that compares two applications of `add`,
-like `add(x, 1n+y) == 1n + add(x, y)`, does not pin the implementation down:
-`add(a, b) = b` satisfies it, because with `1n+y` on the left the goal becomes
-`1n+y == 1n+y`. Putting a term that does not mention `add` on the right is what
-closes that off — `add(a, b) = b` then has to answer `y == x + y`.
-
-Write the implementation in `solution.bend` and the proof in `PROOF.bend`, as
-`def L.add_plus(x, y)`.
+- `add_plus`: `add(x, y)` equals Base's built-in `x + y`, for every `x` and `y`.

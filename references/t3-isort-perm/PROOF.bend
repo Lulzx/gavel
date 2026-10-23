@@ -218,3 +218,34 @@ def L.isort_swap(x, y, e):
 def L.isort_keep(x, y, e):
   %Equal.sym(Bool, P.le(x, y), True{}, e) : {P.insert_put(Nil{}, y, x, _) == x <> y <> Nil{} : List<&2, Nat>}
   {==}
+
+# The reference's cons case is `P.insert_put(t, h, y, P.le(y, h))`, and both of
+# `insert_put`'s cases on `t` then match on the decision. The decision is the
+# hypothesis's left side, so rewriting it to `True{}` lets each case compute.
+def L.insert_before(h, t, y, e):
+  match t:
+    case Nil{}:
+      %Equal.sym(Bool, P.le(y, h), True{}, e)
+        : {P.insert_put(Nil{}, h, y, _) == y <> h <> Nil{} : List<&2, Nat>}
+      {==}
+    case +h2 <> t2:
+      %Equal.sym(Bool, P.le(y, h), True{}, e)
+        : {P.insert_put(h2 <> t2, h, y, _) == y <> h <> h2 <> t2 : List<&2, Nat>}
+      {==}
+
+# The same split with the decision rewritten to `False{}`. In the cons case
+# both sides then reduce to `h <> P.insert_put(t2, h2, y, P.le(y, h2))`.
+def L.insert_after(h, t, y, e):
+  match t:
+    case Nil{}:
+      %Equal.sym(Bool, P.le(y, h), False{}, e)
+        : {P.insert_put(Nil{}, h, y, _) == h <> y <> Nil{} : List<&2, Nat>}
+      {==}
+    case +h2 <> t2:
+      %Equal.sym(Bool, P.le(y, h), False{}, e)
+        : {P.insert_put(h2 <> t2, h, y, _) == h <> S.insert(h2 <> t2, y) : List<&2, Nat>}
+      {==}
+
+# Definitional: the match on the list steps on the cons.
+def L.isort_cons(h, t):
+  {==}

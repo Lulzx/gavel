@@ -4,7 +4,8 @@
   "laws": [
     "max_prefix_zero",
     "max_prefix_len",
-    "max_prefix_nil"
+    "max_prefix_nil",
+    "max_prefix_step"
   ],
   "policy_targets": [
     "max_prefix"
@@ -12,7 +13,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "c5c9da870515ad09ddb2d52e4f689e77eada30d978d8409848cd4965b467aa53",
+    "laws": "6a178bb1a40cb401d7038dda779303e2e5fb1c04877ca610400ff8a79f894f9d",
     "prelude": "b6951d0551b09f1c22e851f57189b9805a6cdf96fca9baaee306f798d56d58a5"
   },
   "bend_version": "2.0.5"

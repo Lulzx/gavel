@@ -4,7 +4,8 @@
   "laws": [
     "zeros_prefix_zero",
     "zeros_prefix_len",
-    "zeros_prefix_nil"
+    "zeros_prefix_nil",
+    "zeros_prefix_step"
   ],
   "policy_targets": [
     "zeros_prefix"
@@ -12,7 +13,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "d8bd4090f472d1e57db97b9bb91590e31ce23c0ccd937732e67f9b8cbcaa08ae",
+    "laws": "6dab55ea55bbcb26554be3c3839ff74fac4c6b348208809d6f28896c45de3b57",
     "prelude": "2caef6b9d85e362cd051c08e33d1397ae0936911fedd6a7e0baea28f1a74394b"
   },
   "bend_version": "2.0.5"

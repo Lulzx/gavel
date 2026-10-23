@@ -1,15 +1,19 @@
-Implement `append` and `len` on lists of `Nat`, then prove both laws.
+Implement `append` and `len`, then prove the four laws in `LAWS.bend`.
 
-`append(xs, ys)` must return the elements of `xs` followed by the elements of
-`ys`; recurse on `xs`. `len(xs)` must return how many elements `xs` has;
-recurse on `xs`.
+`append(xs, ys)` is the list `xs` followed by the list `ys`. `len(xs)` is the
+number of elements of `xs`.
 
-`len_cons` says consing one more element onto a list adds one to its length;
-since `len` steps on the cons cell, it computes away by itself. `len_append`
-says the length of an append is the sum of the lengths. That one is inductive in
-`xs`, and its step case needs the associativity of `+` to move the head past the
-two lengths -- `+` is stuck on a variable head, so that reassociation is a lemma
-of its own, under the reserved `Policy.` namespace.
+    append([1n, 2n], [3n]) == [1n, 2n, 3n]
+    append(Nil{}, [3n]) == [3n]
+    len([4n, 4n, 4n]) == 3n
+    len(Nil{}) == 0n
 
-Write the implementations in `solution.bend` and the proofs in `PROOF.bend`,
-as `def L.len_cons(x, xs)` and `def L.len_append(xs, ys)`.
+The laws use `S.append` and `S.len`, the targets themselves.
+
+- `len_cons`: putting `x` in front of `xs` makes the list one longer,
+  `len(x <> xs) == 1n + len(xs)`.
+- `len_append`: the length of an append is the sum of the two lengths,
+  `len(append(xs, ys)) == len(xs) + len(ys)`.
+- `append_cons`: appending to a list that starts with `h` and continues with `t`
+  gives `h` in front of `append(t, ys)`.
+- `append_nil_left`: appending `ys` to the empty list gives `ys`.

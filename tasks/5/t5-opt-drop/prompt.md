@@ -1,86 +1,41 @@
-Implement `exec` and `opt`, then prove all nine laws.
+Implement `exec` and `opt`, then prove the nine laws in `LAWS.bend`.
 
-The prelude owns the machine (`P.Op`, with the constructors `P.Zero{}`,
-`P.Inc{}` and `P.Twice{}`) and the specification the optimiser is judged
-against, `P.clean`. A program is a list of instructions read left to right, and
-the machine holds one number, the accumulator.
+A program is a `List<&2, P.Op>` read left to right, run on a machine holding one
+number, the accumulator. The instructions are the prelude's `P.Zero{}` (set the
+accumulator to `0n`), `P.Inc{}` (add one) and `P.Twice{}` (double it).
 
-`exec(prog, s)` runs a program from the accumulator `s`. `opt(prog, z)` is the
-optimiser: `z` is what the caller knows about the accumulator where `prog`
-starts -- `True{}` when it holds zero -- and a caller that knows nothing passes
-`False{}`.
+`exec(prog, s)` is the accumulator after running `prog` from the accumulator
+`s`, applying the first instruction first. The empty program returns `s`.
 
-The instruction the task is about is the `Twice` that follows a `Zero`.
-Doubling zero is zero, so that instruction cannot change what the program
-computes and removing it is free -- but only there. A `Twice` the caller had no
-licence to remove is a wrong answer, and the flag is the licence: it is not
-decoration on `opt`, it is the difference between an optimiser and a bug.
+`opt(prog, z)` is the optimised program: `prog` with every `P.Twice{}` removed
+that is reached while the accumulator is known to hold zero (doubling zero is
+zero), and every other instruction kept, in order. `z` is what the caller knows
+at the start: `True{}` when the accumulator holds zero there, `False{}` when
+nothing is known. The accumulator is known to be zero at the start when `z` is
+`True{}` and right after every `P.Zero{}`; a removed `P.Twice{}` keeps that
+knowledge, while a `P.Inc{}` or a kept `P.Twice{}` ends it.
 
-`P.clean(p, z)` is **not yours**. It is the specification of what the optimiser
-is allowed to leave behind, indexed by the same flag: under the claim the caller
-made, the output has no `Twice` left where the accumulator is zero. Because it
-lives in the immutable prelude, `clean_opt` is a statement about the policy's
-code rather than a restatement of it.
+    exec([P.Inc{}, P.Twice{}], 3n) == 8n
+    opt([P.Zero{}, P.Twice{}, P.Inc{}, P.Twice{}], False{}) == [P.Zero{}, P.Inc{}, P.Twice{}]
+    opt([P.Twice{}, P.Inc{}], True{}) == [P.Inc{}]
+    opt([P.Twice{}, P.Inc{}], False{}) == [P.Twice{}, P.Inc{}]
 
-`exec_nil`, `exec_zero`, `exec_inc` and `exec_twice` are the pins on `exec`, one
-per instruction plus the empty program. Each is stated over an **arbitrary
-tail** rather than over a one-instruction program, and that is the whole
-difference between a pin and a decoration: an `exec` that applied the first
-instruction and stopped would satisfy the one-instruction version of all four,
-and none of the laws about the optimiser would notice either, because the
-programs they compare are truncated in the same way on both sides. With the
-tail arbitrary the four clauses determine `exec` by induction on the program.
-They are definitional in the sense of this bank -- each is its own body read
-back -- and the reference proves each with `{==}`.
+The prelude's `P.clean(p, z)` is the specification of the optimiser's output:
+it is `True{}` when `p`, started from an accumulator known to be zero exactly
+when `z` is `True{}`, never reaches a `P.Twice{}` at a known-zero accumulator.
+It tracks the knowledge the same way: a `P.Zero{}` makes it known-zero, and a
+`P.Inc{}` or a `P.Twice{}` makes it unknown.
 
-The next three laws are the optimiser's, and they are three different
-obligations rather than three ways of saying one thing. `clean_opt` is the
-specification: it rejects an optimiser that kept the redundant instruction, and
-it is the only one of this three that does -- an optimiser that changes nothing
-satisfies both correctness laws. It is not, on its own, enough to pin the
-program, and the laws below say why. `opt_sound` is correctness for the caller who claimed nothing,
-and it rejects an optimiser that removed on its own initiative. `opt_sound_zero`
-is correctness for the caller who claimed the accumulator is zero, and it is
-what stops the claim from being taken on trust: an optimiser can answer `True`
-with anything that is clean and be right about it in the sense of the other two
-laws, and the only place that answer is cashed is here, where both programs are
-run at zero and the results compared.
-
-`opt_zero` and `opt_twice_zero` are the two branches the laws above leave free,
-named. The three optimiser laws pin what `opt` returns only up to `clean` and
-equal meaning, and that leaves *two* branches, not one.
-
-`opt_twice_zero` is the drop itself. `clean` forbids a `Twice` where the
-accumulator is known to be zero, but it permits a `Zero`, and at a known-zero
-accumulator a `Zero` is a no-op -- so an `opt` that answers
-`P.Zero{} <> opt(t, True{})` is clean and sound and is not this optimiser. That
-branch is free precisely because it is the only one allowed to *remove* an
-instruction. `opt_twice_zero` is its definition: the instruction goes, and
-nothing takes its place.
-
-`opt_zero` is the other, and it is free for the opposite reason. A `Zero`
-*resets* the accumulator, so any instruction the branch puts in front of it is
-dead, and `clean` -- which tracks the accumulator instruction by instruction --
-permits a `Zero` wherever one appears. An `opt` whose `Zero` branch answers
-`P.Zero{} <> P.Zero{} <> ...` or `P.Inc{} <> P.Zero{} <> ...` is therefore clean
-and sound too, and produces a longer program than the one it was handed, which
-is the opposite of the work. `opt_zero` is that branch's definition: one `Zero`
-goes out, and the flag the branch hands its tail is `True{}` whatever the caller
-claimed, because a `Zero` is what makes the accumulator zero.
-
-Two things about the shape of the work. Bend's defs cannot mention a later def,
-so the two soundness laws cannot be proved by a pair of helpers that call each
-other -- and they need each other, because a `Zero` turns the unknown-state
-obligation into the zero-state one and a `Twice` under a `False{}` turns it back.
-State a single helper over the flag, alongside a small function whose whole job
-is to name the accumulator the flag describes, and both laws fall out of one
-induction: `opt_sound` is that helper at `False{}` and `opt_sound_zero` is it at
-`True{}` and `0n`. And in the `Twice` case the helper has to be called with the
-flag the *branch* established rather than the one it was handed, which is the
-same distinction the laws are about.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.exec_nil(s)`, `def L.exec_zero(t, s)`, `def L.exec_inc(t, s)`,
-`def L.exec_twice(t, s)`, `def L.clean_opt(p, z)`, `def L.opt_sound(p, s)`,
-`def L.opt_sound_zero(p)`, `def L.opt_zero(t, z)` and `def L.opt_twice_zero(t)`. Proof helpers go under the reserved `Policy.`
-namespace, which the gate ignores, and none of them may cite a law.
+- `exec_nil`: running the empty program leaves the accumulator `s`.
+- `exec_zero`: running `P.Zero{} <> t` from `s` is running `t` from `0n`.
+- `exec_inc`: running `P.Inc{} <> t` from `s` is running `t` from `1n + s`.
+- `exec_twice`: running `P.Twice{} <> t` from `s` is running `t` from `s + s`.
+- `clean_opt`: `opt(p, z)` is clean under the same flag `z`.
+- `opt_sound`: with flag `False{}`, the optimised program computes the same
+  accumulator as `p` from every starting accumulator `s`.
+- `opt_sound_zero`: with flag `True{}`, the optimised program computes the same
+  accumulator as `p` when both start from `0n`.
+- `opt_zero`: optimising `P.Zero{} <> t` under any flag gives `P.Zero{}`
+  followed by `t` optimised with flag `True{}`.
+- `opt_twice_zero`: optimising `P.Twice{} <> t` with flag `True{}` is
+  optimising `t` with flag `True{}`: the `P.Twice{}` is dropped.

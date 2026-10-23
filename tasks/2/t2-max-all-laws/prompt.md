@@ -1,29 +1,16 @@
-Implement `max_all` on `List<Nat>`, then prove the two laws about it.
+Implement `max_all`, then prove the two laws in `LAWS.bend`.
 
-`max_all(xs, n)` raises every element below `n` up to `n`, `P.max(h, n)`.
-Match on the list: `Nil{}` is `Nil{}`, and a cons cell conses the raised head
-onto the raised tail. `append` and `max` come from the prelude.
+`max_all(xs, n)` raises every element of `xs` that is below `n` up to `n`: each
+element `h` becomes the larger of `h` and `n`. The list keeps its length and
+order. The empty list gives the empty list.
 
-The step names `n` twice, and a binder is consumed on every use, so re-bind it
-reusable inside the step with `+k = n`.
+    max_all([1n, 7n, 3n], 4n) == [4n, 7n, 4n]
+    max_all([5n], 2n)         == [5n]
+    max_all(Nil{}, 4n)        == Nil{}
 
-The laws are the one-element case and the append case:
+The laws use two prelude names. `P.append(xs, ys)` is the list `xs` followed by
+the list `ys`. `P.max(a, b)` is the larger of two numbers.
 
-    S.max_all(h <> Nil{}, n) == P.max(h, n) <> Nil{}
-    S.max_all(P.append(xs, ys), n) == P.append(S.max_all(xs, n), S.max_all(ys, n))
-
-The first is the weak half: it is definitional, and it fixes one-element lists
-only -- a body that raises a singleton and does something else with longer lists
-satisfies it. The second is the one that pins `max_all`: it is satisfied by the
-identity body, which maps a concatenation to itself, and the base law is what
-rules that body out. It is inductive in `xs` -- `append` matches on its first
-argument, so with a variable `xs` the left-hand side does not reduce on its own.
-
-The first law's proof is `{==}`: the match steps on the cons cell and the tail
-is `Nil{}`. The second is an induction in `xs`; its cons case puts the raised
-head outside on both sides, leaving the hypothesis at `t` and `n`. Annotate that
-step with the goal in which the term the hypothesis rewrites has been replaced
-by `_`, and close it with `{==}`.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.max_all_single(h, n)` and `def L.max_all_append(xs, ys, n)`.
+- `max_all_single`: `max_all(h <> Nil{}, n)` is `P.max(h, n) <> Nil{}`.
+- `max_all_append`: `max_all` of `P.append(xs, ys)` with `n` is `P.append` of
+  `max_all(xs, n)` and `max_all(ys, n)`.

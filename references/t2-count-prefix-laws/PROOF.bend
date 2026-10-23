@@ -27,3 +27,7 @@ def L.count_odd_prefix_nil(k):
       {==}
     case 1n+kp:
       {==}
+
+# Definitional: both matches step on a successor and a cons.
+def L.count_odd_prefix_step(k, h, t):
+  {==}

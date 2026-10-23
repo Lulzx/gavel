@@ -1,39 +1,20 @@
-Implement `swap_adjacent`, which exchanges the elements of every neighbouring
-pair, then prove the laws that pin it.
+Implement `swap_adjacent`, then prove the five laws in `LAWS.bend`.
 
-`swap_adjacent(xs)` must return `xs` with each pair of neighbours the other way
-round, so `swap_adjacent(1n <> (2n <> (3n <> (4n <> Nil{}))))` is
-`2n <> (1n <> (4n <> (3n <> Nil{})))`. Recurse on the list: `Nil{}` and a
-one-element list have no pair to exchange and answer themselves, and a list of
-two or more answers its second element in front of its first, in front of the
-swaps of everything from the third element on. Count the input twice -- the odd
-tail is *kept*, not dropped -- so a one-element list is not the empty list here.
+`swap_adjacent(xs)` exchanges the elements of each successive pair of `xs`: the
+first with the second, the third with the fourth, and so on. If the length is
+odd, the last element has no partner and stays where it is, so the answer always
+has the same length as `xs`. The empty list and a one-element list answer
+themselves.
 
-The law `swap_adjacent_nil` fixes the answer on the empty list. It is the pin on
-the case generated mutants reach least: the step law below names two elements or
-more, so a body that answered a non-empty list at `Nil{}` is caught here and
-nowhere else.
+    swap_adjacent([1n, 2n, 3n, 4n]) == [2n, 1n, 4n, 3n]
+    swap_adjacent([1n, 2n, 3n]) == [2n, 1n, 3n]
+    swap_adjacent([7n]) == [7n]
 
-The law `swap_adjacent_single` fixes the answer on a one-element list: the
-element is kept, and it is the only law that says so. The step law names lists
-of two or more, so a body that dropped the odd element, or that answered the
-empty list there, satisfies the step law and contradicts this one.
+The laws use the prelude's `P.len(xs)`, the number of elements of `xs`.
 
-The law `swap_adjacent_cons` is the step. It says which element goes where: the
-second in front of the first, in front of the swaps of the rest. It is the only
-law that distinguishes this function from one that left the list alone.
-
-The law `swap_adjacent_len` says the result has as many elements as the input.
-It is inductive in the list, and it is the law that pins the count: a body that
-dropped the odd tail, or that exchanged elements across pairs and lost one,
-satisfies the step law and fails this one.
-
-The law `swap_adjacent_involutive` says that swapping twice is the identity.
-It is inductive too, and it is the law that pins the *shape* of the answer
-rather than its contents: a body that reversed the list agrees with the step law
-on the first two elements and disagrees here.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.swap_adjacent_nil()`, `def L.swap_adjacent_single(x)`,
-`def L.swap_adjacent_cons(x, y, t)`, `def L.swap_adjacent_len(xs)` and
-`def L.swap_adjacent_involutive(xs)`.
+- `swap_adjacent_nil`: the empty list gives the empty list.
+- `swap_adjacent_single`: a one-element list gives itself.
+- `swap_adjacent_cons`: for `x <> (y <> t)`, the answer is `y`, then `x`, then
+  the answer for `t`.
+- `swap_adjacent_len`: the answer has as many elements as `xs`.
+- `swap_adjacent_involutive`: swapping twice gives back `xs`.

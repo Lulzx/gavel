@@ -23,6 +23,8 @@ LAWS_FILE = "LAWS.bend"
 PRELUDE_FILE = "prelude.bend"
 SOLUTION_FILE = "solution.bend"
 PROOF_FILE = "PROOF.bend"
+HINTS_FILE = "hints.md"
+PRIMER_FILE = "PRIMER.md"
 
 # A task directory carrying this file is on disk but not part of the bank: it is
 # held at the review checkpoint, and a publish skips it. The marker is a file
@@ -68,6 +70,20 @@ class Task:
     stub_src: str
     meta: dict[str, Any]
     hash: str
+    hints: str = ""
+    """``hints.md``: how the reference was written and proved. Not part of the
+    problem, so an observation carries it only when the env asks for hints."""
+
+    @property
+    def primer(self) -> str:
+        """The bank's shared page on Bend and the submission format.
+
+        It lives once in ``tasks/PRIMER.md`` rather than in every prompt: the
+        same paragraphs on Lone variables and rewrite direction were written out
+        in dozens of prompts, in a dozen spellings.
+        """
+        path = self.repo / "tasks" / PRIMER_FILE
+        return path.read_text() if path.is_file() else ""
 
     @property
     def policy_targets(self) -> tuple[str, ...]:
@@ -136,15 +152,28 @@ class Task:
                 SOLUTION_FILE: self.stub_src}
 
     def observation(self, turn: int = 1, max_turns: int = 1,
-                    feedback: str | None = None) -> dict[str, Any]:
-        """SPEC.md 6.2, plus the proof header the policy must start from."""
+                    feedback: str | None = None,
+                    hints: bool = False) -> dict[str, Any]:
+        """SPEC.md 6.2, plus the proof header the policy must start from.
+
+        ``primer`` is the same for every task. ``hints`` is ``None`` unless
+        asked for, so that a run's difficulty is a setting of the run and not
+        a property of how much the prompt happened to give away.
+        """
         return {
             "task_id": self.task_id,
             "tier": self.tier,
             "title": self.title,
             "prompt": self.prompt,
-            "laws": self.laws_src,
-            "stub": self.stub_src,
+            "primer": self.primer,
+            "hints": (self.hints or None) if hints else None,
+            # The law file and the stub are shown without their comments. They
+            # are the author's notes -- why a law is shaped the way it is, which
+            # body it was written to refute -- and they named the reference's
+            # own expression often enough that the problem statement is
+            # ``prompt.md`` and only that.
+            "laws": strip_comments(self.laws_src),
+            "stub": strip_comments(self.stub_src),
             "prelude": self.prelude_src,
             "proof_header": self.proof_header,
             "policy_targets": list(self.policy_targets),
@@ -232,6 +261,7 @@ def load_task(root: Path, entry: dict[str, Any], bank_root: Path) -> Task:
         raise TaskError(f"{root} is missing {', '.join(missing)}")
     meta = json.loads((root / "meta.json").read_text())
     prompt_file = root / "prompt.md"
+    hints_file = root / HINTS_FILE
     laws_src = (root / LAWS_FILE).read_text()
     prelude_src = (root / PRELUDE_FILE).read_text()
     stub_src = (root / SOLUTION_FILE).read_text()
@@ -248,6 +278,7 @@ def load_task(root: Path, entry: dict[str, Any], bank_root: Path) -> Task:
         meta=meta,
         hash=hash_files({LAWS_FILE: laws_src, PRELUDE_FILE: prelude_src,
                          SOLUTION_FILE: stub_src}),
+        hints=hints_file.read_text() if hints_file.is_file() else "",
     )
 
 
@@ -305,6 +336,23 @@ def prepare_workdir(task: Task, files: dict[str, str] | None = None,
 
 def cleanup(workdir: Path) -> None:
     shutil.rmtree(workdir, ignore_errors=True)
+
+
+def strip_comments(src: str) -> str:
+    """``src`` without its whole-line ``#`` comments, blank runs collapsed.
+
+    Whole lines only: Bend has no string literals in a law file or a stub, but
+    a trailing comment is rare enough here that cutting at ``#`` mid-line would
+    risk more than it removes.
+    """
+    kept: list[str] = []
+    for line in src.splitlines():
+        if line.lstrip().startswith("#"):
+            continue
+        if not line.strip() and (not kept or not kept[-1].strip()):
+            continue
+        kept.append(line)
+    return "\n".join(kept).strip("\n") + "\n"
 
 
 def submission_hash(files: dict[str, str]) -> str:

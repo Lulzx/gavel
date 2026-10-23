@@ -1,4 +1,4 @@
-"""V1-V5: the invariants a task in the bank has to satisfy (SPEC.md 5.5).
+"""V1-V6: the invariants a task in the bank has to satisfy (SPEC.md 5.5).
 
 A task is a reward function. These are the checks that it is the reward
 function it claims to be -- that its reference proves what the laws say, that
@@ -22,6 +22,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from . import ground
 from .check import CheckConfig, check_submission
 from .degenerate import corpus, unmodelled
 from .laws import parse_imports, split_top_level
@@ -107,6 +108,7 @@ def validate_task(task: Task, toolchain: Toolchain, *,
     _v1_reference(task, toolchain, config, report, budget_ms)
     _v2_mutants(task, toolchain, config, report)
     _v3_degenerate(task, toolchain, config, report)
+    _v6_ground(task, toolchain, config, report)
     _v5_immutable_files(task, report)
     _v4_latency(report, budget_ms)
     _review_state(task, report)
@@ -206,6 +208,76 @@ def _posed(task: Task, report: TaskReport) -> None:
         report.problems.append(
             "posed: prompt.md is missing or empty, so the policy is shown no "
             "problem statement")
+        return
+    _prompt_contract(task, report)
+
+
+# How a proof goes is ``hints.md``'s to say, and how Bend works is
+# ``tasks/PRIMER.md``'s. A prompt that says either is a guided task under a
+# zero-shot name, and these are the words it says them in.
+STRATEGY_WORDS = re.compile(
+    r"\{==\}|Equal\.|Policy\.|%|\binduct\w*|\bdefinitional\w*|\brewrit\w*"
+    r"|\bmotive\w*|\brecurs\w*|\bcase analysis\b|\blemma\w*|\bhelper\w*",
+    re.IGNORECASE)
+
+_COUNTS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+           "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
+           "twelve": 12}
+_STATED_COUNT = re.compile(
+    r"\b(" + "|".join(_COUNTS) + r"|\d+)\s+laws\b", re.IGNORECASE)
+
+
+def _prompt_contract(task: Task, report: TaskReport) -> None:
+    """``prompt.md`` states the problem, all of it, and nothing more.
+
+    Four checks, each for a defect the bank shipped. A law the prompt never
+    names is a law the policy meets only as a statement. A stated count that
+    disagrees with the law file was in a third of the tier-2 prompts after
+    laws were added to close holes. A line of the reference body in the prompt
+    turns "implement" into "copy". And a prompt that walks through the proof
+    is ``hints.md`` under another name.
+    """
+    prompt = task.prompt
+    missing = [law for law in task.laws if not re.search(rf"\b{re.escape(law)}\b", prompt)]
+    if missing:
+        report.problems.append(
+            f"posed: prompt.md never names {', '.join(missing)}")
+    stated = _STATED_COUNT.search(prompt)
+    if stated:
+        word = stated.group(1).lower()
+        count = _COUNTS.get(word) or (int(word) if word.isdigit() else None)
+        if count is not None and count != task.n_laws:
+            report.problems.append(
+                f"posed: prompt.md says {stated.group(0)!r} and LAWS.bend "
+                f"declares {task.n_laws}")
+    for line in _reference_lines(task):
+        if " ".join(line.split()) in " ".join(prompt.split()):
+            report.problems.append(
+                f"posed: prompt.md quotes the reference body: {line.strip()!r}")
+            break
+    strategy = sorted({m.group(0) for m in STRATEGY_WORDS.finditer(prompt)})
+    if strategy:
+        report.problems.append(
+            f"posed: prompt.md talks about the proof ({', '.join(strategy)}); "
+            f"that belongs in hints.md, and Bend mechanics in tasks/PRIMER.md")
+
+
+def _reference_lines(task: Task) -> list[str]:
+    """The reference body's distinctive lines: not a signature, a match head or
+    a case head, not trivially short, and not something the laws say anyway."""
+    try:
+        reference = task.reference_solution
+    except OSError:
+        return []
+    laws = " ".join(task.laws_src.split())
+    out = []
+    for line in reference.splitlines():
+        text = line.strip()
+        if (len(text) < 12 or text.startswith(("#", "def ", "import ", "match ", "case "))
+                or " ".join(text.split()) in laws):
+            continue
+        out.append(text)
+    return out
 
 
 def _law_references(task: Task, report: TaskReport) -> None:
@@ -355,6 +427,60 @@ def _v3_degenerate(task: Task, toolchain: Toolchain, config: CheckConfig,
             report.problems.append(
                 f"V3: {attempt.name} proves every law -- the task's reward "
                 f"can be earned without solving it")
+
+
+# --- V6: the laws reject the mutants at points, with no proof involved ---------
+
+def _v6_ground(task: Task, toolchain: Toolchain, config: CheckConfig,
+               report: TaskReport) -> None:
+    """V2 with the reference proof taken out of the question.
+
+    V2 counts a mutant as caught when it fails the reference proof, and a
+    proof can fail on a body the laws accept: one that rewrites a subterm the
+    reference *is* cannot be replayed on anything else. That is a hole read as
+    a kill, and seven tasks shipped with one, each mutant's comment naming the
+    law that "rejects" it. ``gavel/ground.py`` evaluates the laws and the
+    cited functions at small closed points instead, so a mutant here is either
+    refuted by an instance, the reference again, or a witness.
+
+    The witness is a problem. A law that could not be read, or a binder type
+    the screen cannot generate values of, is a warning: that part of the task
+    was not looked at, which is the "not yet known" warnings exist to say.
+    """
+    the_plan = ground.plan(task)
+    for name in the_plan.unread:
+        report.warnings.append(f"V6: law {name} could not be read, so no point "
+                               f"of it was evaluated")
+    for gap in the_plan.uncovered:
+        report.warnings.append(f"V6: no values for {gap}, so it was not evaluated")
+    backend = config.backend
+    reference = ground.evaluate(task, toolchain, task.reference_solution, the_plan,
+                                backend=backend)
+    report.checked.append("ground:reference")
+    if reference.outcome == "unevaluable":
+        report.warnings.append(f"V6: the laws could not be evaluated at points "
+                               f"({reference.error})")
+        return
+    if reference.outcome != "equivalent":
+        # V1 proved these laws for the reference, so an instance that fails is
+        # this screen misreading a law, not a law that is false.
+        report.warnings.append(f"V6: the reference fails its own laws at a point, "
+                               f"so the screen misread one: {reference.violations[0]}")
+        return
+    for law in reference.vacuous:
+        report.warnings.append(f"V6: no sampled point satisfies {law}'s "
+                               f"hypotheses, so it was never evaluated")
+    sources = [(path.stem, path.read_text()) for path in task.mutant_paths]
+    sources += [(a.name.split("+")[0], a.files[SOLUTION_FILE]) for a in corpus(task)
+                if a.name.startswith(("vary-", "identity-", "constant-"))]
+    for name, source in sources:
+        found = ground.evaluate(task, toolchain, source, the_plan, backend=backend)
+        report.checked.append(f"ground:{name}")
+        if found.outcome == "hole":
+            report.problems.append(
+                f"V6: {name} satisfies every law at every sampled point and is "
+                f"wrong: {found.differences[0]}. A policy that writes it and "
+                f"proves the laws is paid in full")
 
 
 # --- V4: the reference checks inside the budget --------------------------------

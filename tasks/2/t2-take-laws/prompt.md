@@ -1,17 +1,18 @@
-Implement `take` on lists of `Nat`, then prove both laws.
+Implement `take`, then prove the three laws in `LAWS.bend`.
 
-`take(n, xs)` must keep the first `n` elements of `xs`; recurse on `n`, with no
-steps keeping nothing, and a list that runs out before the count does
-contributing nothing more. `append` and `len` come from the prelude.
+`take(n, xs)` is the first `n` elements of `xs`, in order. When `xs` has fewer
+than `n` elements it is all of `xs`. `take(0n, xs)` is the empty list.
 
-`take_succ` is the successor case: one step of the count keeps one cons cell;
-since `take` steps on the count, it computes away by itself.
+    take(2n, [4n, 1n, 7n]) == [4n, 1n]
+    take(0n, [4n, 1n, 7n]) == Nil{}
+    take(5n, [4n, 1n]) == [4n, 1n]
 
-`take_append_len` says keeping as many elements as `xs` has takes all of `xs`,
-whenever `ys` is what follows it. That one is inductive in `xs` -- `len` and
-`append` both match on their first argument, so the goal does not reduce on its
-own -- and its step case is the hypothesis at the tail of `xs`, under the cons
-cell that `len` counted and `append` put back.
+The laws use the prelude's `P.len(xs)`, the number of elements of `xs`, and
+`P.append(xs, ys)`, the list `xs` followed by the list `ys`.
 
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.take_succ(h, k, xs)` and `def L.take_append_len(xs, ys)`.
+- `take_succ`: taking `1n + k` elements of `h <> xs` gives `h` followed by the
+  first `k` elements of `xs`.
+- `take_append_len`: taking as many elements as `xs` has from `xs` followed by
+  `ys` gives `xs`.
+- `take_nil`: taking from the empty list gives the empty list, whatever the
+  count.

@@ -1,29 +1,17 @@
-Implement `len` and `append` on lists of `Nat`, then prove the laws about `len`.
+Implement `len` and `append`, then prove the five laws in `LAWS.bend`.
 
-`len(xs)` must return the number of elements in `xs`. Recurse on `xs`: `Nil{}`
-is the base case and returns `0n`, and `h <> t` returns `1n+len(t)`.
+`len(xs)` is the number of elements of `xs`. `append(xs, ys)` is the elements of
+`xs` followed by the elements of `ys`.
 
-`append(xs, ys)` must return the elements of `xs` followed by the elements of
-`ys`. Recurse on the first argument: `Nil{}` returns `ys` and `h <> t` returns
-`h <> append(t, ys)`.
+    len([4n, 5n, 6n])        == 3n
+    len(Nil{})               == 0n
+    append([1n, 2n], [3n])   == [1n, 2n, 3n]
+    append(Nil{}, [3n])      == [3n]
 
-The law `len_cons` says that consing one element onto a list makes it one
-element longer. It closes by direct computation: `len` reduces on a non-empty
-list, so both sides become `1n+len(xs)`.
-
-The law `len_single` is the weak companion that pins the base case. `len_cons`
-constrains only the cons step, so a `len` that gets `Nil{}` wrong still satisfies
-it; this one does not.
-
-The law `len_nil_right` says that appending nothing on the right does not change
-a list's length. This one is inductive in `xs`: `append` matches on its first
-argument, so with a variable `xs` on the left the goal does not reduce on its
-own. In the `h <> t` case, the induction hypothesis at `t` rewrites the right
-side into the left.
-
-The law `append_nil_left` pins `append` itself: `len_nil_right` is satisfied by
-the projection `append(xs, ys) = xs`, and this one is not.
-
-Write the implementations in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.len_cons(x, xs)`, `def L.len_single(x)`, `def L.len_nil_right(xs)` and
-`def L.append_nil_left(ys)`.
+- `len_cons`: `len(x <> xs)` is `1n + len(xs)`.
+- `len_single`: `len(x <> Nil{})` is `1n`.
+- `len_nil_right`: appending `Nil{}` on the right does not change a list's
+  length.
+- `append_nil_left`: `append(Nil{}, ys)` is `ys`.
+- `append_cons`: appending `ys` to a list `h <> t` gives `h` placed in front of
+  the result of appending `ys` to `t`.

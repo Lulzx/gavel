@@ -96,6 +96,7 @@ def _fake_repo(tmp_path, names):
     return repo
 
 
+@pytest.mark.checker   # a bare run writes the manifest, which records the pinned bun
 def test_a_held_task_is_skipped_by_a_bare_run(tmp_path, monkeypatch, capsys):
     """``HOLD`` is how a task is on disk and not in the bank.
 

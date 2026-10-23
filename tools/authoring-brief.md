@@ -26,7 +26,8 @@ Read all seven before writing anything.
 
 ## Files you create for one task `t<N>-<slug>` at tier `<N>` (1 or 2 only)
 
-    tasks/<N>/<id>/prompt.md        the problem statement, in the site's voice
+    tasks/<N>/<id>/prompt.md        the specification (see rule 4 below)
+    tasks/<N>/<id>/hints.md         how the reference was written and proved
     tasks/<N>/<id>/LAWS.bend        `import Base`, `import ./prelude.bend as P`,
                                     `import ./solution.bend as S`, then `law`
                                     declarations
@@ -102,12 +103,18 @@ These are the defects that survive every stage, so they are on you:
    check by hand that a wrong body fails. In particular a law that is a *pin*
    (`f(Nil{}) == Nil{}`, `f(x <> Nil{}) == ...`) makes every mutant die on the
    pin and leaves the value laws with no independent weight. Prefer laws with
-   content, and say in the prompt which law pins what.
+   content. Then run `uv run python -m tools.holes <id>`: it evaluates the laws
+   at points with no proof involved, and a "hole" it prints is a wrong body
+   your laws accept.
 3. **No empty case left unconstrained.** If a law mentions `Nil{}`, ask whether
    any mutant that type-checks actually fails it. The empty case is the case
    generated mutants miss most.
-4. **The prompt must not hand over the proof.** Describe the laws and why each
-   is there (as t1-len-map's prompt does); do not write the tactic.
+4. **The prompt is the specification and nothing else.** `prompt.md` says what
+   each target computes, gives worked examples as indented `f(args) == value`
+   lines, and states each law in words. How the reference was written and
+   proved goes in `hints.md`; Bend mechanics are already in `tasks/PRIMER.md`.
+   `uv run python -m tools.prompts check <id>` enforces this and evaluates
+   every example; see `tasks/2/t2-sum-prefix-laws/` for the shape.
 5. **No target is left free by the shape of the law that names it.** Two shapes
    have been measured at full reward in the published bank, both paying a body
    that is the reference at *no* input:

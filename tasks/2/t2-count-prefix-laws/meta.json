@@ -4,7 +4,8 @@
   "laws": [
     "count_odd_prefix_zero",
     "count_odd_prefix_len",
-    "count_odd_prefix_nil"
+    "count_odd_prefix_nil",
+    "count_odd_prefix_step"
   ],
   "policy_targets": [
     "count_odd_prefix"
@@ -12,7 +13,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "6f907a9c8c7c162a87d0e68a950a55d8a037dcd9076f889ceac1f1999312a5ce",
+    "laws": "d989b038a4018734b799ec9fc81921a46aa7db2053ffc846fca892fcefa11c46",
     "prelude": "fe770993992a8733ac731eb9dece65449678b094ae94ae53af63cb7c00b40086"
   },
   "bend_version": "2.0.5"

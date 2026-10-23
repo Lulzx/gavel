@@ -14,6 +14,9 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import subprocess
+import tempfile
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -26,35 +29,28 @@ API_BASE = "https://api.anthropic.com"
 MESSAGES_PATH = "/v1/messages"
 API_URL = API_BASE + MESSAGES_PATH
 API_VERSION = "2023-06-01"
-DEFAULT_MODEL = "claude-opus-5"
+DEFAULT_MODEL = "claude-opus-5-5"
 DEFAULT_MAX_TOKENS = 8192
 
 SYSTEM = """\
 You are writing a proof in Bend 2.0.5, a dependently typed language with no \
-tactics. A task gives you:
-
-- `LAWS.bend`: the definitions you may not edit, each declaring a law over a \
-  module `S` (your solution) that you must prove.
-- `solution.bend`: a stub with the definitions you must fill in. It imports \
-  what it needs; keep its imports.
-- The import header your proof file must begin with.
+tactics. Each task gives you its laws, a stub to complete, its prelude, and the \
+header your proof file must begin with.
 
 Reply with one JSON object and nothing else:
 
-{"solution": "<full contents of solution.bend>", "proof": "<full contents of PROOF.bend>"}
+{"solution": "<full contents of solution.bend>", "proof": "<full contents of PROOF.bend>"}"""
 
-The proof file declares, for each law, a def named `L.<law>` whose body is a \
-proof term. Useful facts about the checker:
 
-- `{a == b : T}` is an equality type; `{==}` closes a goal whose sides are \
-  already the same after reduction.
-- `match x:` with `case 0n:` and `case 1n+p:` for `Nat`; `case Nil{}:` and \
-  `case h <> t:` for `List<T>`.
-- `%e : P` rewrites with `e : {a == b : T}`. Write `P` as the goal with `_` \
-  where `b` goes, after reducing both sides as far as they go.
-- `?TODO` is a hole and proves nothing. `@unsafe` is rejected outright.
-- Put one binder per line: `for x: Nat` then `for y: Nat`, never both on one.
-- Goal types must match exactly; partial application is not accepted."""
+def system_prompt(observation: dict[str, Any]) -> str:
+    """The reply format, then the bank's shared primer on Bend.
+
+    The primer used to be a short list here and a long one repeated inside
+    every task prompt. It is now one file, ``tasks/PRIMER.md``, and the
+    observation carries it so that a policy outside this module sees it too.
+    """
+    primer = (observation.get("primer") or "").strip()
+    return SYSTEM + ("\n\n" + primer if primer else "")
 
 
 class Policy(Protocol):
@@ -128,6 +124,9 @@ def build_prompt(observation: dict[str, Any]) -> str:
     if observation.get("prelude"):
         parts.append("## prelude.bend (already implemented, imported as P)\n```\n"
                      + observation["prelude"].strip() + "\n```")
+    if observation.get("hints"):
+        parts.append("## Hints: how the reference was written and proved\n"
+                     + observation["hints"].strip())
     if observation.get("feedback"):
         parts.append("## The checker rejected your previous attempt\n```\n"
                      + observation["feedback"] + "\n```\n"
@@ -171,12 +170,12 @@ class AnthropicPolicy:
             return self.base_url
         return self.base_url.rstrip("/") + MESSAGES_PATH
 
-    def complete(self, prompt: str) -> str:
+    def complete(self, prompt: str, system: str = SYSTEM) -> str:
         body = json.dumps({
             "model": self.model,
             "max_tokens": self.max_tokens,
             "temperature": self.temperature,
-            "system": SYSTEM,
+            "system": system,
             "messages": [{"role": "user", "content": prompt}],
         }).encode()
         request = urllib.request.Request(
@@ -204,7 +203,79 @@ class AnthropicPolicy:
         return text
 
     def __call__(self, observation: dict[str, Any]) -> Action:
-        return action_from_reply(self.complete(build_prompt(observation)))
+        return action_from_reply(self.complete(build_prompt(observation),
+                                               system_prompt(observation)))
+
+
+@dataclass
+class ClaudeCliPolicy:
+    """One completion per turn through the ``claude`` CLI's print mode.
+
+    For an operator whose access is a Claude account rather than an API key.
+    The CLI is run with every tool disabled, the system prompt replaced, no
+    settings, no session saved, and an empty working directory, so what comes
+    back is a completion and not an agent's work: the model cannot run the
+    checker, read the reference, or see this repository.
+    """
+
+    model: str = DEFAULT_MODEL
+    binary: str = "claude"
+    effort: str | None = None
+    timeout: float = 900.0
+    calls: int = 0
+    input_tokens: int = 0
+    output_tokens: int = 0
+    cost_usd: float = 0.0
+
+    name = "claude-cli"
+
+    def __post_init__(self) -> None:
+        if shutil.which(self.binary) is None:
+            raise PolicyError(f"{self.binary!r} is not on PATH")
+
+    def argv(self, system: str) -> list[str]:
+        argv = [self.binary, "-p", "--model", self.model,
+                "--output-format", "json", "--tools", "",
+                "--system-prompt", system, "--setting-sources", "",
+                "--strict-mcp-config", "--no-session-persistence"]
+        if self.effort:
+            argv += ["--effort", self.effort]
+        return argv
+
+    def complete(self, prompt: str, system: str = SYSTEM) -> str:
+        # A nested CLI refuses to start inside a Claude Code session, and the
+        # session's own variables are not this call's business either way.
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("CLAUDECODE", "CLAUDE_CODE_"))}
+        self.calls += 1
+        with tempfile.TemporaryDirectory(prefix="gavel-policy-") as cwd:
+            try:
+                proc = subprocess.run(self.argv(system), input=prompt, text=True,
+                                      capture_output=True, cwd=cwd, env=env,
+                                      timeout=self.timeout)
+            except subprocess.TimeoutExpired as exc:
+                raise PolicyError(f"the CLI timed out after {self.timeout}s") from exc
+        try:
+            payload = json.loads(proc.stdout)
+        except json.JSONDecodeError as exc:
+            detail = (proc.stderr or proc.stdout).strip()[:400]
+            raise PolicyError(f"the CLI exited {proc.returncode}: {detail}") from exc
+        if payload.get("is_error"):
+            raise PolicyError(f"the CLI reported an error: {payload.get('result')!r}")
+        usage = payload.get("usage", {})
+        self.input_tokens += (usage.get("input_tokens", 0)
+                              + usage.get("cache_read_input_tokens", 0)
+                              + usage.get("cache_creation_input_tokens", 0))
+        self.output_tokens += usage.get("output_tokens", 0)
+        self.cost_usd += float(payload.get("total_cost_usd") or 0.0)
+        text = payload.get("result") or ""
+        if not text:
+            raise PolicyError(f"the reply carried no text: {payload}")
+        return text
+
+    def __call__(self, observation: dict[str, Any]) -> Action:
+        return action_from_reply(self.complete(build_prompt(observation),
+                                               system_prompt(observation)))
 
 
 @dataclass
@@ -235,5 +306,6 @@ class EchoPolicy:
 
 
 __all__ = ["API_BASE", "API_URL", "DEFAULT_MODEL", "MESSAGES_PATH", "SYSTEM",
-           "AnthropicPolicy", "EchoPolicy", "Policy", "PolicyError",
-           "ScriptedPolicy", "action_from_reply", "build_prompt", "extract_json"]
+           "AnthropicPolicy", "ClaudeCliPolicy", "EchoPolicy", "Policy", "PolicyError",
+           "ScriptedPolicy", "action_from_reply", "build_prompt", "extract_json",
+           "system_prompt"]

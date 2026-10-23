@@ -76,3 +76,7 @@ def L.concat_sum(xss):
 def L.concat_single(xs):
   %Equal.sym(List<Nat>, P.append(xs, Nil{}), xs, Policy.append_nil(xs)) : {_ == xs : List<Nat>}
   {==}
+
+# Definitional: the match on `xss` steps on the cons.
+def L.concat_cons(h, t):
+  {==}

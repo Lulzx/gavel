@@ -1,41 +1,24 @@
-Implement `count_matches` on lists of `Nat`, then prove the four laws about it.
+Implement `count_matches`, then prove the four laws in `LAWS.bend`.
 
-`count_matches(xs, ys)` counts the positions where the two lists agree,
-stopping at whichever list runs out first. Recurse on both lists. Either list
-running out gives `0n`, so both `Nil{}` cases are base cases. Two cons cells
-weigh the head's agreement with `k` and add it to the tail's count: the weight
-is `P.pick(P.eq(h, k), 1n, 0n)`, and the rest is the count of the two tails.
-`P.eq`, `P.pick` and `P.len` come from the prelude.
+`count_matches(xs, ys)` counts the positions at which the two lists hold the
+same number, comparing them position by position and stopping when either list
+runs out. If either list is empty the count is `0n`.
 
-`P.eq(a, b)` steps one successor off both of its arguments at once, so
-`P.eq(x, x)` on a variable `x` is stuck -- that it is `True{}` is a fact about
-`x`, not an unfolding. `P.pick` matches on its first argument and `P.len`
-matches on its own, so neither reduces on a variable either.
+    count_matches([1n, 2n, 3n], [1n, 5n, 3n]) == 2n
+    count_matches([1n, 2n], [1n, 2n, 3n, 4n]) == 2n
+    count_matches([1n, 2n], Nil{}) == 0n
+    count_matches(Nil{}, [1n]) == 0n
 
-The law `count_matches_nil` fixes the answer on an empty first list. It is the
-weak half: it is definitional, and the constant body `0n` satisfies it.
+The prelude's `P.eq(a, b)` is `True{}` when `a` and `b` are the same number and
+`False{}` otherwise. `P.pick(c, a, b)` is `a` when `c` is `True{}` and `b` when
+it is `False{}`. `P.len(xs)` is the number of elements of `xs`.
 
-The law `count_matches_nil_right` fixes the other stopped match, where it is
-`ys` that has run out. Its left-hand side is ground in that argument --
-`count_matches` steps on the cons cell and then finds `Nil{}` where it wants a
-second element -- and the cons law names its second argument as a cons cell, so
-no other law here reaches that answer. It is the law that rules out a body
-whose stopped match answers anything but zero.
-
-The law `count_matches_cons` is the step, and it is definitional: it is the
-definition written out, and it says *which* elements are compared. A body that
-weighed the head against the wrong element, or that recursed on the wrong tail,
-does not have its two sides equal. It is satisfied by every body of the right
-shape, so it is not enough on its own.
-
-The law `count_matches_self` is the one with content, and it is the reason this
-task exists: a list agrees with itself at every position, so its self-count is
-its length. It is inductive in `xs`. `P.eq(x, x)` on a variable does not
-reduce, so the step has to establish that the head agrees with itself before
-`P.pick` yields its weight, and the hypothesis carries the tail. The constant
-body `0n` fails it, because the right-hand side is the length, and a body that
-always answered the length fails `count_matches_cons`.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.count_matches_nil(ys)`, `def L.count_matches_nil_right(h, t)`,
-`def L.count_matches_cons(h, k, t, u)` and `def L.count_matches_self(xs)`.
+- `count_matches_nil`: with an empty first list the count is `0n`, whatever `ys`
+  is.
+- `count_matches_nil_right`: with an empty second list the count is `0n`, however
+  long the first list is.
+- `count_matches_cons`: for `h <> t` and `k <> u`, the count is `1n` or `0n`
+  according to whether `h` and `k` are the same (`P.pick(P.eq(h, k), 1n, 0n)`),
+  added to `count_matches(t, u)`.
+- `count_matches_self`: a list matches itself everywhere, so
+  `count_matches(xs, xs) == P.len(xs)`.

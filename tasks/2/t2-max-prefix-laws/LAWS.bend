@@ -28,3 +28,17 @@ law max_prefix_len:
 law max_prefix_nil:
   for k: Nat
   {S.max_prefix(k, Nil{}) == 0n : Nat}
+
+# LAW: one step of the walk. The three laws above fix `max_prefix` where the count
+# is `0n`, where the list is `Nil{}`, and on the diagonal where the count is the
+# list's length -- and nowhere else. A body that answers the whole list's total
+# for any nonzero count satisfies all three and is wrong at every count strictly
+# between `0n` and the length: **measured** by `tools/holes.py`, which found two
+# shipped mutants doing exactly that while V2 read them as killed, because the
+# reference proof of the length law did not fit their shape. This law is the
+# interior: with the zero and nil laws it determines `max_prefix` everywhere.
+law max_prefix_step:
+  for k: Nat
+  for h: Nat
+  for t: List<Nat>
+  {S.max_prefix(1n + k, h <> t) == P.max(h, S.max_prefix(k, t)) : Nat}

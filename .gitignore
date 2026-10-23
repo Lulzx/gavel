@@ -38,3 +38,6 @@ manifest.scratch.*.json
 
 # OS
 .DS_Store
+
+# The pinned bun, fetched by `toolchain.fetch --bun`: a platform binary.
+toolchain/bun/

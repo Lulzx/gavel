@@ -99,7 +99,8 @@ Components, each one module or one directory:
 
 ```
 tasks/<tier>/<task_id>/
-  prompt.md          # natural-language task statement shown to the policy
+  prompt.md          # the specification shown to the policy: targets, examples, laws in words
+  hints.md           # how the reference was written and proved; shown only in guided runs
   LAWS.bend          # laws; immutable during episodes; hashed in meta.json
   prelude.bend       # immutable predicates and helpers the laws refer to; hashed
   solution.bend      # signatures of the policy targets with ?TODO bodies;
@@ -215,12 +216,13 @@ carries, and the second is measured by validation rather than stored.
 
 A task is valid if and only if `gavel/validate.py` reports no problem:
 
-- **Before V1.** The prompt is non-empty, since a task with no prompt is still a perfectly good reward function and a policy is shown nothing; and every `S.<f>` a law cites is a policy target the stub asks for. Both are properties of the files and are checked before any checker run.
+- **Before V1.** The prompt is non-empty, since a task with no prompt is still a perfectly good reward function and a policy is shown nothing; and every `S.<f>` a law cites is a policy target the stub asks for. Both are properties of the files and are checked before any checker run. The prompt also meets its contract: every law named, any stated law count right, no line of the reference body, no proof strategy (that is `hints.md`'s, and Bend mechanics are `tasks/PRIMER.md`'s).
 - **V1.** `references/<id>/solution.bend` + `PROOF.bend` + `LAWS.bend` type-check under the pinned toolchain, and the reference earns tier 4.
 - **V2.** For every mutant in `references/<id>/mutants/`, the reference proof fails to check against it, and at least one mutant exists. This is *proof incompatibility*: it shows the reference proof does not transfer, not that no proof exists. A law's kill count is the number of mutants whose failure was attributed to it. The stronger claim, that a mutant admits no proof at all, is made only where an author probed for one and found none. A mutant that does not type-check is recorded as *weak*, not as a kill.
 - **V3.** No submission from the degenerate corpus (§7.5), checked against a `{==}`-only proof, proves every law, and none is rejected by the gate (a gate rejection means V3 tested nothing).
 - **V4.** The reference's slowest checker run takes ≤ 2000 ms.
 - **V5.** No forbidden construct (§7.2) appears in `LAWS.bend`, `prelude.bend`, or the reference, and the immutable files import only `Base` and each other.
+- **V6.** No mutant or degenerate body satisfies every law at every sampled point while disagreeing with the reference (`gavel/ground.py`). This is V2 without the reference proof: V2's kill can be the proof failing to fit a body the laws accept, and V6's cannot.
 
 Validation also reports, as warnings rather than problems: a law that no
 mutant kills, a tier-3+ task whose review record is missing (`unreviewed`) or
@@ -253,8 +255,10 @@ loopback HTTP; `examples/client.ts` is a client that knows nothing about Bend.
   "tier": 3,
   "title": "...",
   "prompt": "<contents of prompt.md>",
-  "laws": "<contents of LAWS.bend>",
-  "stub": "<contents of solution.bend>",
+  "primer": "<contents of tasks/PRIMER.md>",
+  "hints": null,
+  "laws": "<LAWS.bend without its comments>",
+  "stub": "<solution.bend without its comments>",
   "prelude": "<contents of prelude.bend>",
   "proof_header": "import Base\nimport ./prelude.bend as P\n...",
   "policy_targets": ["flatten"],
@@ -407,14 +411,14 @@ Sampling is a `Sampler` callable passed to the env: `uniform_sampler` (default),
 Translating a module and inventing the laws is human or agent work. Everything after that is a measurement, and `tools/author.py` runs the measurements in a fixed order and refuses to carry a task past a stage it has not passed:
 
 ```
-files → derive → screens → mutants → V1–V5 → episode → review → publish
+files → derive → screens → mutants → V1–V6 → episode → review → publish
 ```
 
 1. **files.** The task and reference directories hold the files of §5.1, the stub carries `?TODO` per target, the prelude is byte-identical to the reference's, and no function set collides with a registered task's.
 2. **derive.** `meta.json` is derived from the files.
 3. **screens.** The static readings of §7.5. Refuses on a target no law names and on a target named only inside a premise; the same defect found after the corpus exists costs the corpus too.
 4. **mutants.** `tools/mutate.py` generates the corpus unless `mutants/` already holds hand-authored files, in which case generation is skipped so it cannot wipe them. Each mutant's tier is measured and the strong ones are counted.
-5. **V1–V5.** `gavel/validate.py` (§5.5).
+5. **V1–V6.** `gavel/validate.py` (§5.5).
 6. **episode.** One real episode through the env with the reference as the submission; it must earn 1.0.
 7. **review.** A tier ≥ 3 task stops here unless `reviews/<task_id>.json` exists and its hashes match the shipped laws and prelude. **No tool in this repository writes under `reviews/`**, `gavel/reviews.py` is a reader, and a test asserts the writer does not exist. The record was once a key inside the derived `meta.json`, written by a flag, which let the pipeline attest to its own review; eleven such records were deleted rather than migrated. `tools/docket.py` assembles the reading a reviewer needs (laws, kill counts, screens, corpus) into one block per task and writes nothing.
 8. **publish.** `tools/publish.py` rehashes the task and rebuilds `manifest.json`. A task directory carrying a `HOLD` file is skipped by the bare publish and refused when named explicitly; the only way to register it is to delete the marker.

@@ -4,7 +4,8 @@
   "laws": [
     "sq_prefix_zero",
     "sq_prefix_len",
-    "sq_prefix_nil"
+    "sq_prefix_nil",
+    "sq_prefix_step"
   ],
   "policy_targets": [
     "sq_prefix"
@@ -12,7 +13,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "b4f7317bbe8decfb0ce5974f5b78b58f0135cd5a321629a6c04fe3d01540c060",
+    "laws": "3e6c4f57c45c032ba2bc393682caf85c0d4af420ce7e3f9226e62c557882402d",
     "prelude": "6447f7259d5f2c864de9770ccb7428eb7c089e8ccc2b8a20d322c9904b4e3faf"
   },
   "bend_version": "2.0.5"

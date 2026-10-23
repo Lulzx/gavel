@@ -1,57 +1,14 @@
-Implement `add` and `mul` on `Nat`, then prove the four laws about them.
+Implement `add` and `mul`, then prove the four laws in `LAWS.bend`.
 
-`add(a, b)` must return the sum of `a` and `b`, recursing on the first
-argument.
+`add(a, b)` is the sum of `a` and `b`. `mul(a, b)` is the product of `a` and
+`b`.
 
-`mul(a, b)` must return the product of `a` and `b`. Recurse on the first
-argument and build the step out of `add`: `0n` is the base case and the step is
-`add(b, mul(p, b))`. That step names `b` twice, and a binder is consumed on
-every use, so `b` is declared reusable with `+b`.
+    add(2n, 3n) == 5n
+    mul(3n, 4n) == 12n
+    mul(2n, 5n) == 10n
+    mul(0n, 5n) == 0n
 
-The law `mul_two` says that multiplying by two is adding a number to itself:
-
-    S.mul(2n, x) == x + x
-
-The `+` there is Base's addition, not `S.add`, which is what makes closing it a
-question about how `S.add` relates to Base's `+` rather than a computation.
-
-It does not, by itself, determine `mul` — and this is worth saying plainly,
-because the obvious reading is that it does. `mul(2n, x)` names its first
-argument as a literal, so `mul(a, b) = b + b` satisfies it. Three more laws close
-that off, and each is one line:
-
-    law mul_zero:  for x: Nat  {S.mul(0n, x) == 0n : Nat}
-    law mul_succ:  for a: Nat  for b: Nat
-      {S.mul(1n+a, b) == S.add(b, S.mul(a, b)) : Nat}
-    law add_zero:  for x: Nat  {S.add(x, 0n) == x : Nat}
-
-`mul_succ` is the one that gives `mul` its *step*. The other two observe `mul`
-at `0n` and at `2n`, and a body can agree at both and be wrong at everything
-above: `mul` answering `b` at `1n` and `2n * b` from `2n` up satisfies
-`mul_zero`, `mul_two` and `add_zero` and is not this function. `mul_succ` at an
-arbitrary `a` rules that out, and with `mul_zero` it determines `mul` at every
-input. It is definitional for the implementation below — `1n+a` is headed by a
-constructor, so `mul`'s match reduces on it and the goal is the body itself.
-
-`mul_zero` is definitional: `mul` matches on its first argument and that
-argument is `0n`, so `{==}` is the whole proof. `add_zero` is the second lemma
-below — the goal is exactly what that lemma proves.
-
-`mul` recurses on its first argument, so `mul(2n, x)` reduces all the way to
-`add(x, add(x, 0n))` and the goal is a rewrite rather than an induction. Closing
-it means relating `S.add` to Base's `+`, which takes two auxiliary lemmas:
-
-    def Policy.add_plus(x: Nat, y: Nat) -> {S.add(x, y) == x + y : Nat}:
-    def Policy.add_zero(x: Nat) -> {S.add(x, 0n) == x : Nat}:
-
-A helper in `PROOF.bend` is a def named `Policy.` and, unlike a law, it must
-carry its type. Both of these are inductive in `x`.
-
-A rewrite goes from the lemma's right-hand side to its left, so annotate the
-step with the goal written in `S.add` form and leave `_` where the Base `+` term
-being replaced sits. Note that `x` is named more than once in `L.mul_two`, and a
-binder is consumed on every use: re-bind it reusable first with `+x = x`.
-
-Write the implementations in `solution.bend` and the proof in `PROOF.bend`, as
-`def L.mul_two(x)`, `def L.mul_zero(x)`, `def L.mul_succ(a, b)` and
-`def L.add_zero(x)`.
+- `mul_zero`: `mul(0n, x)` is `0n`.
+- `mul_two`: `mul(2n, x)` equals Base's `x + x`.
+- `mul_succ`: `mul(1n+a, b)` is `add(b, mul(a, b))`.
+- `add_zero`: `add(x, 0n)` is `x`.

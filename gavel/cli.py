@@ -203,7 +203,7 @@ def cmd_serve(args) -> int:
         args.socket = "gavel.sock"
     gavel = server_mod.GavelServer.from_manifest(
         Path(args.manifest), mode=args.mode, max_turns=args.max_turns,
-        backend=args.backend,
+        backend=args.backend, hints=args.hints,
         cache=server_mod.VerdictCache(args.cache) if args.cache else None,
         trajectory=(server_mod.Trajectory(args.trajectory, run_id=args.run_id)
                     if args.trajectory else None))
@@ -270,6 +270,8 @@ def build_parser() -> argparse.ArgumentParser:
                        help="host:port to bind, loopback by default")
     p_srv.add_argument("--mode", default="dense", choices=("dense", "sparse"))
     p_srv.add_argument("--max-turns", type=int, default=4)
+    p_srv.add_argument("--hints", action="store_true",
+                       help="show each task's hints.md in its observation")
     p_srv.add_argument("--backend", default="auto",
                        choices=("auto", "plain", "bwrap"))
     p_srv.add_argument("--cache", default=None, help="sqlite verdict cache path")

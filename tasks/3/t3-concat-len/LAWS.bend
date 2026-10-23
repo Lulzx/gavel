@@ -32,3 +32,18 @@ law concat_sum:
 law concat_single:
   for xs: List<Nat>
   {S.concat(xs <> Nil{}) == xs : List<Nat>}
+
+# LAW: a piece goes in front of the rest. The three laws above constrain two
+# measures of the answer and its value on one-piece lists, and that leaves the
+# order of the pieces free: `P.append(concat(t), h)` has the same length and the
+# same sum, and a one-piece list cannot tell the order apart. **Measured** by
+# `tools/holes.py`: the shipped mutant `concat-reversed-pieces` satisfies every
+# instance of the three and answers `[1n, 0n]` for `[[0n], [1n]]`. V2 had read it
+# as killed by `concat_len`, because the reference proof's step rewrites with
+# `len_append` in the reference's order -- a fact about that proof, not about
+# the law. With this law the answer is determined: the empty list is pinned by
+# `concat_len`, since a list of length `0n` is `Nil{}`.
+law concat_cons:
+  for h: List<Nat>
+  for t: List<List<Nat>>
+  {S.concat(h <> t) == P.append(h, S.concat(t)) : List<Nat>}

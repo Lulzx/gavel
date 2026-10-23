@@ -1,28 +1,15 @@
-Implement `append` and `sum` on lists of `Nat`, then prove the four laws.
+Implement `append` and `sum`, then prove the four laws in `LAWS.bend`.
 
-`append(xs, ys)` must return the elements of `xs` followed by the elements of
-`ys`; recurse on `xs`. `sum(xs)` must return the total of the elements of `xs`;
-recurse on `xs`, adding the head to the sum of the tail.
+`append(xs, ys)` is the elements of `xs` followed by the elements of `ys`, in
+order. `sum(xs)` is the total of the elements of `xs`, `0n` for the empty list.
 
-`sum_append` says the sum of an append is the sum of the sums; it is inductive
-in `xs`, and its step case needs the associativity of `+` to move the head past
-the two sums -- `+` is stuck on a variable head, so that reassociation is a
-lemma of its own, under the reserved `Policy.` namespace.
+    append([1n, 2n], [3n]) == [1n, 2n, 3n]
+    append(Nil{}, [3n]) == [3n]
+    sum([1n, 2n, 3n]) == 6n
+    sum(Nil{}) == 0n
 
-`sum_single` says the sum of a one-element list is that element. `sum` computes
-it to `h + 0n`, so that proof needs the fact that adding zero on the right is
-the identity, also as a `Policy.` lemma.
-
-The last two laws are what make `append` an obligation rather than a name the
-set passes around. `sum_append` is about `sum`, and a sum cannot see a
-permutation: a body that recurses on its own list and pushes the head onto the
-*other* one returns `reverse(xs) <> ys`, keeps every element and therefore every
-sum, so the two laws above are satisfied by a body that does not concatenate.
-`append_cons` observes order -- it is `append`'s cons step read back -- and
-`append_nil_left` says the empty list is the left identity, without which
-`append(Nil{}, ys)` stays free in content because only its sum is fixed. Both
-close by reduction, so `{==}` is their whole proof.
-
-Write the implementations in `solution.bend` and the proofs in `PROOF.bend`,
-as `def L.sum_append(xs, ys)`, `def L.sum_single(h)`,
-`def L.append_cons(h, t, ys)` and `def L.append_nil_left(ys)`.
+- `sum_append`: the sum of `append(xs, ys)` is the sum of `xs` plus the sum of
+  `ys`.
+- `sum_single`: the sum of the one-element list `[h]` is `h`.
+- `append_cons`: appending `ys` to `h <> t` gives `h` followed by `append(t, ys)`.
+- `append_nil_left`: appending `ys` to the empty list gives `ys`.

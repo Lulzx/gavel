@@ -1,25 +1,12 @@
-Implement `snoc` on `List<Nat>`, then prove the two laws about it.
+Implement `snoc`, then prove the two laws in `LAWS.bend`.
 
-`snoc(xs, x)` appends `x` to the end of `xs`. Match on the list: `Nil{}` gives
-the one-element list `x <> Nil{}`, and a cons cell conses its head onto the
-`snoc` of its tail. `append` comes from the prelude.
+`snoc(xs, x)` is `xs` with `x` added at the end.
 
-The laws are the empty case and the append case:
+    snoc([1n, 2n], 3n) == [1n, 2n, 3n]
+    snoc(Nil{}, 5n) == [5n]
+    snoc([4n], 4n) == [4n, 4n]
 
-    S.snoc(Nil{}, x) == x <> Nil{}
-    S.snoc(P.append(xs, ys), x) == P.append(xs, S.snoc(ys, x))
+The laws use `P.append(xs, ys)`, the concatenation of two lists.
 
-The first is the weak half: it is definitional, and a body that ignores the list
-and answers `x <> Nil{}` satisfies it. The second is the one that pins `snoc`:
-the constant body fails it, and so does a body that puts `x` in front instead of
-at the end. It is inductive in `xs` -- `append` matches on its first argument,
-so with a variable `xs` the left-hand side does not reduce on its own.
-
-The first law's proof is `{==}`. The second is an induction in `xs`: its
-`Nil{}` case is definitional on both sides, and its cons case reduces both sides
-to the same head consed onto the hypothesis at `t`. Annotate that step with the
-goal in which the term the hypothesis rewrites has been replaced by `_`, and
-close it with `{==}`.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.snoc_nil(x)` and `def L.snoc_append(xs, ys, x)`.
+- `snoc_nil`: `snoc(Nil{}, x)` is `x <> Nil{}`.
+- `snoc_append`: `snoc(P.append(xs, ys), x)` is `P.append(xs, snoc(ys, x))`.

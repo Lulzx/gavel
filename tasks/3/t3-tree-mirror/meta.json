@@ -14,7 +14,7 @@
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
     "laws": "0b36ae08d968a9474589180fe32d7d1f98ce5cea7afb3d96822148a4741c311d",
-    "prelude": "cfea4f6d0dbdba299b63a8797299ec17f3fb9a9e92131fbd65f3dcf2206106b1"
+    "prelude": "d1462b5b828fd995c92d76a8b03c80161540c460d9904b4a3c6500837f6e4f2d"
   },
   "bend_version": "2.0.5"
 }

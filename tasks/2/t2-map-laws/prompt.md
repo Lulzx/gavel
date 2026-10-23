@@ -1,18 +1,18 @@
-Implement `len` and `map` on lists of `Nat`, then prove both laws.
+Implement `len` and `map`, then prove the three laws in `LAWS.bend`.
 
-`len(xs)` must return how many elements `xs` has; recurse on `xs`. `map(xs)` is
-the successor map: it replaces every element `h` with `1n+h`, and recurses on
-`xs`.
+`len(xs)` is the number of elements of `xs`.
 
-`len_map_cons` says the length of a mapped cons is one more than the length of
-the tail. `map(h <> t)` is `(1n+h) <> map(t)` and `len` of that is
-`1n + len(map(t))`, so the goal closes once you have the fact that mapping
-preserves the length -- that fact is an induction of its own, to be proved under
-the reserved `Policy.` namespace.
+    len([4n, 5n, 6n]) == 3n
+    len(Nil{})        == 0n
 
-`map_cons` says what `map` does to a cons: the head becomes `1n+h` and the tail
-is mapped. It is what `map` already computes, so that proof closes without
-induction.
+`map(xs)` is the successor map: the list of the same length in which every
+element `h` is replaced by `1n + h`.
 
-Write the implementations in `solution.bend` and the proofs in `PROOF.bend`,
-as `def L.len_map_cons(h, t)` and `def L.map_cons(h, t)`.
+    map([0n, 4n]) == [1n, 5n]
+    map(Nil{})    == Nil{}
+
+The prelude adds nothing: the laws use only `Base` terms and the two targets.
+
+- `len_map_cons`: `len(map(h <> t))` is `1n + len(t)`.
+- `map_cons`: `map(h <> t)` is `(1n + h) <> map(t)`.
+- `len_single`: `len(h <> Nil{})` is `1n`.

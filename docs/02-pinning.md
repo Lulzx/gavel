@@ -14,6 +14,15 @@ Gavel therefore:
 `gavel.toolchain.Toolchain.load` refuses to run if either pin has drifted, and
 the test suite checks the bun it runs under against the pin.
 
+The bun pin is only useful if the pinned bun can be had. A machine's own bun
+is whatever it last upgraded to, so on a fresh clone the pin used to fail every
+checker test, 119 identical errors deep. `uv run python -m toolchain.fetch --bun`
+downloads the pinned release from bun's GitHub releases into `toolchain/bun/`
+(untracked), checks it against the `SHASUMS256.txt` the release publishes, and
+`Toolchain.load` prefers it over the bun on PATH. If the pin still fails, the
+test suite stops once with that instruction, and `pytest -m "not checker"`
+runs everything that does not need the checker.
+
 Every verdict carries the toolchain hash and the bank hash, so a reward
 recorded in a trajectory can always be traced to the exact checker and the
 exact laws that produced it.

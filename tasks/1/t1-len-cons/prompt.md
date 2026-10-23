@@ -1,21 +1,15 @@
-Implement `len(xs)` on lists of `Nat`, then prove the laws about it.
+Implement `len`, then prove the three laws in `LAWS.bend`.
 
-`len(xs)` must return the number of elements in `xs`. Recurse on `xs`: `Nil{}`
-is the base case and returns `0n`, and `h <> t` returns `1n+len(t)`.
+`len(xs)` is the number of elements of `xs`.
 
-The law `len_cons` says that consing one element onto a list makes it one
-element longer. It closes by direct computation -- `len` reduces on a non-empty
-list, so both sides become `1n+len(xs)` -- so its proof body is just `{==}`.
+    len([4n, 5n, 6n]) == 3n
+    len([9n])         == 1n
+    len(Nil{})        == 0n
 
-The law `len_single` is the weak companion that pins the base case. `len_cons`
-constrains only the cons step, so a `len` that gets `Nil{}` wrong still satisfies
-it; this one does not. It also closes by direct computation.
+The laws use `P.append(xs, ys)`, the elements of `xs` followed by those of
+`ys`.
 
-The law `len_nil_right` says that appending nothing on the right does not change
-a list's length. `append` is supplied by the prelude, and it matches on its
-first argument, so with a variable `xs` on the left the goal does not reduce on
-its own. This one is inductive in `xs`: in the `h <> t` case the induction
-hypothesis at `t` rewrites the right side into the left.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.len_cons(x, xs)`, `def L.len_single(x)` and `def L.len_nil_right(xs)`.
+- `len_cons`: `len(x <> xs)` is `1n + len(xs)`.
+- `len_single`: `len(x <> Nil{})` is `1n`.
+- `len_nil_right`: `len(P.append(xs, Nil{}))` equals `len(xs)`, so appending
+  `Nil{}` on the right does not change a list's length.

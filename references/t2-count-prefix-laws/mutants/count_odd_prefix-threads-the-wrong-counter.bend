@@ -3,10 +3,10 @@ import ./prelude.bend as P
 
 # A body a person would plausibly write: the recursion passes the count it was
 # given rather than the decremented one, so no matter where the prefix ends the
-# walk carries on to the end of the list. Rejected by
-# `count_odd_prefix_len`: at the cons case of its induction the law wants the
-# head's test added to the answer for the *rest*, and this body's answer for the
-# rest has already consumed the head.
+# walk carries on to the end of the list. It is right on the diagonal the length
+# law states -- a count at least the length walks the whole list either way -- so
+# the three original laws accept it (`tools/holes.py`: wrong at
+# `count_odd_prefix(1n, [2n, 1n, 2n])`). Rejected by `count_odd_prefix_step`.
 def count_odd_prefix(n: Nat, xs: List<Nat>) -> Nat:
   match n:
     case 0n:

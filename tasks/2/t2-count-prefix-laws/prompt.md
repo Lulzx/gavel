@@ -1,33 +1,21 @@
-Implement `count_odd_prefix` on `Nat` and `List<Nat>`, then prove the two laws
-about it.
+Implement `count_odd_prefix`, then prove the four laws in `LAWS.bend`.
 
-`count_odd_prefix(n, xs)` counts the odd numbers among the first `n` elements
-of `xs`, so it is `0n` once either the count or the list runs out. `n` is the
-argument that gets consumed: `0n` is the base case, and the step splits the
-list -- `Nil{}` counts none, and a cons cell adds `P.is_odd(h)` to
-`count_odd_prefix(k, t)`. `len`, `is_odd` and `count_odd` come from the
-prelude.
+`count_odd_prefix(n, xs)` is the number of odd numbers among the first `n`
+elements of `xs`. When `xs` has fewer than `n` elements it counts the odd
+numbers in all of them.
 
-The laws are the empty-count case and the length case:
+    count_odd_prefix(2n, [3n, 4n, 5n]) == 1n
+    count_odd_prefix(3n, [3n, 4n, 5n]) == 2n
+    count_odd_prefix(0n, [3n, 4n, 5n]) == 0n
+    count_odd_prefix(5n, [3n, 4n]) == 1n
 
-    S.count_odd_prefix(0n, xs) == 0n
-    S.count_odd_prefix(P.len(xs), xs) == P.count_odd(xs)
+The prelude's `P.len(xs)` is the number of elements of `xs`. `P.is_odd(n)` is
+`1n` when `n` is odd and `0n` when it is even. `P.count_odd(xs)` is the number
+of odd elements of `xs`.
 
-The first is the weak half: the constant body `0n` satisfies it, and so does a
-body that ignores the list and hands back its count. The second is the one that
-pins `count_odd_prefix`: a body that ignored the count would have to be `0n` for
-every list -- from the base law -- and equal to `count_odd(xs)` for every list,
-and a body that ignored the list would have to hand back `count_odd(xs)` without
-ever looking at an element. It is inductive in `xs`: `len` and `count_odd` both
-match on their first argument, so with a variable `xs` the left-hand side does
-not reduce on its own.
-
-The first law's proof is `{==}`: the match steps on `0n` and answers `0n`
-without needing to look at the list. The second is an induction in `xs`. Its
-`Nil{}` case is `0n` on both sides; its cons case reduces both sides to
-`P.is_odd(h)` added to the hypothesis at `t`. Annotate that step with the goal
-in which the term the hypothesis rewrites has been replaced by `_`, and close it
-with `{==}`.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.count_odd_prefix_zero(xs)` and `def L.count_odd_prefix_len(xs)`.
+- `count_odd_prefix_zero`: a count of `0n` gives `0n`, whatever the list is.
+- `count_odd_prefix_len`: counting over as many elements as the list has is
+  counting over the whole list, `count_odd_prefix(P.len(xs), xs) == P.count_odd(xs)`.
+- `count_odd_prefix_nil`: the empty list gives `0n`, whatever the count is.
+- `count_odd_prefix_step`: with a count of `1n + k` and a list `h <> t`, the
+  answer is `P.is_odd(h)` added to `count_odd_prefix(k, t)`.

@@ -1,15 +1,13 @@
-Implement `rev_append` on lists of `Nat`, then prove both laws.
+Implement `rev_append`, then prove the two laws in `LAWS.bend`.
 
-`rev_append(xs, ys)` must return `xs` reversed in front of `ys`; recurse on
-`xs`, with the empty list leaving the accumulator alone. `append` comes from
-the prelude.
+`rev_append(xs, ys)` is `xs` reversed and placed in front of `ys`.
 
-`rev_append_single` says reversing a one-element list onto an accumulator puts
-that element in front of it; since `rev_append` steps on the cons cell, it
-computes away by itself. `rev_append_append` says reversing a concatenation
-onto an accumulator is reversing the two pieces onto it in turn, the second
-piece outermost. That one is inductive in `xs`, and its step case is the
-hypothesis at the tail of `xs` with the head carried onto the accumulator.
+    rev_append([1n, 2n, 3n], [8n, 9n]) == [3n, 2n, 1n, 8n, 9n]
+    rev_append(Nil{}, [8n]) == [8n]
+    rev_append([5n], [8n]) == [5n, 8n]
 
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.rev_append_single(h, ys)` and `def L.rev_append_append(xs, ys, zs)`.
+The laws use `P.append(xs, ys)`, the concatenation of two lists.
+
+- `rev_append_single`: `rev_append(h <> Nil{}, ys)` is `h <> ys`.
+- `rev_append_append`: `rev_append(P.append(xs, ys), zs)` is
+  `rev_append(ys, rev_append(xs, zs))`.

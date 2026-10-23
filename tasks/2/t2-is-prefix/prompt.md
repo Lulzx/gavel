@@ -1,50 +1,21 @@
-Implement `is_prefix` on lists of `Nat`, then prove the five laws about it.
+Implement `is_prefix`, then prove the five laws in `LAWS.bend`.
 
-`is_prefix(xs, ys)` answers whether `xs` is the first part of `ys`: whether
-`ys` starts with `xs`. Recurse on both lists. The empty list is a prefix of
-everything, so `Nil{}` answers `True{}`. A cons cell looks at `ys`: if `ys` is
-empty there is nothing for the head to match and the answer is `False{}`, and
-if `ys` is `k <> u` the answer is the head's equality with `k` and the tail's
-prefix test, combined with `Bool.and`. `P.eq` and `P.append` come from the
-prelude.
+`is_prefix(xs, ys)` is `True{}` when `ys` starts with `xs`, that is, when `xs`
+is the first part of `ys`, element for element. The empty list is a prefix of
+every list. A non-empty list is not a prefix of the empty list, and a list
+longer than `ys` is never a prefix of it.
 
-`P.eq(a, b)` steps one successor off both of its arguments at once, so
-`P.eq(x, x)` on a variable `x` is stuck -- that it is `True{}` is a fact about
-`x`, not an unfolding. `P.append(xs, ys)` matches on its first argument, so with
-a variable `xs` it does not reduce either.
+    is_prefix([1n, 2n], [1n, 2n, 3n]) == True{}
+    is_prefix([2n], [1n, 2n])         == False{}
+    is_prefix([1n], Nil{})            == False{}
+    is_prefix(Nil{}, [1n])            == True{}
 
-The law `is_prefix_nil` fixes the answer on the empty input. It is the weak
-half: it is definitional, and the constant body `True{}` satisfies it.
+The laws use two prelude names. `P.eq(a, b)` is the `Bool` comparison of two
+`Nat`s. `P.append(xs, ys)` is the list `xs` followed by the list `ys`.
 
-The law `is_prefix_nil_right` fixes the other empty case, where it is `ys` that
-has run out. Its left-hand side is ground in that argument -- `is_prefix` steps
-on the cons cell and then finds `Nil{}` where it wants a second element -- and
-no other law here reaches that answer, because the cons law names its second
-argument as a cons cell. It is the law that rules out a body whose `Nil{}` case
-answers `True{}`.
-
-The law `is_prefix_cons` is the step, and it is definitional: it is the
-definition written out, and it says *which* elements have to line up. A body
-that compared the head against the wrong element, or that recursed on the wrong
-tail, does not have its two sides equal. It is satisfied by every body of the
-right shape, so it is not enough on its own -- it says nothing about where the
-recursion is handed.
-
-The law `is_prefix_append` is the first with real content, and it is the reason
-this task exists: prefixing `ys` with `xs` makes `xs` a prefix of the result. It
-is inductive in `xs`. `append` matches on its first argument, so with a variable
-`xs` the left-hand side does not reduce on its own, and the hypothesis has to
-carry the head comparison out of the `and` one element at a time. The constant
-body `False{}` fails it, because the right-hand side is `True{}` at every
-length, and a body that stopped after the first element fails it too.
-
-The law `is_prefix_self` says that every list is a prefix of itself. It is the
-second law with content, it is also inductive in `xs`, and it is not given away
-by `is_prefix_append`: `P.append(xs, Nil{})` is not `xs` to the checker. It ties
-the answer to the second argument's own elements rather than to a list built
-around them.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.is_prefix_nil(ys)`, `def L.is_prefix_nil_right(h, t)`,
-`def L.is_prefix_cons(h, k, t, u)`, `def L.is_prefix_append(xs, ys)` and
-`def L.is_prefix_self(xs)`.
+- `is_prefix_nil`: `is_prefix(Nil{}, ys)` is `True{}`.
+- `is_prefix_nil_right`: `is_prefix(h <> t, Nil{})` is `False{}`.
+- `is_prefix_cons`: `is_prefix(h <> t, k <> u)` is `Bool.and` of `P.eq(h, k)`
+  and `is_prefix(t, u)`: the heads are equal and the tails are a prefix.
+- `is_prefix_append`: `is_prefix(xs, P.append(xs, ys))` is `True{}`.
+- `is_prefix_self`: `is_prefix(xs, xs)` is `True{}`.

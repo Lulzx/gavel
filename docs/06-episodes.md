@@ -18,6 +18,11 @@ env.metrics.write("runs/metrics.json")
 `info` is the full `Verdict`: tier, reward, the laws proven and failed, every
 checker run, and the hashes of the task, the toolchain and the submission.
 
+An observation carries the task's `prompt`, the shared `primer`, the laws and
+the stub with their comments stripped, the prelude, and the proof header.
+`GavelEnv(..., hints=True)` (or `gavel serve --hints`) adds each task's
+`hints.md` as `hints`; otherwise it is `None`.
+
 The env is in-process and owns no threads. `gavel serve` wraps the same
 `handle` for other stacks over a Unix socket or loopback HTTP, and
 `examples/client.ts` is a client in TypeScript.

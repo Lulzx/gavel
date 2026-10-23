@@ -1,17 +1,12 @@
-Implement `replicate` on `Nat`, then prove both laws.
+Implement `replicate`, then prove the two laws in `LAWS.bend`.
 
-`replicate(n, x)` must return the list of `n` copies of `x`; recurse on `n`,
-with no steps producing the empty list. Every element of the result is a copy
-of `x`, so `x` is marked `+` -- duplicable -- in the signature the stub gives
-you. `len` comes from the prelude.
+`replicate(n, x)` is the list of `n` copies of `x`.
 
-`replicate_succ` says one more copy puts one more element in front; since
-`replicate` steps on the count, it computes away by itself.
+    replicate(3n, 7n) == [7n, 7n, 7n]
+    replicate(1n, 4n) == [4n]
+    replicate(0n, 4n) == Nil{}
 
-`replicate_len` says the result has as many elements as were asked for. That
-one is inductive in `n` -- `len` matches on its first argument, so the goal
-does not reduce on its own -- and its step case is the hypothesis at the
-predecessor, under the `1n +` that `len` produced.
+The laws use `P.len(xs)`, the number of elements of `xs`.
 
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.replicate_succ(n, x)` and `def L.replicate_len(n, x)`.
+- `replicate_succ`: `replicate(1n + n, x)` is `x <> replicate(n, x)`.
+- `replicate_len`: `replicate(n, x)` has `n` elements.

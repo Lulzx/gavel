@@ -1,75 +1,49 @@
-Implement `ins_at`, `insert` and `count`, then prove all nine laws.
+Implement `ins_at`, `insert` and `count`, then prove the nine laws in `LAWS.bend`.
 
-`insert(t, k)` is `t` with `k` stored in it: the keys already there are kept and
-`k` is added, so an ordered tree stays ordered. `count(t, x)` is how many keys
-in `t` are equal to `x`, counting equal keys rather than answering yes or no.
-The prelude owns the type (`P.Tip{}`, `P.Bin{l, key, r}`), the ordering
-predicate (`P.ordered`, built from `P.all_le` and `P.all_ge`), the comparison
-`P.le` and the indicator `P.is_eq`, which returns `1n` or `0n` rather than a
-`Bool` so that a count is a sum of indicators.
+The trees are the prelude's `P.Tree`: `P.Tip{}` is the empty tree and
+`P.Bin{l, key, r}` a node with key `key` and subtrees `l` and `r`.
 
-`insert_leaf`, `insert_le` and `insert_gt` are definitional pins. They fix what
-`insert` does on a one-node tree -- a key at most the node's goes to its left, a
-key greater goes to its right -- and they are what rules out an implementation
-that stores the key in the wrong place on a small tree.
+`insert(t, k)` is `t` with `k` added as a new leaf: every key already in `t`
+stays where it is, and the new node hangs below the existing ones, reached by
+going left at each node whose key is at least `k` and right at each node whose
+key is less than `k`. A key equal to a node's key therefore goes to its left.
+On the empty tree the answer is the one-node tree holding `k`.
 
-`ins_at_tip`, `ins_at_left` and `ins_at_right` are also definitional, and they
-are `ins_at`'s definition written out: one case for the tip and one per
-decision at a node. They are what makes the stub's first obligation an
-obligation. `ins_at` is reached by no law about `insert`, so without them a
-submission can put the descent wherever the gate allows -- including under
-`Policy.` -- and leave `ins_at` answering its own tree for full reward. A
-submission may still delegate the work to a `Policy.` helper; what it may not
-do is hand back something `ins_at` is not.
+`ins_at(t, c, k)` is the same insertion when the decision at the root of `t` has
+already been made and handed over as `c`: `True{}` means `k` goes into the left
+subtree, `False{}` the right. Below the root every decision is the usual one,
+`P.le(k, P.root_key(s))` for the subtree `s` being entered. On `P.Tip{}` the
+decision is ignored and the answer is the one-node tree holding `k`.
 
-`count_tip` is the third definitional pin, and it is the one that makes `count`
-a value rather than a difference. On its own `insert_count` fixes only how the
-count *changes*: `count(t, x) = 1n + <the real count>` satisfies it at every
-input, because the `1n` appears on both sides and cancels. `count_tip` names
-`count` at a closed term -- `S.count(P.Tip{}, x) == 0n` -- and `1n` is not `0n`.
-It is `count`'s base case, and since every tree is reached from `P.Tip{}` by
-inserts, the base plus the increment determine the function.
+`count(t, x)` is how many keys in `t` are equal to `x`; equal keys are counted
+separately, and the empty tree counts `0n`.
 
-`insert_ordered` and `insert_count` are the work.
+    insert(P.Bin{P.Tip{}, 5n, P.Tip{}}, 2n) == P.Bin{P.Bin{P.Tip{}, 2n, P.Tip{}}, 5n, P.Tip{}}
+    insert(P.Bin{P.Bin{P.Tip{}, 2n, P.Tip{}}, 5n, P.Tip{}}, 7n) == P.Bin{P.Bin{P.Tip{}, 2n, P.Tip{}}, 5n, P.Bin{P.Tip{}, 7n, P.Tip{}}}
+    ins_at(P.Bin{P.Tip{}, 5n, P.Tip{}}, False{}, 2n) == P.Bin{P.Tip{}, 5n, P.Bin{P.Tip{}, 2n, P.Tip{}}}
+    count(P.Bin{P.Bin{P.Tip{}, 5n, P.Tip{}}, 5n, P.Tip{}}, 5n) == 2n
 
-`insert_ordered` is the invariant law. It is stated as an implication: the
-statement carries `for e: {P.ordered(t) == True{} : Bool}` and what is to be
-proved is `P.ordered(S.insert(t, k)) == True{}`. That premise is not decorative
--- an insert into an unordered tree is not claimed to produce anything -- and
-the proof cannot skip it: `P.ordered` on a variable tree is stuck, so the step
-has to unfold both the tree and the premise, and what is left is a pair of
-bound lemmas, one per side of every node. Each of those is an induction of its
-own, and each has to be generalized over the bound `b`. `P.root_key` is in the
-prelude for the comparison the descent needs at the next node down.
+Prelude names: `P.le(a, b)` is `True{}` when `a` is at most `b`.
+`P.root_key(t)` is the key at the root of `t`, and `0n` for `P.Tip{}`.
+`P.all_le(t, b)` says every key in `t` is at most `b`, and `P.all_ge(t, b)` that
+every key is at least `b`. `P.ordered(t)` says that at every node all keys in
+the left subtree are at most the node's key and all keys in the right subtree
+at least it. `P.is_eq(a, b)` is `1n` when `a` and `b` are equal and `0n`
+otherwise.
 
-`insert_count` is the multiset law: the count at a key goes up by exactly one
-when that key is the one inserted. It needs no invariant hypothesis, only
-arithmetic. After the induction hypothesis the inserted key's indicator is
-nested inside the subtree it landed in and has to become a term of the whole
-sum, which is one reassociation -- plus one commutation, because `Nat.add`
-matches on its *left* argument and will not move a term past a variable on its
-own. `a + 0n` is stuck for the same reason, so even the leaf case is not
-definitional, and `P.is_eq(x, x)` is `1n` only by an induction of its own.
-
-Two things about the shape of the descent, both of which the checker enforces
-with an error rather than a warning, and both of which are why `ins_at` is
-declared in the stub rather than left to you. A `match` cannot scrutinise a
-computed value: `match P.le(k, key):` is refused with "a parameter or field
-scrutinee (a match cannot scrutinize a computed value: give it its own def)", so
-the decision has to be a parameter of a def. And two defs may not call each
-other: an `insert` that calls `ins_at` which calls `insert` again is refused
-with "a decreasing self-call (arguments are read left to right: each passed
-unchanged until one shrinks)". `ins_at` is therefore its own recursion, with the
-subtree it is descending into and the decision it was handed as its first two
-parameters, computing the next decision itself. Its pattern variables are Lone
-and a variable bound by a pattern is usable live once per branch: destructuring
-a node and *also* passing the node on is "consumed more than once", so pass the
-parts reassembled.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.insert_leaf(k)`, `def L.insert_le(x, y, e)`, `def L.insert_gt(x, y, e)`,
-`def L.ins_at_tip(c, k)`, `def L.ins_at_left(l, key, r, k)`,
-`def L.ins_at_right(l, key, r, k)`, `def L.count_tip(x)`,
-`def L.insert_ordered(t, k, e)` and
-`def L.insert_count(t, k, x)`. Proof helpers go under the reserved `Policy.`
-namespace, which the gate ignores, and none of them may cite a law.
+- `insert_leaf`: inserting `k` into the empty tree gives the one-node tree
+  holding `k`.
+- `insert_le`: when `y` is at most `x`, inserting `y` into the one-node tree
+  holding `x` puts `y` in a new left leaf.
+- `insert_gt`: when `y` is not at most `x`, inserting `y` into the one-node tree
+  holding `x` puts `y` in a new right leaf.
+- `ins_at_tip`: `ins_at` on the empty tree gives the one-node tree holding `k`,
+  whatever the decision `c`.
+- `ins_at_left`: `ins_at` on `P.Bin{l, key, r}` with decision `True{}` keeps
+  `key` and `r` and replaces `l` by `ins_at(l, P.le(k, P.root_key(l)), k)`.
+- `ins_at_right`: `ins_at` on `P.Bin{l, key, r}` with decision `False{}` keeps
+  `l` and `key` and replaces `r` by `ins_at(r, P.le(k, P.root_key(r)), k)`.
+- `insert_ordered`: when `t` is ordered, `insert(t, k)` is ordered.
+- `insert_count`: the count of `x` in `insert(t, k)` is the count of `x` in `t`
+  plus `P.is_eq(k, x)`, so it goes up by one exactly when `k` is `x`.
+- `count_tip`: the empty tree counts `0n` of any key.

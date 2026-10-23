@@ -1,34 +1,20 @@
-Implement `tree_fold` on the prelude's tree, then prove the laws that pin it.
+Implement `tree_fold`, then prove the three laws in `LAWS.bend`.
 
-The prelude declares `Tree` with a `P.Leaf{v}` carrying a number and a
-`P.Node{l, r}` carrying two subtrees, and it declares `P.flatten`, the leaf
-values of a tree read left to right.
+The prelude's `P.Tree` is either `P.Leaf{v}`, a leaf carrying a `Nat`, or
+`P.Node{l, r}`, a node with two subtrees.
 
-`tree_fold(t, acc)` must read the leaves of `t` into the accumulator `acc`.
-Recurse on `t`: a leaf returns `v <> acc`, putting its own value in front of the
-accumulator, and a node returns `tree_fold(l, tree_fold(r, acc))`, folding the
-right subtree first and then folding the left subtree onto the result. The
-accumulator therefore comes out at the far end, with the tree's leaves in front
-of it.
+`tree_fold(t, acc)` is the leaf values of `t`, read left to right, followed by
+the list `acc`. A leaf gives its value in front of `acc`.
 
-The law `tree_fold_leaf` is definitional: the fold matches on a leaf, so both
-sides are `v <> acc`. It fixes what a leaf is worth -- a body that put the
-accumulator in front of the value does not satisfy it.
+    tree_fold(P.Leaf{4n}, [9n]) == [4n, 9n]
+    tree_fold(P.Node{P.Leaf{1n}, P.Leaf{2n}}, [9n]) == [1n, 2n, 9n]
+    tree_fold(P.Node{P.Leaf{1n}, P.Leaf{2n}}, Nil{}) == [1n, 2n]
 
-The law `tree_fold_node` is definitional too, and it fixes the order: the
-right subtree is folded first and the left is folded onto the result.
+The laws use the prelude's `P.flatten(t)`, the leaf values of `t` read left to
+right, and `P.append(xs, ys)`, the list `xs` followed by the list `ys`.
 
-The law `tree_fold_flatten` is the one with content. It says the fold's answer
-is `P.flatten(t)` with the accumulator on the end -- the leaves come out in the
-order `P.flatten` puts them in, and the accumulator is a suffix rather than
-something the fold consumes or reorders. The two definitional laws already
-determine the fold; this is the statement that gives it meaning, and it is
-where the work is. It is an induction in the tree, and it does not close
-definitionally: after the two induction hypotheses land, one side has the two
-flattened lists nested and the other has them side by side, so you need the
-reassociation of `P.append`. That is a list lemma, an induction on the list
-rather than on the tree, and the prelude does not supply it.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.tree_fold_leaf(v, acc)`, `def L.tree_fold_node(l, r, acc)` and
-`def L.tree_fold_flatten(t, acc)`.
+- `tree_fold_leaf`: folding `P.Leaf{v}` onto `acc` gives `v <> acc`.
+- `tree_fold_node`: folding `P.Node{l, r}` onto `acc` is folding `l` onto the
+  result of folding `r` onto `acc`.
+- `tree_fold_flatten`: folding `t` onto `acc` is `P.flatten(t)` followed by
+  `acc`.

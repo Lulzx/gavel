@@ -17,9 +17,10 @@ something that is not a solution. Gavel's answer to each is simple.
    two-law inductive proof takes well under a second, so a check can sit
    inside a training loop.
 2. **Soundness.** A proof may only cite laws declared earlier in the file, so
-   circular proofs are structurally impossible. And a law is only admitted to
-   the bank once it has been shown, mechanically, that no wrong solution can
-   satisfy it. Most of the engineering here is in that second half.
+   circular proofs are structurally impossible. And a law set is only admitted
+   to the bank once wrong solutions have been run against it, mechanically and
+   without a proof, and none of them satisfies it. Most of the engineering
+   here is in that second half.
 
 The failure modes worth worrying about are in the laws, not the checker.
 A law like `add(x, 0) == x` is satisfied by `add(a, b) = a`, and it earns full
@@ -30,6 +31,7 @@ and [the laws page](docs/04-laws.md) is the reasoning behind how.
 
 ```
 uv sync
+uv run python -m toolchain.fetch --bun              # the pinned bun
 uv run gavel list                                   # tasks by tier
 uv run gavel info t1-add-plus                       # prompt, laws, stub
 uv run gavel check t1-add-plus --reference          # the reference earns 1.0
@@ -63,7 +65,8 @@ Details in [reward](docs/03-reward.md).
 ```
 gavel/          the harness: gate, runner, check protocol, reward, env, cache, server
 toolchain/      the vendored, pinned checker
-tasks/<tier>/   task definitions: prompt, LAWS.bend, prelude.bend, stub
+tasks/<tier>/   task definitions: prompt, hints, LAWS.bend, prelude.bend, stub
+tasks/PRIMER.md the Bend primer every observation carries
 references/     hidden reference solutions, proofs and mutants
 tools/          offline authoring tools, none of which run in the reward path
 tests/          the suite, including the adversarial corpus
@@ -87,5 +90,7 @@ measurement of the real checker forced a departure from the spec.
 ## Status
 
 The harness runs end to end and has been soaked for ten thousand episodes.
-The bank holds 239 tasks across five tiers. What it still owes is in
-`docs/PLAN.md`, and the largest item is a human reading of every tier-3+ law set.
+The bank holds 239 tasks across five tiers, and every one passes V1–V6 and the
+prompt contract. What it still owes is in `docs/PLAN.md`: a solve rate from a
+real model (`tools/calibrate.py` is ready and has not been run against one),
+and a human reading of every tier-3+ law set.

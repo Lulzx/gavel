@@ -7,13 +7,35 @@ Everything after that is a measurement, so it is a gate rather than a maxim.
 one it has not passed:
 
 ```
-files, derive, screens, mutants, V1-V5, episode, review, publish
+files, derive, screens, mutants, V1-V6, episode, review, publish
 ```
 
 The `screens` stage refuses the two shapes where nothing constrains a target
 at all: a target named only inside a premise, and a target no law names. A
 refusal there costs a two-line fix. The same defect found after a mutant
 corpus has been written against it costs the corpus too.
+
+## The problem statement
+
+A task's text is three files with three readers:
+
+- `tasks/PRIMER.md`, shared by every task: the file layout, the naming rules,
+  and how the checker reads a proof. Every observation carries it.
+- `prompt.md`, the specification: what each target computes, with worked
+  examples, and each law in words. It is all a policy is shown by default.
+- `hints.md`, how the reference was written and proved. An observation carries
+  it only when the env is built with `hints=True`, so a guided run is a
+  setting and not a property of how much a prompt gave away.
+
+The prompts used to be all three at once, and the same paragraphs on Lone
+variables and rewrite direction were written out in dozens of them. Validation
+holds `prompt.md` to a contract (`_prompt_contract` in `gavel/validate.py`):
+every law named, any stated law count right, no line of the reference body, and
+none of the words a proof is described in. Before the split, 16 prompts stated
+the wrong number of laws, 36 quoted the reference body, and about 10 never
+named one of their laws. `tools/prompts.py check` also evaluates every worked
+example (`    f(args) == value`) against the reference. The law file and the
+stub are shown without their comments, which are the author's notes.
 
 ## The review checkpoint
 

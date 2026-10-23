@@ -4,7 +4,8 @@
   "laws": [
     "sum_prefix_zero",
     "sum_prefix_len",
-    "sum_prefix_nil"
+    "sum_prefix_nil",
+    "sum_prefix_step"
   ],
   "policy_targets": [
     "sum_prefix"
@@ -12,7 +13,7 @@
   "prelude_defs": [],
   "proof_header": "import Base\nimport ./prelude.bend as P\nimport ./solution.bend as S\nimport ./LAWS.bend as L\n",
   "hashes": {
-    "laws": "a4206b058fe2708714e7c2c8a46e824cf9a8edf2f37965f0914bbeb4bcafb84f",
+    "laws": "f0c8a9d7b9a033e3b78d72e710f8ac3b1d11ef30c39ac12e44e8a82cc3a2d35f",
     "prelude": "75a1f07503abb8f71b581b49d3d50001ef630ab1512fbe016040ad7dd8faff40"
   },
   "bend_version": "2.0.5"

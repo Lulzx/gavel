@@ -1,35 +1,20 @@
-Implement `pairs` on a list of `Nat`, then prove all four laws.
+Implement `pairs`, then prove the four laws in `LAWS.bend`.
 
-`pairs(xs)` packs each element with the one after it: `pairs([1n, 2n, 3n])` is
-`[P.MkPair{1n, 2n}, P.MkPair{2n, 3n}]`. A lone last element has no neighbour
-and is dropped, so `pairs([1n])` is `Nil{}` and `pairs(Nil{})` is `Nil{}`. Both
-matches are needed: the outer one splits off the first element, and the inner
-one on the tail tells you whether there is a second. The result is built with
-`P.MkPair{a, b}`, the record the prelude declares.
+`pairs(xs)` is the list of the neighbouring pairs of `xs`, left to right: each
+element is paired with the one after it, as `P.MkPair{a, b}`. A list of `n`
+elements gives `n - 1` pairs, and a list of fewer than two elements gives
+`Nil{}`. The pairs overlap, so a middle element appears in two of them.
 
-The prelude is immutable and already has the vocabulary the laws are stated in:
-`P.MkPair{a, b}`, `P.len`, the length of a list of `Nat`, and `P.plen`, the
-length of a list of pairs -- `len` does not take the pair type, and `plen` does
-not look inside a pair.
+    pairs([1n, 2n, 3n]) == P.MkPair{1n, 2n} <> P.MkPair{2n, 3n} <> Nil{}
+    pairs([5n]) == Nil{}
+    pairs([4n, 7n]) == P.MkPair{4n, 7n} <> Nil{}
 
-`pairs_nil` fixes the answer on an empty input and `pairs_single` on a
-one-element one; the step law below only names lists of two or more elements, so
-neither covers the other's case, and `pairs_single` is what catches a body that
-packed the last element with nothing.
+The result is a `List<&2, P.Pair>`. The laws use `P.len(xs)`, the number of
+elements of a `List<Nat>`, and `P.plen(ps)`, the number of pairs in a list of
+`P.Pair`.
 
-`pairs_cons` is the step: the first two elements are packed together, and the
-answer continues with the pairs of the tail *from the second element on*. It is
-the law that says which number goes in which component, and it is the only law
-here that looks inside a pair at all -- a body that built `P.MkPair{h, x}`
-instead has the right shape everywhere else, and a body that recursed on `t`
-instead of on `b <> t` answers a list that is short by a pair.
-
-`pairs_len` is the count law, and it is the one law here that is not
-definitional: with `x` on the front, `pairs` is stuck, so the two sides do not
-compute and the induction is the proof. It pins how many pairs there are -- the
-answer is one shorter than the input -- while `pairs_cons` pins which pairs they
-are.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.pairs_nil()`, `def L.pairs_single(x)`, `def L.pairs_cons(a, b, t)` and
-`def L.pairs_len(xs, x)`.
+- `pairs_nil`: `pairs(Nil{})` is `Nil{}`.
+- `pairs_single`: `pairs(x <> Nil{})` is `Nil{}`.
+- `pairs_cons`: `pairs(a <> (b <> t))` is `P.MkPair{a, b}` followed by
+  `pairs(b <> t)`.
+- `pairs_len`: `pairs(x <> xs)` has `P.len(xs)` pairs.

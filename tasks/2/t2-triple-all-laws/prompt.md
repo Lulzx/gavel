@@ -1,27 +1,17 @@
-Implement `triple_all` on `List<Nat>`, then prove the two laws about it.
+Implement `triple_all`, then prove the two laws in `LAWS.bend`.
 
-`triple_all(xs)` replaces every element with its triple. Match on the list: `Nil{}` is
-`Nil{}`, and a cons cell conses its triple of the head onto the mapped tail.
-`append` and `triple` come from the prelude.
+`triple_all(xs)` is the list of the same length as `xs` in which every element
+`n` is replaced by `n + n + n`, in the same order. The empty list maps to the
+empty list.
 
-The laws are the one-element case and the append case:
+    triple_all([1n, 4n]) == [3n, 12n]
+    triple_all([0n]) == [0n]
+    triple_all(Nil{}) == Nil{}
 
-    S.triple_all(h <> Nil{}) == (P.triple(h)) <> Nil{}
-    S.triple_all(P.append(xs, ys)) == P.append(S.triple_all(xs), S.triple_all(ys))
+The laws use the prelude's `P.triple(n)`, which is `n + n + n`, and
+`P.append(xs, ys)`, the list `xs` followed by the list `ys`.
 
-The first is the weak half: it is definitional, and it fixes one-element lists
-only -- a body that mapped a singleton and did something else with longer lists
-satisfies it. The second is the one that pins `triple_all`: it is satisfied by the
-identity body, which maps a concatenation to itself, and the base law is what
-rules that body out. It is inductive in `xs` -- `append` matches on its first
-argument, so with a variable `xs` the left-hand side does not reduce on its
-own.
-
-The first law's proof is `{==}`: the match steps on the cons cell and the tail
-is `Nil{}`. The second is an induction in `xs`; its cons case puts the mapped
-head outside on both sides, leaving the hypothesis at `t`. Annotate that step
-with the goal in which the term the hypothesis rewrites has been replaced by
-`_`, and close it with `{==}`.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.triple_all_single(h)` and `def L.triple_all_append(xs, ys)`.
+- `triple_all_single`: mapping the one-element list `[h]` gives the one-element
+  list holding `P.triple(h)`.
+- `triple_all_append`: mapping a concatenation is the concatenation of the two
+  mapped lists.

@@ -1,27 +1,15 @@
-Implement `mod3_all` on `List<Nat>`, then prove the two laws about it.
+Implement `mod3_all`, then prove the two laws in `LAWS.bend`.
 
-`mod3_all(xs)` replaces every element with the element modulo three. Match on the list: `Nil{}` is
-`Nil{}`, and a cons cell conses the element modulo three of the head onto the mapped tail.
-`append` and `mod3` come from the prelude.
+`mod3_all(xs)` is `xs` with every element replaced by its remainder modulo
+three, in the same order and with the same length.
 
-The laws are the one-element case and the append case:
+    mod3_all([4n, 6n, 8n]) == [1n, 0n, 2n]
+    mod3_all([]) == Nil{}
+    mod3_all([2n]) == [2n]
 
-    S.mod3_all(h <> Nil{}) == (P.mod3(h)) <> Nil{}
-    S.mod3_all(P.append(xs, ys)) == P.append(S.mod3_all(xs), S.mod3_all(ys))
+The laws use `P.mod3(n)`, the remainder of `n` modulo three, and
+`P.append(xs, ys)`, the concatenation of two lists.
 
-The first is the weak half: it is definitional, and it fixes one-element lists
-only -- a body that mapped a singleton and did something else with longer lists
-satisfies it. The second is the one that pins `mod3_all`: it is satisfied by the
-identity body, which maps a concatenation to itself, and the base law is what
-rules that body out. It is inductive in `xs` -- `append` matches on its first
-argument, so with a variable `xs` the left-hand side does not reduce on its
-own.
-
-The first law's proof is `{==}`: the match steps on the cons cell and the tail
-is `Nil{}`. The second is an induction in `xs`; its cons case puts the mapped
-head outside on both sides, leaving the hypothesis at `t`. Annotate that step
-with the goal in which the term the hypothesis rewrites has been replaced by
-`_`, and close it with `{==}`.
-
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.mod3_all_single(h)` and `def L.mod3_all_append(xs, ys)`.
+- `mod3_all_single`: `mod3_all(h <> Nil{})` is `P.mod3(h) <> Nil{}`.
+- `mod3_all_append`: `mod3_all(P.append(xs, ys))` is
+  `P.append(mod3_all(xs), mod3_all(ys))`.

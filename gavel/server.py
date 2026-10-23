@@ -79,6 +79,7 @@ class GavelServer:
     max_turns: int = 4
     backend: str = "auto"
     store_actions: bool = False
+    hints: bool = False
     cache: VerdictCache | None = None
     trajectory: Trajectory | None = None
     metrics: Metrics = field(default_factory=Metrics)
@@ -182,7 +183,7 @@ class GavelServer:
                        mode=self.mode, max_turns=self.max_turns,
                        config=CheckConfig(backend=self.backend),
                        cache=self.cache, trajectory=self.trajectory,
-                       store_actions=self.store_actions)
+                       store_actions=self.store_actions, hints=self.hints)
         # Every session's episodes land in the server's one report, because a
         # report is about the run and the run is every client.
         env.metrics = self.metrics

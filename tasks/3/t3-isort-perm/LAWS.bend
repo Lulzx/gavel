@@ -39,3 +39,36 @@ law isort_keep:
   for +y: Nat
   for e: {P.le(x, y) == True{} : Bool}
   {S.isort(x <> y <> Nil{}) == x <> y <> Nil{} : List<&2, Nat>}
+
+# LAW: a number at most the head goes in front of it. The four laws above say
+# that `insert` and `isort` keep every count and that `isort` orders a list of
+# two, and nothing about a list of three: **measured** by `tools/holes.py`, the
+# shipped mutant `isort-tail-not-sorted` -- `insert(t, h)`, inserting the head
+# into the *unsorted* tail -- keeps every count, orders every pair, and answers
+# `[0n, 1n, 0n]` for `[0n, 1n, 0n]`. V2 had read it as killed by the reference
+# proof of `isort_count`, which is a fact about that proof's shape. This law and
+# the next fix `insert` on every cons; `insert_count` already fixes it on
+# `Nil{}`, where the only list holding exactly one `y` is `y <> Nil{}`.
+law insert_before:
+  for +h: Nat
+  for t: List<&2, Nat>
+  for +y: Nat
+  for e: {P.le(y, h) == True{} : Bool}
+  {S.insert(h <> t, y) == y <> h <> t : List<&2, Nat>}
+
+# LAW: a number above the head goes into the rest. The other half of the case
+# split on `P.le(y, h)`.
+law insert_after:
+  for +h: Nat
+  for t: List<&2, Nat>
+  for +y: Nat
+  for e: {P.le(y, h) == False{} : Bool}
+  {S.insert(h <> t, y) == h <> S.insert(t, y) : List<&2, Nat>}
+
+# LAW: sorting a cons is inserting its head into the sorted rest. With the two
+# laws above this determines `isort` on every list; `isort_count` fixes it on
+# `Nil{}`, since a list with no copies of anything is `Nil{}`.
+law isort_cons:
+  for h: Nat
+  for t: List<&2, Nat>
+  {S.isort(h <> t) == S.insert(S.isort(t), h) : List<&2, Nat>}

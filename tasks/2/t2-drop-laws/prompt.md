@@ -1,16 +1,17 @@
-Implement `drop` on lists of `Nat`, then prove both laws.
+Implement `drop`, then prove the three laws in `LAWS.bend`.
 
-`drop(n, xs)` must remove the first `n` elements of `xs`; recurse on `n`, with
-no steps leaving the list alone. A list that runs out before the count does is
-empty. `append` and `len` come from the prelude.
+`drop(n, xs)` removes the first `n` elements of `xs` and returns the rest. With
+`n` equal to `0n` the list comes back unchanged. If `xs` has fewer than `n`
+elements the answer is the empty list.
 
-`drop_succ` is the successor case: one step of the count removes one cons cell;
-since `drop` steps on the count, it computes away by itself.
+    drop(2n, [5n, 6n, 7n]) == [7n]
+    drop(0n, [5n])         == [5n]
+    drop(5n, [5n])         == Nil{}
 
-`drop_append_len` says dropping as many elements as `xs` has leaves the rest of
-`xs <> ys`, namely `ys`. That one is inductive in `xs` -- `len` and `append`
-both match on their first argument, so the goal does not reduce on its own --
-and its step case is the hypothesis at the tail of `xs`.
+The laws use two prelude names. `P.len(xs)` is the number of elements of `xs`.
+`P.append(xs, ys)` is the list `xs` followed by the list `ys`.
 
-Write the implementation in `solution.bend` and the proofs in `PROOF.bend`, as
-`def L.drop_succ(k, h, t)` and `def L.drop_append_len(xs, ys)`.
+- `drop_succ`: `drop(1n + k, h <> t)` is `drop(k, t)`.
+- `drop_append_len`: dropping `P.len(xs)` elements from `P.append(xs, ys)` leaves
+  `ys`.
+- `drop_nil`: `drop(k, Nil{})` is `Nil{}`, whatever `k` is.
